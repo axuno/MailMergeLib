@@ -13,7 +13,7 @@ using MailKit.Security;
 namespace MailMergeLib
 {
 	/// <summary>
-	/// Sends MailMergeMessages to an SMTP server. It uses System.Net.Mail.SmtpClient for low level operations.
+	/// Sends MailMergeMessages to an SMTP server. It uses MailKit.Net.Smtp.SmtpClient for low level operations.
 	/// </summary>
 	public class MailMergeSender : IDisposable
 	{
