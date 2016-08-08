@@ -1,4 +1,4 @@
 # MailMergeLib
-MailMergeLib is a SMTP mail client library which provides comfortable mail merge capabilities for plain and HTML text, including inline images and attachments. MailMergLib has good throughput for sending mail messages and is nicely fault-tolerant for unattended production systems.
+MailMergeLib is a SMTP mail client library which provides comfortable mail merge capabilities e.g. by placeholders for plain and HTML text, including inline images and attachments. MailMergLib has good sending throughput by sending mail messages in parallel and it is nicely fault-tolerant for unattended production systems.
 
 
