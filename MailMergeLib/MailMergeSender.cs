@@ -513,8 +513,8 @@ namespace MailMergeLib
 		/// </summary>
 		private SmtpClient GetConfiguredSmtpClient()
 		{
-var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
-			//var smtpClient = SmtpClientConfig.ProtocolLogger != null ? new SmtpClient(SmtpClientConfig.ProtocolLogger) : new SmtpClient();
+			//var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
+			var smtpClient = SmtpClientConfig.ProtocolLogger != null ? new SmtpClient(SmtpClientConfig.ProtocolLogger) : new SmtpClient();
 			smtpClient.Timeout = SmtpClientConfig.Timeout;
 			smtpClient.LocalDomain = SmtpClientConfig.LocalHostName;
 			// smtp.AuthenticationMechanisms.Remove("XOAUTH2");
