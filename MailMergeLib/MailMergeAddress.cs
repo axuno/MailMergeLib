@@ -82,11 +82,6 @@ namespace MailMergeLib
 		/// </summary>
 		public Encoding DisplayNameCharacterEncoding { get; set; }
 
-		/// <summary>
-		/// Gets or sets the TextVariableManager for replacing placeholders
-		/// by variable values.
-		/// </summary>
-		internal TextVariableManager TextVariableManager { get; set; }
 
 		/// <summary>
 		/// Gets the MailAddress representation of the MailMergeAddress.
@@ -94,13 +89,13 @@ namespace MailMergeLib
 		/// <returns>Returns a MailAddress ready to be used for a MailAddress, or Null if no address part exists.</returns>
 		/// <exception cref="NullReferenceException">Throws a NullReferenceException if TextVariableManager is null.</exception>
 		/// <exception cref="FormatException">Throws a FormatException if the computed MailAddress is not valid.</exception>
-		internal MailboxAddress GetMailAddress()
+		internal MailboxAddress GetMailAddress(MailSmartFormatter formatter, object dataItem)
 		{
-			string address = TextVariableManager.Process(Address, false);
-			string displayName = TextVariableManager.Process(DisplayName, false);
+			string address = formatter.Format(Address, dataItem);
+			string displayName = formatter.Format(DisplayName, dataItem);
 			if (string.IsNullOrEmpty(displayName)) displayName = null;
 
-			// let caller decide how to deal with empty or illegal address parts
+			// let MimeKit decide how to deal with empty or illegal address parts
 			// which exist after replacing placeholders with values.
 			try
 			{
@@ -117,17 +112,6 @@ namespace MailMergeLib
 			return mailAddress;
 		}
 
-		/// <summary>
-		/// Convert the MailMergeAddress to a string.
-		/// </summary>
-		/// <returns>Return the string representation of the MailMergeAddress, 
-		/// with all placeholders replaced by variable values.</returns>
-		public override string ToString()
-		{
-			var addr = GetMailAddress();
-			return addr?.ToString() ?? string.Empty;
-		}
-
 		private static void ParseMailAddress(string inputAddr, out string displayName, out string address)
 		{
 			displayName = null;
@@ -137,6 +121,7 @@ namespace MailMergeLib
 				return;
 
 			inputAddr = inputAddr.Trim();
+
 			// display name should start with quotation mark
 			int pos = inputAddr.IndexOf('"');
 			if (pos == 0)

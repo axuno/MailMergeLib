@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using MailKit;
+using MailMergeLib.SmartFormatMail.Core.Settings;
+using MailMergeLiba;
 using MimeKit;
 
 [assembly: CLSCompliant(false)]
@@ -22,23 +24,20 @@ namespace MailMergeLib
 
 		private MimeEntity _textMessagePart;  // plain text and/or html text, maybe with inline attachments
 		private List<MimePart> _attachmentParts;
-		private readonly TextVariableManager _textVariableManager;
 		private static readonly object _syncRoot = new object();
 
 		#endregion
 
 		#region *** Private fields for Encoding and Globalization ***
 
-		private CultureInfo _cultureInfo = Thread.CurrentThread.CurrentCulture;
-
 		#endregion
 
 		#region *** Private lists for tracking errors ***
 
-		private readonly List<string> _badAttachmentFiles = new List<string>();
-		private readonly List<string> _badMailAddr = new List<string>();
-		private List<string> _badInlineFiles = new List<string>();
-		private List<string> _badVariableNames = new List<string>();
+		private readonly HashSet<string> _badAttachmentFiles = new HashSet<string>();
+		private readonly HashSet<string> _badMailAddr = new HashSet<string>();
+		private HashSet<string> _badInlineFiles = new HashSet<string>();
+		private HashSet<string> _badVariableNames = new HashSet<string>();
 
 		#endregion
 
@@ -73,12 +72,9 @@ namespace MailMergeLib
 			TextTransferEncoding = ContentEncoding.SevenBit;
 			CharacterEncoding = Encoding.Default;
 
-			_textVariableManager = new TextVariableManager
-			                       	{
-			                       		CultureInfo = CultureInfo,
-			                       		ShowNullAs = string.Empty,
-			                       		ShowEmptyAs = string.Empty
-			                       	};
+			SmartFormatter.ErrorAction = ErrorAction.Ignore;
+			SmartFormatter.Parser.ErrorAction = ErrorAction.ThrowError;
+			// Todo: ShowNullAs = string.Empty, ShowEmptyAs = string.Empty. z.B. mit: Smart.Format("{Name:choose(null|):N/A|leer|{Name}}", abc) wobei abc.Name NULL, string.Emtpy oder ein string sein kann
 
 			MailMergeMessage msg = this;
 			MailMergeAddresses = new MailMergeAddressCollection(ref msg);
@@ -182,17 +178,15 @@ namespace MailMergeLib
 		public ContentEncoding BinaryTransferEncoding { get; set; }
 
 		/// <summary>
-		/// Gets or sets the culture info to apply for any variable formatting (like date, time etc.)
+		/// Gets or sets the culture info to apply for any variable formatting (like date, time etc.).
+		/// Default: CultureInfo of the current thread.
 		/// </summary>
-		public CultureInfo CultureInfo
-		{
-			get { return _cultureInfo; }
-			set
-			{
-				_cultureInfo = value;
-				_textVariableManager.CultureInfo = _cultureInfo;
-			}
-		}
+		public CultureInfo CultureInfo { get; set; } = Thread.CurrentThread.CurrentCulture;
+
+		/// <summary>
+		/// Gets or sets the instance of the MailSmartFormatter (derived from SmartFormat.NET's SmartFormatter) which will be used with MailMergeLib.
+		/// </summary>
+		public MailSmartFormatter SmartFormatter { get; set; } = new MailSmartFormatter(ErrorAction.ThrowError, ErrorAction.Ignore);
 		
 		/// <summary>
 		/// Converts the HtmlText property into plain text (without tags or html entities)
@@ -221,16 +215,6 @@ namespace MailMergeLib
 		}
 
 		/// <summary>
-		/// Gets the TextVariableManager used by the MailMergeMessage
-		/// for processing the message text parts.
-		/// </summary>
-		/// <returns>Returns the TextVariableManager used by the current MailMergeMessage.</returns>
-		public TextVariableManager GetTextVariableManager()
-		{
-			return _textVariableManager;
-		}
-
-		/// <summary>
 		/// Gets the MimeMessage representation of the MailMergeMessage for a specific data item.
 		/// </summary>
 		/// <param name="dataItem">
@@ -244,15 +228,13 @@ namespace MailMergeLib
 		{
 			lock (_syncRoot)
 			{
-				_textVariableManager.DataItem = dataItem;
-
 				var mimeMessage = new MimeMessage();
-				AddSubjectToMailMessage(mimeMessage);
-				AddAttributesToMailMessage(mimeMessage);
-				AddAddressesToMailMessage(mimeMessage);
+				AddSubjectToMailMessage(mimeMessage, dataItem);
+				AddAttributesToMailMessage(mimeMessage, dataItem);
+				AddAddressesToMailMessage(mimeMessage, dataItem);
 
-				BuildTextMessagePart();
-				BuildAttachmentPartsForMessage();
+				BuildTextMessagePart(dataItem);
+				BuildAttachmentPartsForMessage(dataItem);
 
 				var exceptions = new List<Exception>();
 
@@ -323,6 +305,9 @@ namespace MailMergeLib
 			Dispose(false);
 		}
 
+		/// <summary>
+		/// Dispose MailMergeMessage
+		/// </summary>
 		public void Dispose()
 		{
 			Dispose(true);
@@ -373,25 +358,18 @@ namespace MailMergeLib
 		/// Gets or sets the local base directory of HTML content.
 		/// It useful for retrieval of inline attachments (linked resources of the HTML body).
 		/// </summary>
-		public string FileBaseDir
-		{
-			get { return _textVariableManager.FileBaseDir; }
-			set { _textVariableManager.FileBaseDir = value; }
-		}
+		public string FileBaseDir { get; set; }
 
 		/// <summary>
 		/// Replaces all variables in the text with their corresponding values.
 		/// Used for subject, body and attachment.
 		/// </summary>
 		/// <param name="text">Text to search and replace.</param>
+		/// <param name="dataItem"></param>
 		/// <returns>Returns the text with all variables replaced.</returns>
-		private StringBuilder SearchAndReplaceVars(StringBuilder text)
+		private string SearchAndReplaceVars(string text, object dataItem)
 		{
-			_textVariableManager.Text = text;
-			StringBuilder toReturn = _textVariableManager.Process();
-			_badVariableNames = _textVariableManager.BadVariables;
-			_badInlineFiles = _textVariableManager.BadFiles;
-			return toReturn;
+			return SmartFormatter.Format(CultureInfo, text, dataItem);
 		}
 
 		/// <summary>
@@ -420,13 +398,11 @@ namespace MailMergeLib
 		/// Prepares the mail message subject:
 		/// Replacing placeholders with their values and setting correct encoding.
 		/// </summary>
-		private void AddSubjectToMailMessage(MimeMessage msg)
+		private void AddSubjectToMailMessage(MimeMessage msg, object dataItem)
 		{
-			var subject = new StringBuilder(Subject);
-			subject = SearchAndReplaceVars(subject);
-
-			msg.Subject = subject.ToString();
-			msg.Headers.Add(HeaderId.Subject, CharacterEncoding, msg.Subject);
+			var subject = SearchAndReplaceVars(Subject, dataItem);
+			msg.Subject = subject;
+			msg.Headers.Add(HeaderId.Subject, CharacterEncoding, subject);
 		}
 
 
@@ -434,7 +410,7 @@ namespace MailMergeLib
 		/// Prepares the mail message part (plain text and/or HTML:
 		/// Replacing placeholders with their values and setting correct encoding.
 		/// </summary>
-		private void BuildTextMessagePart()
+		private void BuildTextMessagePart(object dataIteam)
 		{
 			_badInlineFiles.Clear();
 			_textMessagePart = null;
@@ -447,7 +423,7 @@ namespace MailMergeLib
 
 			if (!string.IsNullOrEmpty(PlainText))
 			{
-				var plainText = SearchAndReplaceVars(new StringBuilder(PlainText)).ToString();
+				var plainText = SearchAndReplaceVars(PlainText, dataIteam);
 				plainTextPart = (TextPart) new PlainBodyBuilder(plainText)
 				{
 					TextTransferEncoding = TextTransferEncoding,
@@ -470,8 +446,8 @@ namespace MailMergeLib
 			if (!string.IsNullOrEmpty(HtmlText))
 			{
 				// create the HTML text body part with any linked resources
-				var htmlText = SearchAndReplaceVars(new StringBuilder(HtmlText)).ToString();
-				var htmlBody = new HtmlBodyBuilder(htmlText, SearchAndReplaceVars(new StringBuilder(Subject)).ToString())
+				var htmlText = SearchAndReplaceVars(HtmlText, dataIteam);
+				var htmlBody = new HtmlBodyBuilder(htmlText, SearchAndReplaceVars(Subject, dataIteam))
 				{
 					DocBaseUrl = FileBaseDir,
 					TextTransferEncoding = TextTransferEncoding,
@@ -481,7 +457,7 @@ namespace MailMergeLib
 
 				htmlBody.InlineAtt.AddRange(_inlineAttExternal);
 				InlineAttachments = htmlBody.InlineAtt;
-				_badInlineFiles.AddRange(htmlBody.BadInlineFiles);
+				htmlBody.BadInlineFiles.ForEach(f => _badInlineFiles.Add(f));
 
 				if (alternative != null)
 				{
@@ -496,7 +472,7 @@ namespace MailMergeLib
 			else
 			{
 				InlineAttachments = new List<FileAttachment>();
-				_badInlineFiles = new List<string>();
+				_badInlineFiles = new HashSet<string>();
 			}
 		}
 
@@ -505,15 +481,15 @@ namespace MailMergeLib
 		/// Prepares the mail message file and string attachments:
 		/// Replacing placeholders with their values and setting correct encoding.
 		/// </summary>
-		private void BuildAttachmentPartsForMessage()
+		private void BuildAttachmentPartsForMessage(object dataItem)
 		{
 			_badAttachmentFiles.Clear();
 			_attachmentParts = new List<MimePart>();
 
 			foreach (var fa in FileAttachments)
 			{
-				var filename = MakeFullPath(SearchAndReplaceVars(new StringBuilder(fa.Filename)).ToString());
-				var displayName = SearchAndReplaceVars(new StringBuilder(fa.DisplayName)).ToString();
+				var filename = MakeFullPath(SearchAndReplaceVars(fa.Filename, dataItem));
+				var displayName = SearchAndReplaceVars(fa.DisplayName, dataItem);
 
 				try
 				{
@@ -533,7 +509,7 @@ namespace MailMergeLib
 
 			foreach (var sa in StreamAttachments)
 			{
-				var displayName = SearchAndReplaceVars(new StringBuilder(sa.DisplayName)).ToString();
+				var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
 				_attachmentParts.Add(
 					new AttachmentBuilder(new StreamAttachment(sa.Stream, displayName, sa.MimeType), CharacterEncoding,
 						TextTransferEncoding, BinaryTransferEncoding).GetAttachment());
@@ -541,7 +517,7 @@ namespace MailMergeLib
 
 			foreach (var sa in StringAttachments)
 			{
-				var displayName = SearchAndReplaceVars(new StringBuilder(sa.DisplayName)).ToString();
+				var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
 				_attachmentParts.Add(
 					new AttachmentBuilder(new StringAttachment(sa.Content, displayName, sa.MimeType), CharacterEncoding,
 						TextTransferEncoding, BinaryTransferEncoding).GetAttachment());
@@ -579,7 +555,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Prepares all recipient address and the corresponding header fields of a mail message.
 		/// </summary>
-		private void AddAddressesToMailMessage(MimeMessage mimeMessage)
+		private void AddAddressesToMailMessage(MimeMessage mimeMessage, object dataItem)
 		{
 			#region *** Clear MailMessage headers ***
 
@@ -605,10 +581,6 @@ namespace MailMergeLib
 				                                   mmAddr.DisplayNameCharacterEncoding);
 			}
 
-			// ShowNullsAs MUST be string.empty with email addresses!
-			TextVariableManager txtMgr = _textVariableManager.Clone();
-			txtMgr.ShowNullAs = txtMgr.ShowEmptyAs = string.Empty;
-
 			foreach (var mmAddr in MailMergeAddresses)
 			{
 				try
@@ -618,17 +590,14 @@ namespace MailMergeLib
 					if (testAddress != null)
 					{
 						testAddress.DisplayName = mmAddr.DisplayName;
-						testAddress.TextVariableManager = txtMgr;
-						mailboxAddr = testAddress.GetMailAddress();
+						mailboxAddr = testAddress.GetMailAddress(SmartFormatter, dataItem);
 					}
 					else
 					{
-						mmAddr.TextVariableManager = txtMgr;
-						mailboxAddr = mmAddr.GetMailAddress();
+						mailboxAddr = mmAddr.GetMailAddress(SmartFormatter, dataItem);
 					}
 
-					_badVariableNames.AddRange(txtMgr.BadVariables);
-					_badInlineFiles.AddRange(txtMgr.BadFiles);
+					SmartFormatter.MissingVariables.ToList().ForEach(f => _badVariableNames.Add(f));
 
 					if (IgnoreEmptyRecipientAddr && mailboxAddr == null)
 						continue;
@@ -701,7 +670,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Sets all attributes of a mail message.
 		/// </summary>
-		private void AddAttributesToMailMessage(MimeMessage mimeMessage)
+		private void AddAttributesToMailMessage(MimeMessage mimeMessage, object dataItem)
 		{
 			mimeMessage.Priority = Priority;
 			

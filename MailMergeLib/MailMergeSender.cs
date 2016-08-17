@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,31 +18,21 @@ namespace MailMergeLib
 	/// </summary>
 	public class MailMergeSender : IDisposable
 	{
-		private SmtpClientConfig _smtpClientConfig;
+		private ISmtpClientConfig[] _smtpClientConfig = new ISmtpClientConfig[] { new SmtpClientConfig() };
 		private int _maxNumOfSmtpClients = 5;
-		private int _maxFailures = 1;
-		private int _retryDelayTime;
 
 		private bool _disposed;
 		private bool _sendCancel;
-		public readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-
-		private MailMergeSender()
+		/// <summary>
+		/// CTOR
+		/// </summary>
+		public MailMergeSender()
 		{
-			ReadyMerged = true;
-			ReadySent = true;
 			IsBusy = false;
 		}
 
-		/// <summary>
-		/// MailMergeSender CTOR
-		/// </summary>
-		/// <param name="readDefaultsFromConfigFile">If true (default), default settings will be read from configuration system.net/mailSettings/smtp</param>
-		public MailMergeSender(bool readDefaultsFromConfigFile = true) : this()
-		{
-			SmtpClientConfig = new SmtpClientConfig(readDefaultsFromConfigFile);
-		}
 
 		/// <summary>
 		/// Gets or sets the maximum number of SmtpClient to send messages concurrently.
@@ -59,41 +50,6 @@ namespace MailMergeLib
 		/// </summary>
 		public bool IsBusy { get; private set; }
 		
-		/// <summary>
-		/// Returns true, if the transaction of sending a message has completed, else false.
-		/// </summary>
-		public bool ReadySent { get; private set; }
-
-		/// <summary>
-		/// Returns true, if the mail merge transaction has completed, else false.
-		/// </summary>
-		public bool ReadyMerged { get; private set; }
-
-		/// <summary>
-		/// Gets or sets the number of failures (1-5) for which a retry to send will be performed.
-		/// </summary>
-		public int MaxFailures
-		{
-			get { return _maxFailures; }
-			set { _maxFailures = (value >= 1 && value < 5) ? value : 1; }
-		}
-
-		/// <summary>
-		/// Gets or sets the delay time in milliseconds (0-10000) to elaps between retries to send the message.
-		/// </summary>
-		public int RetryDelayTime
-		{
-			get { return _retryDelayTime; }
-			set { _retryDelayTime = (value >= 0 && value <= 10000) ? value : 0; }
-		}
-
-		/// <summary>
-		/// Gets or sets the delay time in milliseconds (0-10000) between the messages.
-		/// In case more than one SmtpClient will be used concurrently, the delay will be used per thread.
-		/// Mainly used for debug purposes.
-		/// </summary>
-		public int DelayBetweenMessages { get; set; }
-
 
 		/// <summary>
 		/// Sends mail messages asynchronously to all recipients supplied in the data source
@@ -106,7 +62,8 @@ namespace MailMergeLib
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
 		/// </exception>
 		/// <exception cref="InvalidOperationException">A send operation is pending.</exception>
-		/// <exception cref="AggregateException"></exception>
+		/// <exception cref="NullReferenceException"></exception>
+		/// <exception cref="Exception">The first exception found in one of the async tasks.</exception>
 		public async Task SendAsync<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
 		{
 			if (mailMergeMessage == null || dataSource == null)
@@ -116,7 +73,6 @@ namespace MailMergeLib
 				throw new InvalidOperationException($"{nameof(SendAsync)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
 
 			IsBusy = true;
-			ReadyMerged = false;
 			var sentMsgCount = 0;
 			var errorMsgCount = 0;
 
@@ -136,12 +92,21 @@ namespace MailMergeLib
 			var numOfRecords = queue.Count;
 			var sendTasks = new Task[_maxNumOfSmtpClients];
 
+			// The max. number of configurations used is the number of parallel smtp clients
+			var smtpConfigForTask = new ISmtpClientConfig[_maxNumOfSmtpClients];
+			// Set as many smtp configs as we have for each task
+			// Example: 5 tasks with 2 configs: task 0 => config 0, task 1 => config 1, task 2 => config 0, task 3 => config 1, task 4 => config 0, task 5 => config 1
+			for (var i = 0; i < _maxNumOfSmtpClients; i++)
+			{
+				smtpConfigForTask[i] = SmtpClientConfig[i%_smtpClientConfig.Length];
+			}
+
 			for (var i = 0; i < sendTasks.Length; i++)
 			{
 				var taskNo = i;
 				sendTasks[i] = Task.Run(() =>
 				{
-					using (var smtpClient = GetConfiguredSmtpClient())
+					using (var smtpClient = GetInitializedSmtpClient(smtpConfigForTask[taskNo]))
 					{
 						T dataItem;
 						while (queue.TryDequeue(out dataItem))
@@ -166,20 +131,15 @@ namespace MailMergeLib
 								return;
 							}
 
-							try
-							{
-								OnMergeProgress?.Invoke(this,
-									new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount, null, true));
+							OnMergeProgress?.Invoke(this,
+								new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
 
-								SendMimeMessage(smtpClient, mimeMessage); 
+							SendMimeMessage(smtpClient, mimeMessage, smtpConfigForTask[taskNo]); 
 
-								OnMergeProgress?.Invoke(this,
-									new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount, null, true));
-							}
-							catch (Exception ex)
-							{
-								OnSendFailure?.Invoke(smtpClient, new MailSenderSendFailureEventArgs(ex, 1, 1, 0, mimeMessage));
-							}
+							OnMergeProgress?.Invoke(this,
+								new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+
+							Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages).Wait(_cancellationTokenSource.Token);
 						}
 
 						try
@@ -188,11 +148,10 @@ namespace MailMergeLib
 						}
 						catch (Exception)
 						{
-							// don't care for excpetion when disconnecting,
+							// don't care for exception when disconnecting,
 							// because smptClient will be disposed immediately anyway
 						}
-
-						Task.Delay(DelayBetweenMessages).Wait(_cancellationTokenSource.Token);
+						smtpClient.ProtocolLogger?.Dispose();
 					}
 				}, _cancellationTokenSource.Token);
 			}
@@ -201,24 +160,14 @@ namespace MailMergeLib
 			{
 				OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
 
-				//Task.WaitAll(sendTasks, _cancellationTokenSource.Token);
+				// Note await Task.WhenAll will only throw the FIRST exception of the aggregate exception!
 				await Task.WhenAll(sendTasks.AsEnumerable());
-
-				OnMergeComplete?.Invoke(this,
-					new MailSenderMergeCompleteEventArgs(_sendCancel, startTime, DateTime.Now, sentMsgCount));
-			}
-			catch (AggregateException exception)
-			{
-				foreach (var ex in exception.InnerExceptions)
-				{
-					OnSendFailure?.Invoke(this, new MailSenderSendFailureEventArgs(ex, 1, 1, RetryDelayTime, null));
-				}
-				throw;
 			}
 			finally
 			{
+				OnMergeComplete?.Invoke(this, new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, errorMsgCount));
+
 				OnAfterSend -= afterSend;
-				ReadyMerged = true;
 
 				IsBusy = false;
 			}
@@ -245,14 +194,16 @@ namespace MailMergeLib
 
 			try
 			{
-				await Task.Factory.StartNew(() =>
+				await Task.Run(() =>
 				{
-					using (var smtpClient = GetConfiguredSmtpClient())
+					var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+					using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 					{
-						SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem));
+						SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig);
+						smtpClient.ProtocolLogger?.Dispose();
 					}
 
-				}, _cancellationTokenSource.Token, TaskCreationOptions.None, TaskScheduler.Default);
+				}, _cancellationTokenSource.Token);
 			}
 			finally
 			{
@@ -281,29 +232,34 @@ namespace MailMergeLib
 
 			IsBusy = true;
 
+			var sentMsgCount = 0;
+
 			try
 			{
 				var startTime = DateTime.Now;
 				var numOfRecords = dataSource.Count();
-				var sentMsgCount = 0;
-				var errorMsgCount = 0;
 
-				using (var smtpClient = GetConfiguredSmtpClient())
+				var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+				using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 				{
 					OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
 
 					foreach (var dataItem in dataSource)
 					{
-						OnMergeProgress?.Invoke(this, new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount, null, true));
+						OnMergeProgress?.Invoke(this,
+							new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
 
 						var mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
-						SendMimeMessage(smtpClient, mimeMessage);
+						SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
 						sentMsgCount++;
 
-						OnMergeProgress?.Invoke(this, new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount, null, true));
+						OnMergeProgress?.Invoke(this,
+							new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
 					}
 
-					OnMergeComplete?.Invoke(this, new MailSenderMergeCompleteEventArgs(_sendCancel, startTime, DateTime.Now, sentMsgCount));
+					OnMergeComplete?.Invoke(this,
+						new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 0));
+					smtpClient.ProtocolLogger?.Dispose();
 				}
 			}
 			finally
@@ -334,9 +290,11 @@ namespace MailMergeLib
 
 			try
 			{
-				using (var smtpClient = GetConfiguredSmtpClient())
+				var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+				using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 				{
-					SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem));
+					SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig);
+					smtpClient.ProtocolLogger?.Dispose();
 				}
 			}
 			finally
@@ -350,6 +308,7 @@ namespace MailMergeLib
 		/// </summary>
 		/// <param name="smtpClient">The fully configures SmtpClient used to send the MimeMessate</param>
 		/// <param name="mimeMsg">Mime message to send.</param>
+		/// <param name="config"></param>
 		/// <exception>
 		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
@@ -357,15 +316,11 @@ namespace MailMergeLib
 		/// <exception cref="SmtpCommandException"></exception>
 		/// <exception cref="SmtpProtocolException"></exception>
 		/// <exception cref="AuthenticationException"></exception>
-		private void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg)
+		/// <exception cref="System.Net.Sockets.SocketException"></exception>
+		private void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, ISmtpClientConfig config)
 		{
-			if (!ReadyMerged && !ReadySent)
-				_sendCancel = false;
-
 			var startTime = DateTime.Now;
 			Exception sendException = null;
-
-			ReadySent = false;
 
 			// the client can rely on the sequence of events: OnBeforeSend, OnSendFailure (if any), OnAfterSend
 			OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(null, _sendCancel, mimeMsg, startTime));
@@ -376,19 +331,21 @@ namespace MailMergeLib
 				try
 				{
 					sendException = null;
-					switch (SmtpClientConfig.MessageOutput)
+					const string mailExt = ".eml";
+					switch (config.MessageOutput)
 					{
 						case MessageOutput.None:
 							break;
 						case MessageOutput.Directory:
-							mimeMsg.WriteTo(System.IO.Path.Combine(SmtpClientConfig.MailOutputDirectory, Guid.NewGuid().ToString("N") + ".eml"));
+							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt));
 							break;
-
 						case MessageOutput.PickupDirectoryFromIis:
-							mimeMsg.WriteTo(System.IO.Path.Combine(SmtpClientConfig.MailOutputDirectory, Guid.NewGuid().ToString("N")));
+							// for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
+							// and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
+							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt));
 							break;
 						default:
-							SendMimeMessageToSmtpServer(smtpClient, mimeMsg);
+							SendMimeMessageToSmtpServer(smtpClient, mimeMsg, config);
 							break; // break switch
 					}
 					// when SendMimeMessageToSmtpServer throws less than _maxFailures exceptions,
@@ -399,28 +356,36 @@ namespace MailMergeLib
 				{
 					// exceptions which are thrown by SmtpClient:
 					if (ex is SmtpCommandException || ex is SmtpProtocolException ||
-					    ex is AuthenticationException)
+					    ex is AuthenticationException || ex is System.Net.Sockets.SocketException)
 					{
 						failureCounter++;
 						sendException = ex;
 						OnSendFailure?.Invoke(smtpClient,
-							new MailSenderSendFailureEventArgs(sendException, failureCounter, MaxFailures, RetryDelayTime,
-								mimeMsg));
-						Task.Delay(RetryDelayTime).Wait(_cancellationTokenSource.Token);
+							new MailSenderSendFailureEventArgs(sendException, failureCounter, config, mimeMsg));
+						Task.Delay(config.RetryDelayTime).Wait(_cancellationTokenSource.Token);
+
+						// on first SMTP failure switch to the backup configuration, if one exists
+						if (failureCounter == 1 && config.MaxFailures > 1)
+						{
+							var backupConfig = SmtpClientConfig.FirstOrDefault(c => c != config);
+							if (backupConfig == null) continue;
+
+							backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
+							SetConfigForSmtpClient(smtpClient, backupConfig);
+							config = backupConfig;
+						}
 					}
 					else
 					{
-						failureCounter = MaxFailures;
+						failureCounter = config.MaxFailures;
 						sendException = ex;
-						OnSendFailure?.Invoke(smtpClient, new MailSenderSendFailureEventArgs(sendException, 1, 1, 0, mimeMsg));
+						OnSendFailure?.Invoke(smtpClient, new MailSenderSendFailureEventArgs(sendException, 1, config, mimeMsg));
 					}
 				}
-			} while (failureCounter < MaxFailures && failureCounter > 0);
+			} while (failureCounter < config.MaxFailures && failureCounter > 0);
 
 			OnAfterSend?.Invoke(smtpClient,
 				new MailSenderAfterSendEventArgs(sendException, _sendCancel, mimeMsg, startTime, DateTime.Now));
-
-			ReadySent = true;
 
 			// Do some clean-up with the message
 			foreach (var mimeEntity in mimeMsg.Attachments)
@@ -441,13 +406,18 @@ namespace MailMergeLib
 		/// </summary>
 		/// <param name="smtpClient"></param>
 		/// <param name="message"></param>
-		private void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message)
+		/// <param name="config"></param>
+		private void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message, ISmtpClientConfig config)
 		{
+			var hostPortConfig = $"{config.SmtpHost}:{config.SmtpPort} using configuration '{config.Name}'";
+			const string errorConnect = "Error trying to connect";
+			const string errorAuth = "Error trying to authenticate on";
+
 			try
 			{
 				if (!smtpClient.IsConnected)
 				{
-					smtpClient.Connect(SmtpClientConfig.SmtpHost, SmtpClientConfig.SmtpPort, SmtpClientConfig.SecureSocketOptions,
+					smtpClient.Connect(config.SmtpHost, config.SmtpPort, config.SecureSocketOptions,
 						_cancellationTokenSource.Token);
 
 				}
@@ -455,31 +425,31 @@ namespace MailMergeLib
 			catch (SmtpCommandException ex)
 			{
 				throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-					$"Error trying to connect {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+					$"{errorConnect} {hostPortConfig}'. " + ex.Message);
 			}
 			catch (SmtpProtocolException ex)
 			{
 				throw new SmtpProtocolException(
-					$"Error trying to connect {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+					$"{errorConnect} {hostPortConfig}'. " + ex.Message);
 			}
-			
-			if (SmtpClientConfig.Credentials != null && !smtpClient.IsAuthenticated && smtpClient.Capabilities.HasFlag(SmtpCapabilities.Authentication))
+
+			if (config.NetworkCredential != null && !smtpClient.IsAuthenticated && smtpClient.Capabilities.HasFlag(SmtpCapabilities.Authentication))
 			{
 				try
 				{
-					smtpClient.Authenticate(SmtpClientConfig.Credentials, _cancellationTokenSource.Token);
+					smtpClient.Authenticate(config.NetworkCredential, _cancellationTokenSource.Token);
 				}
 				catch (AuthenticationException ex)
 				{
-					throw new AuthenticationException($"Error trying to authenticate on {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+					throw new AuthenticationException($"{errorAuth} {hostPortConfig}. " + ex.Message);
 				}
 				catch (SmtpCommandException ex)
 				{
-					throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"Error trying to authenticate on {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+					throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"{errorAuth} {hostPortConfig}. " + ex.Message);
 				}
 				catch (SmtpProtocolException ex)
 				{
-					throw new SmtpProtocolException($"Error trying to authenticate on {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+					throw new SmtpProtocolException($"{errorAuth} {hostPortConfig}. " + ex.Message);
 				}
 			}
 
@@ -492,42 +462,75 @@ namespace MailMergeLib
 				switch (ex.ErrorCode)
 				{
 					case SmtpErrorCode.RecipientNotAccepted:
-						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"Recipient not accepted by {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+							$"Recipient not accepted by {hostPortConfig}. " + ex.Message);
 					case SmtpErrorCode.SenderNotAccepted:
-						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"Sender not accepted by {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+							$"Sender not accepted by {hostPortConfig}. " + ex.Message);
 					case SmtpErrorCode.MessageNotAccepted:
-						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"Message not accepted by {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+							$"Message not accepted by {hostPortConfig}. " + ex.Message);
 					default:
-						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"Error sending message to {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+						throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+							$"Error sending message to {hostPortConfig}. " + ex.Message);
 				}
 			}
 			catch (SmtpProtocolException ex)
 			{
-				throw new SmtpProtocolException($"Error while sending message to {SmtpClientConfig.SmtpHost}:{SmtpClientConfig.SmtpPort}. " + ex.Message);
+				throw new SmtpProtocolException($"Error while sending message to {hostPortConfig}. " + ex.Message, ex);
 			}
 		}
 
 
 		/// <summary>
-		/// Get pre-configured SmtpClient using SmtpClientConfig
+		/// Get pre-configured SmtpClient
 		/// </summary>
-		private SmtpClient GetConfiguredSmtpClient()
+		private static SmtpClient GetInitializedSmtpClient(ISmtpClientConfig config)
 		{
 			//var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
-			var smtpClient = SmtpClientConfig.ProtocolLogger != null ? new SmtpClient(SmtpClientConfig.ProtocolLogger) : new SmtpClient();
-			smtpClient.Timeout = SmtpClientConfig.Timeout;
-			smtpClient.LocalDomain = SmtpClientConfig.LocalHostName;
-			// smtp.AuthenticationMechanisms.Remove("XOAUTH2");
+			var smtpClient = config.EnableLogOutput ? new SmtpClient(config.GetProtocolLogger()) : new SmtpClient();
+			SetConfigForSmtpClient(smtpClient, config);
+
+			// smtpClient.AuthenticationMechanisms.Remove("XOAUTH2");
 			return smtpClient;
 		}
 
 		/// <summary>
-		/// Gets or sets the configuration the SmtpClients will use.
+		/// Disconnects the SmtpClient if connected, and sets the new configuration.
 		/// </summary>
-		public SmtpClientConfig SmtpClientConfig
+		/// <remarks>
+		/// Note: 
+		/// Part of configuration will only be used by SmtpClient during Connect() or Authorize().
+		/// Protocol logger settings do not change.
+		/// </remarks>
+		/// <param name="smtpClient"></param>
+		/// <param name="config"></param>
+		private static void SetConfigForSmtpClient(SmtpClient smtpClient, ISmtpClientConfig config)
+		{
+			try
+			{	
+				if (smtpClient.IsConnected)
+					smtpClient.Disconnect(false);
+			}
+			catch (Exception)
+			{}
+			
+			smtpClient.Timeout = config.Timeout;
+			smtpClient.LocalDomain = config.ClientDomain;
+			smtpClient.LocalEndPoint = config.LocalEndPoint;
+			smtpClient.ServerCertificateValidationCallback = config.ServerCertificateValidationCallback;
+		}
+		
+
+		/// <summary>
+		/// Gets or sets the array of configurations the SmtpClients will use.
+		/// The first SmtpClientConfig is the "standard", any second is the "backup".
+		/// Other instances of SmtpClientConfig in the array are used for parallel sending messages.
+		/// </summary>
+		public ISmtpClientConfig[] SmtpClientConfig
 		{
 			get { return _smtpClientConfig; }
-			set { _smtpClientConfig = value ?? new SmtpClientConfig(false); }
+			set { _smtpClientConfig = value ?? new ISmtpClientConfig[] {new SmtpClientConfig()}; }
 		}
 
 		/// <summary>
@@ -568,11 +571,13 @@ namespace MailMergeLib
 		/// <summary>
 		/// Cancel any transactions sending or merging mail.
 		/// </summary>
-		public void SendCancel()
+		/// <param name="waitTime">The number of milliseconds to wait before cancelation.</param>
+		public void SendCancel(int waitTime = 0)
 		{
 			if (_cancellationTokenSource.IsCancellationRequested) return;
 
-			_sendCancel = true;
+			if (waitTime == 0) _cancellationTokenSource.Cancel();
+			else _cancellationTokenSource.CancelAfter(new TimeSpan(0, 0, 0, 0, waitTime));
 		}
 
 		/// <summary>

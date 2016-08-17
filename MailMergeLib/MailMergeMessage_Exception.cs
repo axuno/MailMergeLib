@@ -14,7 +14,7 @@ namespace MailMergeLib
 		/// </summary>
 		public class AddressException : Exception
 		{
-			public AddressException(string message, List<string> badAddress, Exception innerException)
+			public AddressException(string message, HashSet<string> badAddress, Exception innerException)
 				: base(message, innerException)
 			{
 				BadAddress = badAddress;
@@ -26,7 +26,7 @@ namespace MailMergeLib
 			{
 			}
 
-			public List<string> BadAddress { get; } = new List<string>();
+			public HashSet<string> BadAddress { get; } = new HashSet<string>();
 		}
 
 		#endregion
@@ -38,7 +38,7 @@ namespace MailMergeLib
 		/// </summary>
 		public class AttachmentException : Exception
 		{
-			public AttachmentException(string message, List<string> badAttachment, Exception innerException)
+			public AttachmentException(string message, HashSet<string> badAttachment, Exception innerException)
 				: base(message, innerException)
 			{
 				BadAttachment = badAttachment;
@@ -50,7 +50,7 @@ namespace MailMergeLib
 			{
 			}
 
-			public List<string> BadAttachment { get; } = new List<string>();
+			public HashSet<string> BadAttachment { get; } = new HashSet<string>();
 		}
 
 		#endregion
@@ -109,7 +109,7 @@ namespace MailMergeLib
 		/// </summary>
 		public class VariableException : Exception
 		{
-			public VariableException(string message, List<string> missingVariable, Exception innerException)
+			public VariableException(string message, HashSet<string> missingVariable, Exception innerException)
 				: base(message, innerException)
 			{
 				MissingVariable = missingVariable;
@@ -121,7 +121,7 @@ namespace MailMergeLib
 			{
 			}
 
-			public List<string> MissingVariable { get; } = new List<string>();
+			public HashSet<string> MissingVariable { get; } = new HashSet<string>();
 		}
 
 		#endregion

@@ -42,7 +42,6 @@ namespace MailMergeLib
 
 		public new void Add(MailMergeAddress address)
 		{
-			address.TextVariableManager = _mailMergeMessage.GetTextVariableManager();
 			base.Add(address);
 		}
 
@@ -58,28 +57,13 @@ namespace MailMergeLib
 			return addrCol;
 		}
 
-		public string ToString(MailAddressType addrType)
+		public string ToString(MailAddressType addrType, MailSmartFormatter formatter, object dataItem)
 		{
-			TextVariableManager txtMgr = _mailMergeMessage.GetTextVariableManager().Clone();
-			txtMgr.ShowEmptyAs = txtMgr.ShowNullAs = string.Empty;
 			var addr = new StringBuilder();
 
 			foreach (MailMergeAddress mmAddr in Get(addrType))
 			{
-				// copy all bad file names and bad variable names from "main" TextVariableManager
-				txtMgr.BadFiles.AddRange(_mailMergeMessage.GetTextVariableManager().BadFiles);
-				txtMgr.BadVariables.AddRange(_mailMergeMessage.GetTextVariableManager().BadVariables);
-
-				mmAddr.TextVariableManager = txtMgr;
-				addr.Append(mmAddr.ToString());
-
-				// fill the "main" TextVariableManager with bad file/variable names
-				_mailMergeMessage.GetTextVariableManager().BadFiles.Clear();
-				_mailMergeMessage.GetTextVariableManager().BadFiles.AddRange(txtMgr.BadFiles);
-
-				_mailMergeMessage.GetTextVariableManager().BadVariables.Clear();
-				_mailMergeMessage.GetTextVariableManager().BadVariables.AddRange(txtMgr.BadVariables);
-
+				addr.Append(mmAddr.GetMailAddress(formatter, dataItem));
 				addr.Append(", ");
 			}
 

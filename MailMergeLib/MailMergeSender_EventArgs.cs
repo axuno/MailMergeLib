@@ -51,55 +51,40 @@ namespace MailMergeLib
 	public class MailSenderMergeBeginEventArgs : EventArgs
 	{
 		public readonly DateTime StartTime;
-		public readonly int NumOfMessagesToSend;
+		public readonly int TotalMsg;
 
-		internal MailSenderMergeBeginEventArgs(DateTime startTime, int numOfMessagesToSend)
+		internal MailSenderMergeBeginEventArgs(DateTime startTime, int totalMsg)
 		{
 			StartTime = startTime;
-			NumOfMessagesToSend = numOfMessagesToSend;
+			TotalMsg = totalMsg;
 		}
 	}
 
 	/// <summary>
 	/// Argument used by the event after every mail sent during a mail merge.
 	/// </summary>
-	public class MailSenderMergeProgressEventArgs : EventArgs
+	public class MailSenderMergeProgressEventArgs : MailSenderMergeBeginEventArgs
 	{
-		public readonly int ErrorMsg;
-		public readonly MimeMessage MimeMessage;
 		public readonly int SentMsg;
-		public readonly DateTime StartTime;
-		public readonly int TotalMsg;
-		public bool Completed;
-
-		internal MailSenderMergeProgressEventArgs(DateTime startTime, int totalMsg, int sentMsg, int errorMsg,
-		                                          MimeMessage mimeMessage, bool completed)
+		public readonly int ErrorMsg;
+		
+		internal MailSenderMergeProgressEventArgs(DateTime startTime, int totalMsg, int sentMsg, int errorMsg) : base(startTime, totalMsg)
 		{
-			StartTime = startTime;
-			TotalMsg = totalMsg;
 			SentMsg = sentMsg;
 			ErrorMsg = errorMsg;
-			MimeMessage = mimeMessage;
-			Completed = completed;
 		}
 	}
 
 	/// <summary>
 	/// Argument used by the event after finishing a mail merge.
 	/// </summary>
-	public class MailSenderMergeCompleteEventArgs : EventArgs
+	public class MailSenderMergeCompleteEventArgs : MailSenderMergeProgressEventArgs
 	{
-		public readonly bool Cancelled;
 		public readonly DateTime EndTime;
-		public readonly int MailsSent;
-		public readonly DateTime StartTime;
 
-		internal MailSenderMergeCompleteEventArgs(bool cancelled, DateTime startTime, DateTime endTime, int mailsSent)
+		internal MailSenderMergeCompleteEventArgs(DateTime startTime, DateTime endTime, int totalMsg, int sentMsg, int errorMsg) : base(startTime, totalMsg, sentMsg, errorMsg)
 		{
-			Cancelled = cancelled;
-			StartTime = startTime;
 			EndTime = endTime;
-			MailsSent = mailsSent;
 		}
 	}
 
@@ -111,16 +96,14 @@ namespace MailMergeLib
 		public readonly Exception Error;
 		public readonly int FailureCounter;
 		public readonly MimeMessage MimeMessage;
-		public readonly int MaxFailures;
-		public readonly int RetryDelayTime;
+		public readonly ISmtpClientConfig SmtpClientConfig;
 
-		internal MailSenderSendFailureEventArgs(Exception error, int failureCounter, int maxFailures, int retryDelayTime,
+		internal MailSenderSendFailureEventArgs(Exception error, int failureCounter, ISmtpClientConfig smtpClientConfig,
 		                                        MimeMessage mimeMessage)
 		{
 			Error = error;
 			FailureCounter = failureCounter;
-			MaxFailures = maxFailures;
-			RetryDelayTime = retryDelayTime;
+			SmtpClientConfig = smtpClientConfig;
 			MimeMessage = mimeMessage;
 		}
 	}

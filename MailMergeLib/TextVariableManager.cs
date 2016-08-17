@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MailMergeLib
+namespace MailMergeLiba
 {
 	/// <summary>
 	/// The Variable class used by TextVariableManager.
@@ -114,10 +114,11 @@ namespace MailMergeLib
 		/// <summary>
 		/// Gets or sets the data item which contains the variables to be applied to the Text.
 		/// The following types are accepted:
-		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances, anonymous types.
-		/// For class instances it's allowed to use the name of parameterless methods; use method names WITHOUT parentheses.
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or even a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot; between properties.
 		/// </summary>
-		public object DataItem { get; set; }
+	public object DataItem { get; set; }
 
 		/// <summary>
 		/// Gets or sets the text to be processed by Process().

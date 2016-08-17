@@ -25,6 +25,7 @@ namespace MailMergeLib
 		public HtmlBodyBuilder(string html)
 		{
 			BinaryTransferEncoding = ContentEncoding.Base64;
+
 			_tagHelper = new HtmlTagHelper("base", html ?? string.Empty);
 			if (_tagHelper.StartTags.Count <= 0) return;
 
@@ -32,10 +33,9 @@ namespace MailMergeLib
 			if ((href = _tagHelper.GetAttributeValue(_tagHelper.StartTags[0], "href")) != null)
 				_docBaseUrl = MakeUri(href);
 
-			// remove if base tag is local file reference
-			if (href != null)
-				if (href.StartsWith(Uri.UriSchemeFile))
-					_tagHelper.ReplaceTag(_tagHelper.StartTags[0], string.Empty);
+			// remove if base tag is local file reference, because it's not usable in the resulting HTML
+			if (href != null && href.StartsWith(Uri.UriSchemeFile))
+				_tagHelper.ReplaceTag(_tagHelper.StartTags[0], string.Empty);
 		}
 
 		/// <summary>
@@ -232,7 +232,7 @@ namespace MailMergeLib
 			 * it will not be decoded. Then the follwing line should be used.
 
 			 * Pre-process for + sign space formatting since System.Uri doesn't handle it.
-			 * "Plus" literals are encoded as %2b normally so this should be safe enough
+			 * "Plus" literals are encoded as %2b so this should be safe enough:
 			 * 
 			 * return uri.StartsWith(Uri.UriSchemeFile) ? new Uri(uri).LocalPath : Uri.UnescapeDataString(uri.Replace("+", " "));
 			 */
