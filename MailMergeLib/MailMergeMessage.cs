@@ -8,10 +8,7 @@ using System.Text;
 using System.Threading;
 using MailKit;
 using MailMergeLib.SmartFormatMail.Core.Settings;
-using MailMergeLiba;
 using MimeKit;
-
-[assembly: CLSCompliant(false)]
 
 namespace MailMergeLib
 {

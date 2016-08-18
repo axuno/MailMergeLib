@@ -9,11 +9,12 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MailMergeLiba
+namespace MailMergeLib
 {
 	/// <summary>
 	/// The Variable class used by TextVariableManager.
 	/// </summary>
+	[Obsolete("Use SmartFormatMail instead.", true)]
 	public class Variable
 	{
 		private const string _defaultFormat = "{0}";
@@ -69,6 +70,7 @@ namespace MailMergeLiba
 	/// <summary>
 	/// Search and replace placeholders in text files with variable values from a data source.
 	/// </summary>
+	[Obsolete("Use SmartFormatMail instead.", true)]
 	public class TextVariableManager : IDisposable, ICloneable
 	{
 		#region VariableError enum

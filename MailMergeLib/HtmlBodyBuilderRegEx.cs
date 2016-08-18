@@ -2,65 +2,56 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AngleSharp.Dom.Html;
-using AngleSharp.Extensions;
-using AngleSharp.Parser.Html;
 using MimeKit;
 using MimeKit.Utils;
 
 namespace MailMergeLib
 {
 	/// <summary>
-	/// Builds the HTML body part for a mail message using AngleSharp. Image references will be converted to
-	/// embedded cid content. Removes any Script tags.
+	/// Builds the HTML body part for a mail message. Images references will be converted to
+	/// embedded cid content. Does not make any general changes to the HTML document
 	/// </summary>
-	internal class HtmlBodyBuilder : BodyBuilderBase
+	[Obsolete("Use HtmlBodyBuilder instead", true)]
+	internal class HtmlBodyBuilderRegEx : BodyBuilderBase
 	{
-		private readonly IHtmlDocument _htmlDocument;
-		private string _docBaseUrl;
+		private readonly HtmlTagHelper _tagHelper;
+		private string _docBaseUrl = string.Empty;
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		/// <param name="html">text of title tag to use</param>
-		public HtmlBodyBuilder(string html)
+		[Obsolete("Use HtmlBodyBuilder instead", true)]
+		public HtmlBodyBuilderRegEx(string html)
 		{
-			_docBaseUrl = string.Empty;
 			BinaryTransferEncoding = ContentEncoding.Base64;
 
-			// Create a new parser front-end (can be re-used)
-			var parser = new HtmlParser();
-			//Just get the DOM representation
-			_htmlDocument = parser.Parse(html);
+			_tagHelper = new HtmlTagHelper("base", html ?? string.Empty);
+			if (_tagHelper.StartTags.Count <= 0) return;
 
-			// remove all Script elements, because they cannot be used in mail messages
-			foreach (var element in _htmlDocument.All.Where(e => e is IHtmlScriptElement))
-			{
-				element.Remove();
-			}
-			
-			// read the <base href="..."> tag
-			var baseEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlBaseElement) as IHtmlBaseElement;
-			var baseDir = baseEle?.Href ?? string.Empty;
-			_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
-			
+			string href;
+			if ((href = _tagHelper.GetAttributeValue(_tagHelper.StartTags[0], "href")) != null)
+				_docBaseUrl = MakeUri(href);
+
 			// remove if base tag is local file reference, because it's not usable in the resulting HTML
-			if (baseEle != null && baseDir.StartsWith(Uri.UriSchemeFile))
-				baseEle.Remove();
+			if (href != null && href.StartsWith(Uri.UriSchemeFile))
+				_tagHelper.ReplaceTag(_tagHelper.StartTags[0], string.Empty);
 		}
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		/// <param name="html">HTML text</param>
-		/// <param name="title">text of title tag to use</param>
-		public HtmlBodyBuilder(string html, string title) : this(html)
+		/// <param name="newTitle">text of title tag to use</param>
+		[Obsolete("Use HtmlBodyBuilder instead", true)]
+		public HtmlBodyBuilderRegEx(string html, string newTitle) : this(html)
 		{
-			var titleEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) as IHtmlTitleElement;
-			if (titleEle != null)
-			{
-				titleEle.Text = title;
-			}
+			_tagHelper.TagName = "title";
+			if (_tagHelper.StartTagsTextEndTags.Count <= 0) return;
+
+			// string oldTitle = _tagHelper.GetValueBetweenStartAndEndTag(_tagHelper.StartTagsTextEndTags[0]);
+			_tagHelper.ReplaceTag(_tagHelper.StartTagsTextEndTags[0],
+			                      _tagHelper.SetValueBetweenStartAndEndTag(_tagHelper.StartTagsTextEndTags[0], newTitle));
 		}
 
 		/// <summary>
@@ -72,7 +63,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Get the HTML representation of the source document
 		/// </summary>
-		public string DocHtml => _htmlDocument.ToHtml();
+		public string DocHtml => _tagHelper.HtmlText.ToString();
 
 
 		/// <summary>
@@ -136,6 +127,7 @@ namespace MailMergeLib
 				}
 			}
 			return mpr;
+			
 		}
 
 		/// <summary>
@@ -166,14 +158,16 @@ namespace MailMergeLib
 		{
 			var fileList = new List<string>();
 
-			foreach (var element in _htmlDocument.All.Where(m => m is IHtmlImageElement))
+			_tagHelper.TagName = "img";
+
+			foreach (var element in _tagHelper.StartTags)
 			{
-				var img = (IHtmlImageElement)element;
-				var currSrc = img.Attributes["src"]?.Value;
-				if (currSrc == null) continue;
+				var srcAttr = _tagHelper.GetAttributeValue(element, "src");
+				if (string.IsNullOrEmpty(srcAttr))
+					continue;
 
 				// this will succeed only with local files (at this time, they don't need to exist yet)
-				var filename = MakeFullPath(MakeLocalPath(currSrc));
+				var filename = MakeFullPath(MakeLocalPath(srcAttr));
 				try
 				{
 					if (!fileList.Contains(filename))
@@ -182,8 +176,7 @@ namespace MailMergeLib
 						var contentType = MimeTypes.GetMimeType(filename);
 						var cid = MimeUtils.GenerateMessageId();
 						InlineAtt.Add(new FileAttachment(filename, MakeCid(string.Empty, cid, new FileInfo(filename).Extension), contentType));
-
-						img.Attributes["src"].Value = MakeCid("cid:", cid, fileInfo.Extension);
+						_tagHelper.ReplaceTag(element, _tagHelper.SetAttributeValue(element, "src", MakeCid("cid:", cid, fileInfo.Extension)));
 						fileList.Add(filename);
 					}
 				}
@@ -214,7 +207,7 @@ namespace MailMergeLib
 		/// <returns>Full path for the given local file</returns>
 		private string MakeFullPath(string filename)
 		{
-			var fullpath = Tools.MakeFullPath(MakeLocalPath(_docBaseUrl), filename);
+			string fullpath = Tools.MakeFullPath(MakeLocalPath(_docBaseUrl), filename);
 			return fullpath;
 		}
 

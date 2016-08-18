@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -8,6 +9,7 @@ namespace MailMergeLib
 	/// <summary>
 	/// Utility class that provides very basic ways to manipulate HTML tags.
 	/// </summary>
+	[Obsolete("Use AngleSharp HTML parser Library instead", true)]
 	internal class HtmlTagHelper
 	{
 		private const string CStartTagMatch = @"(<\s*{0})([^>]*)(>)";
@@ -23,6 +25,7 @@ namespace MailMergeLib
 		/// </summary>
 		/// <param name="tagName">HTML tag to work on.</param>
 		/// <param name="file">FileInfo for file with HTML text.</param>
+		[Obsolete("Use AngleSharp HTML parser Library instead", true)]
 		public HtmlTagHelper(string tagName, FileInfo file)
 		{
 			StartTagsTextEndTags = new List<string>(100);
@@ -39,6 +42,7 @@ namespace MailMergeLib
 		/// </summary>
 		/// <param name="tagName">HTML tag to work on.</param>
 		/// <param name="html">HTML text.</param>
+		[Obsolete("Use AngleSharp HTML parser Library instead", true)]
 		public HtmlTagHelper(string tagName, string html)
 		{
 			StartTagsTextEndTags = new List<string>(100);
@@ -84,6 +88,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Loads a HTML file into memory.
 		/// </summary>
+		[Obsolete("Use AngleSharp HTML parser Library instead", true)]
 		private void LoadHtmlFile()
 		{
 			HtmlText = new StringBuilder();
