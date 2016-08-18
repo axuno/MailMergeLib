@@ -1,6 +1,6 @@
 ![logo](https://github.com/axuno/MailMergeLib/blob/master/MailMergeLlib.png)
-# MailMergeLib 5.0
-```MailMergeLib``` is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` comes with the following features:
+# MailMergeLib
+```MailMergeLib``` version 5.0 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` comes with the following features:
 
 ### 1. Mail message generation:
 * Email templates can be fully personalized in terms of recipients, subject, HTML and/or plain text, attachments and even headers. Placeholders are inserted as variable names from data source between curly braces like so: ```{MailboxAddress.Name}```
