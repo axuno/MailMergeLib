@@ -4,7 +4,7 @@
 
 ### 1. Mail message generation:
 * Email templates can be fully personalized in terms of recipients, subject, HTML and/or plain text, attachments and even headers. Placeholders are inserted as variable names from data source between curly braces like so: ```{MailboxAddress.Name}```
-* HTML text may contain images from local hard disk, which be automatically inserted as inline attachments.
+* HTML text may contain images from local hard disk, which will be automatically inserted as inline attachments.
 * Attachment sources can be files, streams or strings.
 * The data source for email merge messages to a number of recipients and be any ```IEnumerable``` object as well as ```DataTable```s. The data source for single emails can be any of the following types: ```Dictionary<string,object>```, ```ExpandoObject```, ```DataRow```, any class instances or anonymous types. For class instances it's even allowed to use the name of parameter less methods.
 * Placeholders in the email can be formatted with any of the features known from string.Format by using [SmartFormat.NET](https://github.com/scottrippey/SmartFormat.NET/wiki). SmartFormat is a parser coming close to string.Format's speed, but bringing a lot of additional options like easy pluralization for many languages.
