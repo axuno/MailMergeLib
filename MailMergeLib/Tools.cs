@@ -56,8 +56,7 @@ namespace MailMergeLib
 				                   Path.GetPathRoot(toPath), true) != 0)
 				{
 					throw new ArgumentException(
-						string.Format("The paths '{0} and '{1}' have different path roots.",
-						              fromDirectory, toPath));
+						$"The paths '{fromDirectory} and '{toPath}' have different path roots.");
 				}
 			}
 			var relativePath = new StringCollection();
@@ -207,55 +206,18 @@ namespace MailMergeLib
 		/// <summary>
 		/// Parses the email address and breaks into display name and address part.
 		/// </summary>
+		/// <remarks>
+		/// Method is maintained because of compatibility reasons and it's only a wrapper for
+		/// MimeKit.MailboxAddress.Parse(...).
+		/// </remarks>
 		/// <param name="inputAddr"></param>
 		/// <param name="displayName"></param>
 		/// <param name="address"></param>
 		public static void ParseMailAddress(string inputAddr, out string displayName, out string address)
 		{
-			displayName = null;
-			address = null;
-
-			if (string.IsNullOrEmpty(inputAddr))
-				return;
-
-			inputAddr = inputAddr.Trim();
-			// display name should start with quotation mark
-			int pos = inputAddr.IndexOf('"');
-			if (pos == 0)
-			{
-				// get ending quotation mark
-				pos = inputAddr.IndexOf('"', 1);
-				if (pos > 0 && inputAddr.Length != (pos + 1))
-				{
-					displayName = inputAddr.Substring(1, pos - 1);
-					inputAddr = inputAddr.Substring(pos + 1);
-				}
-			}
-
-			// display name was not quoted
-			if (displayName == null)
-			{
-				pos = inputAddr.IndexOf('<');
-				if (pos > 0)
-				{
-					displayName = inputAddr.Substring(0, pos - 1).Trim();
-					inputAddr = inputAddr.Substring(pos + 1);
-				}
-			}
-
-			if (displayName != null)
-			{
-				pos = inputAddr.IndexOf('<');
-				if (pos > 0)
-				{
-					inputAddr = inputAddr.Substring(pos);
-				}
-			}
-
-			address = inputAddr.TrimStart(new[] {'<'}).TrimEnd(new[] {'>'}).Trim();
-
-			if (address.IndexOf('@') == 0)
-				address = null;
+			var mbAddr = MailboxAddress.Parse(ParserOptions.Default, inputAddr);
+			displayName = mbAddr.Name;
+			address = mbAddr.Address;
 		}
 
 		/// <summary>
