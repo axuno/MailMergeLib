@@ -95,21 +95,15 @@ namespace MailMergeLib
 			string displayName = formatter.Format(DisplayName, dataItem);
 			if (string.IsNullOrEmpty(displayName)) displayName = null;
 
-			// let MimeKit decide how to deal with empty or illegal address parts
-			// which exist after replacing placeholders with values.
-			try
-			{
-				new MailboxAddress(DisplayNameCharacterEncoding, displayName, address);
-			}
-			catch
+			// Exclude invalid address from further process
+			if (!EmailValidator.Validate(address, false, true))
 			{
 				return null;
 			}
 
-			var mailAddress = displayName != null
-			                          	? new MailboxAddress(DisplayNameCharacterEncoding, displayName, address)
-			                          	: new MailboxAddress(DisplayNameCharacterEncoding, address, address);
-			return mailAddress;
+			return  displayName != null
+			            ? new MailboxAddress(DisplayNameCharacterEncoding, displayName, address)
+			            : new MailboxAddress(DisplayNameCharacterEncoding, address, address);
 		}
 
 		private static void ParseMailAddress(string inputAddr, out string displayName, out string address)
