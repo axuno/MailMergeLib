@@ -52,7 +52,6 @@ namespace MailMergeLib
 
 		#endregion
 
-
 		#region *** Constructor ***
 
 		/// <summary>
@@ -60,7 +59,7 @@ namespace MailMergeLib
 		/// </summary>
 		public MailMergeMessage()
 		{
-			IgnoreEmptyRecipientAddr = true;
+			IgnoreIllegalRecipientAddr = true;
 			DeliveryStatusNotification = DeliveryStatusNotification.Never;
 			Priority = MessagePriority.Normal;
 			Xmailer = null;
@@ -71,11 +70,11 @@ namespace MailMergeLib
 
 			SmartFormatter.ErrorAction = ErrorAction.Ignore;
 			SmartFormatter.Parser.ErrorAction = ErrorAction.ThrowError;
-			// Todo: ShowNullAs = string.Empty, ShowEmptyAs = string.Empty. z.B. mit: Smart.Format("{Name:choose(null|):N/A|leer|{Name}}", abc) wobei abc.Name NULL, string.Emtpy oder ein string sein kann
+			// Smart.Format("{Name:choose(null|):N/A|empty|{Name}}", variable), where abc.Name NULL, string.Emtpy or a string
 
 			MailMergeMessage msg = this;
 			MailMergeAddresses = new MailMergeAddressCollection(ref msg);
-
+			
 			FileBaseDir = Environment.CurrentDirectory;
 		}
 
@@ -119,7 +118,7 @@ namespace MailMergeLib
 		/// <param name="subject">Mail message subject.</param>
 		/// <param name="plainText">Plain text part of the mail message.</param>
 		/// <param name="fileAtt">File attachments of the mail message.</param>
-		public MailMergeMessage(string subject, string plainText, List<FileAttachment> fileAtt)
+		public MailMergeMessage(string subject, string plainText, HashSet<FileAttachment> fileAtt)
 			: this(subject, plainText, string.Empty, fileAtt)
 		{
 		}
@@ -131,7 +130,7 @@ namespace MailMergeLib
 		/// <param name="plainText">Plain text part of the mail message.</param>
 		/// <param name="htmlText">HTML message part of the mail message.</param>
 		/// <param name="fileAtt">File attachments of the mail message.</param>
-		public MailMergeMessage(string subject, string plainText, string htmlText, List<FileAttachment> fileAtt)
+		public MailMergeMessage(string subject, string plainText, string htmlText, HashSet<FileAttachment> fileAtt)
 			: this(subject, plainText, htmlText)
 		{
 			FileAttachments = fileAtt;
@@ -244,22 +243,22 @@ namespace MailMergeLib
 					exceptions.Add(new EmtpyContentException("Message is empty.", null));
 				if (_badMailAddr.Count > 0)
 					exceptions.Add(
-						new AddressException(string.Format("Bad mail address(es): {0}", string.Join(", ", _badMailAddr.ToArray())),
+						new AddressException($"Bad mail address(es): {string.Join(", ", _badMailAddr.ToArray())}",
 							_badMailAddr, null));
 				if (_badInlineFiles.Count > 0)
 					exceptions.Add(
 						new AttachmentException(
-							string.Format("Inline attachment(s) missing or not readable: {0}", string.Join(", ", _badInlineFiles.ToArray())),
+							$"Inline attachment(s) missing or not readable: {string.Join(", ", _badInlineFiles.ToArray())}",
 							_badInlineFiles, null));
 				if (_badAttachmentFiles.Count > 0)
 					exceptions.Add(
 						new AttachmentException(
-							string.Format("File attachment(s) missing or not readable: {0}", string.Join(", ", _badAttachmentFiles.ToArray())),
+							$"File attachment(s) missing or not readable: {string.Join(", ", _badAttachmentFiles.ToArray())}",
 							_badAttachmentFiles, null));
 				if (_badVariableNames.Count > 0)
 					exceptions.Add(
 						new VariableException(
-							string.Format("Variable(s) for placeholder(s) not found: {0}", string.Join(", ", _badVariableNames.ToArray())),
+							$"Variable(s) for placeholder(s) not found: {string.Join(", ", _badVariableNames.ToArray())}",
 							_badVariableNames, null));
 
 				// Finally throw general exception
@@ -332,7 +331,7 @@ namespace MailMergeLib
 		/// Gets or sets files that will be attached to a mail message.
 		/// File names may contain placeholders.
 		/// </summary>
-		public List<FileAttachment> FileAttachments { get; set; } = new List<FileAttachment>();
+		public HashSet<FileAttachment> FileAttachments { get; set; } = new HashSet<FileAttachment>();
 
 		/// <summary>
 		/// Gets or sets streams that will be attached to a mail message.
@@ -343,7 +342,7 @@ namespace MailMergeLib
 		/// Gets inline attachments (linked resources of the HTML body) of a mail message.
 		/// They are generated automatically with all image sources pointing to local files.
 		/// </summary>
-		public List<FileAttachment> InlineAttachments { get; private set; } = new List<FileAttachment>();
+		public HashSet<FileAttachment> InlineAttachments { get; private set; } = new HashSet<FileAttachment>();
 
 		/// <summary>
 		/// Gets or sets string attachments that will be attached to a mail message.
@@ -364,7 +363,7 @@ namespace MailMergeLib
 		/// <param name="text">Text to search and replace.</param>
 		/// <param name="dataItem"></param>
 		/// <returns>Returns the text with all variables replaced.</returns>
-		private string SearchAndReplaceVars(string text, object dataItem)
+		internal string SearchAndReplaceVars(string text, object dataItem)
 		{
 			return SmartFormatter.Format(CultureInfo, text, dataItem);
 		}
@@ -411,8 +410,7 @@ namespace MailMergeLib
 		{
 			_badInlineFiles.Clear();
 			_textMessagePart = null;
-
-
+			
 			MultipartAlternative alternative = null;
 
 			// create the plain text body part
@@ -429,7 +427,7 @@ namespace MailMergeLib
 				
 				if (!string.IsNullOrEmpty(HtmlText))
 				{
-					// there is plain text and html text
+					// there is plain text AND html text
 					alternative = new MultipartAlternative { plainTextPart };
 					_textMessagePart = alternative;
 				}
@@ -443,8 +441,8 @@ namespace MailMergeLib
 			if (!string.IsNullOrEmpty(HtmlText))
 			{
 				// create the HTML text body part with any linked resources
-				var htmlText = SearchAndReplaceVars(HtmlText, dataIteam);
-				var htmlBody = new HtmlBodyBuilder(htmlText, SearchAndReplaceVars(Subject, dataIteam))
+				// replacing any placeholders in the text or files with variable values
+				var htmlBody = new HtmlBodyBuilder(this, dataIteam)
 				{
 					DocBaseUrl = FileBaseDir,
 					TextTransferEncoding = TextTransferEncoding,
@@ -452,9 +450,9 @@ namespace MailMergeLib
 					CharacterEncoding = CharacterEncoding
 				};
 
-				htmlBody.InlineAtt.AddRange(_inlineAttExternal);
+				_inlineAttExternal.ForEach(ia => htmlBody.InlineAtt.Add(ia));
 				InlineAttachments = htmlBody.InlineAtt;
-				htmlBody.BadInlineFiles.ForEach(f => _badInlineFiles.Add(f));
+				htmlBody.BadInlineFiles.ToList().ForEach(f => _badInlineFiles.Add(f));
 
 				if (alternative != null)
 				{
@@ -468,7 +466,7 @@ namespace MailMergeLib
 			}
 			else
 			{
-				InlineAttachments = new List<FileAttachment>();
+				InlineAttachments = new HashSet<FileAttachment>();
 				_badInlineFiles = new HashSet<string>();
 			}
 		}
@@ -546,7 +544,7 @@ namespace MailMergeLib
 		/// If true, empty merge recipient addresses will be skipped.
 		/// If false, empty addresses will throw an exception.
 		/// </summary>
-		public bool IgnoreEmptyRecipientAddr { get; set; }
+		public bool IgnoreIllegalRecipientAddr { get; set; }
 
 
 		/// <summary>
@@ -596,7 +594,7 @@ namespace MailMergeLib
 
 					SmartFormatter.MissingVariables.ToList().ForEach(f => _badVariableNames.Add(f));
 
-					if (IgnoreEmptyRecipientAddr && mailboxAddr == null)
+					if (IgnoreIllegalRecipientAddr && mailboxAddr == null)
 						continue;
 					
 					switch (mmAddr.AddrType)

@@ -1,7 +1,7 @@
 namespace MailMergeLib
 {
 	/// <summary>
-	/// Class for information about file attachments for mail messages
+	/// Class for file attachments of mail messages
 	/// </summary>
 	public class FileAttachment
 	{
@@ -47,5 +47,29 @@ namespace MailMergeLib
 		/// Gets the MimeType as a string, like "text/plain"
 		/// </summary>
 		public string MimeType { get; private set; }
+
+		/// <summary>
+		/// Determines whether the specified FileAttachment instances are equal.
+		/// </summary>
+		/// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
+		/// <param name="obj"></param>
+		/// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
+		public override bool Equals(object obj)
+		{
+			var otherFa = obj as FileAttachment;
+			if (otherFa == null) return false;
+
+			return otherFa.Filename == Filename && otherFa.DisplayName == DisplayName && otherFa.MimeType == MimeType;
+		}
+
+		/// <summary>
+		/// The HashCode for the FileAttachment.
+		/// </summary>
+		/// <returns>Returns the HashCode for the FileAttachment.</returns>
+		/// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
+		public override int GetHashCode()
+		{
+			return string.Concat(Filename, DisplayName, MimeType).GetHashCode();
+		}
 	}
 }
