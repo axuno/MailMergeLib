@@ -12,68 +12,46 @@ namespace MailMergeLib
 {
 	/// <summary>
 	/// Builds the HTML body part for a mail message using AngleSharp. Image references will be converted to
-	/// embedded cid content. Removes any Script tags.
+	/// embedded cid content. Image references may include {Placeholders}.
+	/// {Placeholders} in the HTML Body and will be replaced by variable values.
 	/// </summary>
+	/// <remarks>
+	/// Removes any Script sections.
+	/// </remarks>
 	internal class HtmlBodyBuilder : BodyBuilderBase
 	{
+		private readonly MailMergeMessage _mailMergeMessage;
 		private readonly IHtmlDocument _htmlDocument;
 		private string _docBaseUrl;
+		private object _dataItem;
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
-		/// <param name="html">text of title tag to use</param>
-		public HtmlBodyBuilder(string html)
+		/// <param name="mailMergeMessage">The parent MailMergeMessage, where HtmlBodyBuilder processes HtmlText and Subject properties.</param>
+		/// <param name="dataItem"></param>
+		public HtmlBodyBuilder(MailMergeMessage mailMergeMessage, object dataItem)
 		{
 			_docBaseUrl = string.Empty;
-			BinaryTransferEncoding = ContentEncoding.Base64;
+			_mailMergeMessage = mailMergeMessage;
+			_dataItem = dataItem;
+			BinaryTransferEncoding = mailMergeMessage.BinaryTransferEncoding;
 
 			// Create a new parser front-end (can be re-used)
 			var parser = new HtmlParser();
 			//Just get the DOM representation
-			_htmlDocument = parser.Parse(html);
-
-			// remove all Script elements, because they cannot be used in mail messages
-			foreach (var element in _htmlDocument.All.Where(e => e is IHtmlScriptElement))
-			{
-				element.Remove();
-			}
-			
-			// read the <base href="..."> tag
-			var baseEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlBaseElement) as IHtmlBaseElement;
-			var baseDir = baseEle?.Href ?? string.Empty;
-			_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
-			
-			// remove if base tag is local file reference, because it's not usable in the resulting HTML
-			if (baseEle != null && baseDir.StartsWith(Uri.UriSchemeFile))
-				baseEle.Remove();
-		}
-
-		/// <summary>
-		/// Constructor.
-		/// </summary>
-		/// <param name="html">HTML text</param>
-		/// <param name="title">text of title tag to use</param>
-		public HtmlBodyBuilder(string html, string title) : this(html)
-		{
-			var titleEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) as IHtmlTitleElement;
-			if (titleEle != null)
-			{
-				titleEle.Text = title;
-			}
+			_htmlDocument = parser.Parse(mailMergeMessage.HtmlText);
 		}
 
 		/// <summary>
 		/// Gets the list of inline attachments (linked resources) referenced in the HTML text.
 		/// </summary>
-		public List<FileAttachment> InlineAtt { get; } = new List<FileAttachment>(20);
-
+		public HashSet<FileAttachment> InlineAtt { get; } = new HashSet<FileAttachment>();
 
 		/// <summary>
 		/// Get the HTML representation of the source document
 		/// </summary>
 		public string DocHtml => _htmlDocument.ToHtml();
-
 
 		/// <summary>
 		/// Gets the ready made body part for a mail message either 
@@ -82,7 +60,34 @@ namespace MailMergeLib
 		/// </summary>
 		public override MimeEntity GetBodyPart()
 		{
+			// remove all Script elements, because they cannot be used in mail messages
+			foreach (var element in _htmlDocument.All.Where(e => e is IHtmlScriptElement))
+			{
+				element.Remove();
+			}
+
+			// set the HTML title tag from email subject
+			var titleEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) as IHtmlTitleElement;
+			if (titleEle != null)
+			{
+				titleEle.Text = _mailMergeMessage.SearchAndReplaceVars(_mailMergeMessage.Subject, _dataItem);
+			}
+
+			// read the <base href="..."> tag in order to find the embedded image files later on
+			var baseEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlBaseElement) as IHtmlBaseElement;
+			var baseDir = baseEle?.Href ?? string.Empty;
+			_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
+
+			// remove if base tag is local file reference, because it's not usable in the resulting HTML
+			if (baseEle != null && baseDir.StartsWith(Uri.UriSchemeFile))
+				baseEle.Remove();
+			
 			ReplaceImgSrcByCid();
+
+			// replace placeholders only in the HTML Body, because e.g. 
+			// in the header there may be CSS definitions with curly brace which collide with SmartFormat {placeholders}
+			_htmlDocument.Body.InnerHtml = _mailMergeMessage.SearchAndReplaceVars(_htmlDocument.Body.InnerHtml, _dataItem);
+
 			var htmlTextPart = new TextPart("html")
 			{
 				ContentTransferEncoding = Tools.IsSevenBit(DocHtml)
@@ -107,7 +112,6 @@ namespace MailMergeLib
 				image/gif...
 			*/
 			var mpr = new MultipartRelated {htmlTextPart};
-			
 
 			// Produce attachments as part of the multipart/related MIME part,
 			// as described in RFC2387
@@ -151,7 +155,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Gets inline files referenced in the HTML text, that were missing or not readable.
 		/// </summary>
-		public List<string> BadInlineFiles { get; } = new List<string>(10);
+		public HashSet<string> BadInlineFiles { get; } = new HashSet<string>();
 
 		/// <summary>
 		/// Gets or sets the transfer encoding for any binary content (e.g. Base64)
@@ -164,7 +168,7 @@ namespace MailMergeLib
 		/// </summary>
 		private void ReplaceImgSrcByCid()
 		{
-			var fileList = new List<string>();
+			var fileList = new HashSet<string>();
 
 			foreach (var element in _htmlDocument.All.Where(m => m is IHtmlImageElement))
 			{
@@ -172,6 +176,8 @@ namespace MailMergeLib
 				var currSrc = img.Attributes["src"]?.Value;
 				if (currSrc == null) continue;
 
+				// replace any placeholders with variables
+				currSrc = _mailMergeMessage.SearchAndReplaceVars(currSrc, _dataItem);
 				// this will succeed only with local files (at this time, they don't need to exist yet)
 				var filename = MakeFullPath(MakeLocalPath(currSrc));
 				try

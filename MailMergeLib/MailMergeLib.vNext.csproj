@@ -87,6 +87,7 @@
     <Compile Include="AttachmentBuilder.cs" />
     <Compile Include="BodyBuilderBase.cs" />
     <Compile Include="AngleSharpHtmlConverter.cs" />
+    <Compile Include="EmailValidator.cs" />
     <Compile Include="HtmlBodyBuilder.cs" />
     <Compile Include="HtmlTagHelper.cs" />
     <Compile Include="FileAttachment.cs" />
