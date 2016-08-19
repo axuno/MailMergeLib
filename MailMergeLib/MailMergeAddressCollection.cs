@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using MimeKit;
 
 namespace MailMergeLib
 {
@@ -45,32 +47,14 @@ namespace MailMergeLib
 			base.Add(address);
 		}
 
-		public MailMergeAddressCollection Get(MailAddressType addrType)
+		public IEnumerable<MailMergeAddress> Get(MailAddressType addrType)
 		{
-			var addrCol = new MailMergeAddressCollection(ref _mailMergeMessage);
-
-			foreach (var mmAddr in Items.Where(mmAddr => mmAddr.AddrType == addrType))
-			{
-				addrCol.Add(mmAddr);
-			}
-
-			return addrCol;
+			return Items.Where(mmAddr => mmAddr.AddrType == addrType);
 		}
 
-		public string ToString(MailAddressType addrType, MailSmartFormatter formatter, object dataItem)
+		public string ToString(MailAddressType addrType, object dataItem)
 		{
-			var addr = new StringBuilder();
-
-			foreach (MailMergeAddress mmAddr in Get(addrType))
-			{
-				addr.Append(mmAddr.GetMailAddress(formatter, dataItem));
-				addr.Append(", ");
-			}
-
-			if (addr.Length >= 2)
-				addr.Remove(addr.Length - 2, 2);
-
-			return addr.ToString();
+			return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(_mailMergeMessage.SmartFormatter, dataItem).ToString()));
 		}
 	}
 }
