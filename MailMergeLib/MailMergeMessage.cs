@@ -64,7 +64,7 @@ namespace MailMergeLib
 			DeliveryStatusNotification = DeliveryStatusNotification.Never;
 			Priority = MessagePriority.Normal;
 			Xmailer = null;
-			Headers = new NameValueCollection();
+			Headers = new HeaderList();
 			BinaryTransferEncoding = ContentEncoding.Base64;
 			TextTransferEncoding = ContentEncoding.SevenBit;
 			CharacterEncoding = Encoding.Default;
