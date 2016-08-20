@@ -406,7 +406,7 @@ namespace MailMergeLib
 		{
 			var subject = SearchAndReplaceVars(Subject, dataItem);
 			msg.Subject = subject;
-			msg.Headers.Add(HeaderId.Subject, CharacterEncoding, subject);
+			//msg.Headers.Add(HeaderId.Subject, CharacterEncoding, subject);
 		}
 
 
@@ -651,7 +651,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Gets or sets the user defined headers of a mail message.
 		/// </summary>
-		public NameValueCollection Headers { get; set; }
+		public HeaderList Headers { get; set; }
 
 		/// <summary>
 		/// Gets or sets the "x-mailer" header value to be used.
@@ -680,6 +680,19 @@ namespace MailMergeLib
 			if (!string.IsNullOrEmpty(Xmailer))
 			{
 				mimeMessage.Headers.Add(HeaderId.XMailer, Xmailer);
+			}
+
+			// collect any headers already present
+			var hl = new HashSet<HeaderId>();
+			foreach (var header in mimeMessage.Headers)
+			{
+				hl.Add(header.Id);
+			}
+			// not add headers for MailMergeMessage
+			foreach (var header in Headers)
+			{
+				if (hl.Add(header.Id))
+					mimeMessage.Headers.Add(header.Id, CharacterEncoding, SearchAndReplaceVars(header.Value, dataItem));
 			}
 		}
 
