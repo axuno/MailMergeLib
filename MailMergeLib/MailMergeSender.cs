@@ -55,7 +55,12 @@ namespace MailMergeLib
 		/// of the mail merge message.
 		/// </summary>
 		/// <param name="mailMergeMessage">Mail merge message.</param>
-		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.</param>
+		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.
+		/// IEnumerable&lt;T&gt; where T can be the following types:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
 		/// <remarks>
 		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
 		/// </remarks>
@@ -180,7 +185,11 @@ namespace MailMergeLib
 		/// </summary>
 		/// <remarks>The method raises events before and after sending, as well as on send failure.</remarks>
 		/// <param name="mailMergeMessage">Mail merge message.</param>
-		/// <param name="dataItem"></param>
+		/// <param name="dataItem">The following types are accepted:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
 		/// <exception>
 		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
@@ -219,7 +228,12 @@ namespace MailMergeLib
 		/// of the mail merge message.
 		/// </summary>
 		/// <param name="mailMergeMessage">Mail merge message.</param>
-		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.</param>
+		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.
+		/// IEnumerable&lt;T&gt; where T can be the following types:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
 		/// <remarks>
 		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
 		/// </remarks>
@@ -278,7 +292,11 @@ namespace MailMergeLib
 		/// Sends a single mail merge message.
 		/// </summary>
 		/// <param name="mailMergeMessage">Message to send.</param>
-		/// <param name="dataItem"></param>
+		/// <param name="dataItem">The following types are accepted:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
 		/// <exception>
 		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
