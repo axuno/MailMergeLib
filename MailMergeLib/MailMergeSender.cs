@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MailKit;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using MimeKit.Cryptography;
 
 
 namespace MailMergeLib
@@ -18,11 +18,10 @@ namespace MailMergeLib
 	/// </summary>
 	public class MailMergeSender : IDisposable
 	{
-		private ISmtpClientConfig[] _smtpClientConfig = new ISmtpClientConfig[] { new SmtpClientConfig() };
+		private ISmtpClientConfig[] _smtpClientConfig = { new SmtpClientConfig() };
 		private int _maxNumOfSmtpClients = 5;
 
 		private bool _disposed;
-		private bool _sendCancel;
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
 		/// <summary>
@@ -49,7 +48,7 @@ namespace MailMergeLib
 		/// Entering a Send method while IsBusy will raise an InvalidOperationException.
 		/// </summary>
 		public bool IsBusy { get; private set; }
-		
+
 
 		/// <summary>
 		/// Sends mail messages asynchronously to all recipients supplied in the data source
@@ -57,6 +56,9 @@ namespace MailMergeLib
 		/// </summary>
 		/// <param name="mailMergeMessage">Mail merge message.</param>
 		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.</param>
+		/// <remarks>
+		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
+		/// </remarks>
 		/// <exception>
 		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
@@ -211,12 +213,16 @@ namespace MailMergeLib
 			}
 		}
 
+
 		/// <summary>
 		/// Sends mail messages syncronously to all recipients supplied in the data source
 		/// of the mail merge message.
 		/// </summary>
 		/// <param name="mailMergeMessage">Mail merge message.</param>
 		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.</param>
+		/// <remarks>
+		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
+		/// </remarks>
 		/// <exception>
 		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
 		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
@@ -323,7 +329,7 @@ namespace MailMergeLib
 			Exception sendException = null;
 
 			// the client can rely on the sequence of events: OnBeforeSend, OnSendFailure (if any), OnAfterSend
-			OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(null, _sendCancel, mimeMsg, startTime));
+			OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(null, _cancellationTokenSource.Token.IsCancellationRequested, mimeMsg, startTime));
 
 			var failureCounter = 0;
 			do
@@ -385,7 +391,7 @@ namespace MailMergeLib
 			} while (failureCounter < config.MaxFailures && failureCounter > 0);
 
 			OnAfterSend?.Invoke(smtpClient,
-				new MailSenderAfterSendEventArgs(sendException, _sendCancel, mimeMsg, startTime, DateTime.Now));
+				new MailSenderAfterSendEventArgs(sendException, _cancellationTokenSource.Token.IsCancellationRequested, mimeMsg, startTime, DateTime.Now));
 
 			// Do some clean-up with the message
 			foreach (var mimeEntity in mimeMsg.Attachments)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -224,6 +225,13 @@ namespace MailMergeLib
 		{
 			lock (_syncRoot)
 			{
+				// convert DataRow to Dictionary<string, object>
+				if (dataItem is DataRow)
+				{
+					var row = (DataRow) dataItem;
+					dataItem = row.Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c]);
+				}
+
 				var mimeMessage = new MimeMessage();
 				AddSubjectToMailMessage(mimeMessage, dataItem);
 				AddAttributesToMailMessage(mimeMessage, dataItem);
