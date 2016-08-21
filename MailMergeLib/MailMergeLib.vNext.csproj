@@ -19,7 +19,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
@@ -87,6 +87,7 @@
     <Compile Include="AttachmentBuilder.cs" />
     <Compile Include="BodyBuilderBase.cs" />
     <Compile Include="AngleSharpHtmlConverter.cs" />
+    <Compile Include="Crypto.cs" />
     <Compile Include="EmailValidator.cs" />
     <Compile Include="HtmlBodyBuilder.cs" />
     <Compile Include="HtmlTagHelper.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="MailMergeMessage_Exception.cs" />
     <Compile Include="MailMergeMessage.cs" />
     <Compile Include="MailMergeSender_EventArgs.cs" />
+    <Compile Include="MessageConfig.cs" />
     <Compile Include="MessageOutput.cs" />
     <Compile Include="MailSmartFormatter.cs" />
     <Compile Include="PlainBodyBuilder.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="MailMergeSender.cs">
     </Compile>
     <Compile Include="RegExHtmlConverter.cs" />
+    <Compile Include="SenderConfig.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormatter.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormattingInfo.cs" />

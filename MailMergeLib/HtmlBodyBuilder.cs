@@ -23,7 +23,7 @@ namespace MailMergeLib
 		private readonly MailMergeMessage _mailMergeMessage;
 		private readonly IHtmlDocument _htmlDocument;
 		private string _docBaseUrl;
-		private object _dataItem;
+		private readonly object _dataItem;
 
 		/// <summary>
 		/// Constructor.
@@ -35,7 +35,7 @@ namespace MailMergeLib
 			_docBaseUrl = string.Empty;
 			_mailMergeMessage = mailMergeMessage;
 			_dataItem = dataItem;
-			BinaryTransferEncoding = mailMergeMessage.BinaryTransferEncoding;
+			BinaryTransferEncoding = mailMergeMessage.Config.BinaryTransferEncoding;
 
 			// Create a new parser front-end (can be re-used)
 			var parser = new HtmlParser();

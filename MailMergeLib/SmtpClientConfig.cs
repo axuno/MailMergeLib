@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Net;
 using System.Net.Configuration;
 using System.Reflection;
+using System.Security;
 using System.Xml.Serialization;
 using MailKit;
 using MailKit.Security;
@@ -53,7 +54,7 @@ namespace MailMergeLib
 			if (smtpSection.Network.EnableSsl) SecureSocketOptions = SecureSocketOptions.Auto;
 
 			if (!string.IsNullOrEmpty(smtpSection.Network.UserName) && !string.IsNullOrEmpty(smtpSection.Network.Password))
-				NetworkCredential = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
+				NetworkCredential = new Credential(smtpSection.Network.UserName, smtpSection.Network.Password);
 			
 			SmtpPort = smtpSection.Network.Port;
 			SmtpHost = smtpSection.Network.Host;
@@ -104,7 +105,7 @@ namespace MailMergeLib
 		/// Set NetworkCredential to null if no authentification is required.
 		/// </summary>
 		/// <remarks> Used during SmtpClient connect.</remarks>
-		public NetworkCredential NetworkCredential { get; set; }
+		public Credential NetworkCredential { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the output directory of sent mail messages
@@ -226,5 +227,86 @@ namespace MailMergeLib
 				throw ex.InnerException ?? ex;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Class used for serialization of credentials.
+	/// Credentials will be saved encrypted. Only GetCredential() returns the NetworkCredential decrypted.
+	/// </summary>
+	public class Credential : ICredentials
+	{
+		/// <summary>
+		/// Initializes a new instance of the Credential class.
+		/// </summary>
+		public Credential()
+		{}
+
+		/// <summary>
+		/// Initializes a new instance of the Credential class.
+		/// </summary>
+		/// <param name="username"></param>
+		/// <param name="password"></param>
+		/// <param name="domain"></param>
+		public Credential(string username, string password, string domain = null)
+		{
+			Username = username;
+			Password = password;
+			Domain = domain; 
+		}
+
+		/// <summary>
+		/// Get the Networkcredentials.
+		/// </summary>
+		/// <param name="uri"></param>
+		/// <param name="authType"></param>
+		/// <returns></returns>
+		public NetworkCredential GetCredential(Uri uri, string authType)
+		{
+			return string.IsNullOrEmpty(Domain)
+				? new NetworkCredential(Username, Password).GetCredential(uri, authType)
+				: new NetworkCredential(Username, Password, Domain).GetCredential(uri, authType);
+		}
+
+		/// <summary>
+		/// Get the NetworkCredential
+		/// </summary>
+		/// <returns></returns>
+		public NetworkCredential GetCredential()
+		{
+			return string.IsNullOrEmpty(Domain)
+				? new NetworkCredential(Username, Password)
+				: new NetworkCredential(Username, Password, Domain);
+		}
+
+		/// <summary>
+		/// User name, set as plain text, returned encrypted.
+		/// </summary>
+		[XmlIgnore]
+		public string Username { get; set; }
+
+		[XmlAttribute("Username")]
+		public string UsernameEncrypted
+		{
+			get { return Crypto.Encrypt(Username); }
+			set { Username = Crypto.Decrypt(value); }
+		}
+
+		/// <summary>
+		/// Password, set as plain text, returned encrypted.
+		/// </summary>
+		[XmlIgnore]
+		public string Password { get; set; }
+
+		[XmlAttribute("Password")]
+		public string PasswordEncrypted
+		{
+			get { return Crypto.Encrypt(Password); }
+			set { Password = Crypto.Decrypt(value); }
+		}
+
+		/// <summary>
+		/// The domain.
+		/// </summary>
+		public string Domain { get; set; }
 	}
 }

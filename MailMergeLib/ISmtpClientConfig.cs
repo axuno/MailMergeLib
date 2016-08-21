@@ -46,7 +46,7 @@ namespace MailMergeLib
 		/// Set authentification details for logging into an SMTP server.
 		/// Set NetworkCredential to null if no authentification is required.
 		/// </summary>
-		NetworkCredential NetworkCredential { get; set; }
+		Credential NetworkCredential { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the output directory of sent mail messages

@@ -5,7 +5,7 @@ using MimeKit;
 
 namespace MailMergeLib
 {
-	public partial class MailMergeMessage
+	partial class MailMergeMessage
 	{
 		#region Nested type: AddressException
 

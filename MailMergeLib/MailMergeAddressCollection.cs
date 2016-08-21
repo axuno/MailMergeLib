@@ -37,7 +37,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Constructor.
 		/// </summary>
-		internal MailMergeAddressCollection(ref MailMergeMessage msg)
+		internal MailMergeAddressCollection(MailMergeMessage msg)
 		{
 			_mailMergeMessage = msg;
 		}

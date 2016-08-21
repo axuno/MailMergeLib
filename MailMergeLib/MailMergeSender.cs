@@ -18,7 +18,6 @@ namespace MailMergeLib
 	/// </summary>
 	public class MailMergeSender : IDisposable
 	{
-		private ISmtpClientConfig[] _smtpClientConfig = { new SmtpClientConfig() };
 		private int _maxNumOfSmtpClients = 5;
 
 		private bool _disposed;
@@ -105,7 +104,7 @@ namespace MailMergeLib
 			// Example: 5 tasks with 2 configs: task 0 => config 0, task 1 => config 1, task 2 => config 0, task 3 => config 1, task 4 => config 0, task 5 => config 1
 			for (var i = 0; i < _maxNumOfSmtpClients; i++)
 			{
-				smtpConfigForTask[i] = SmtpClientConfig[i%_smtpClientConfig.Length];
+				smtpConfigForTask[i] = Config.SmtpClientConfig[i% Config.SmtpClientConfig.Length];
 			}
 
 			for (var i = 0; i < sendTasks.Length; i++)
@@ -123,8 +122,7 @@ namespace MailMergeLib
 							{
 								mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
 #if DEBUG
-								if (mimeMessage.Headers[HeaderId.XMailer] != null) mimeMessage.Headers[HeaderId.XMailer] += "  #" + taskNo;
-								else mimeMessage.Headers[HeaderId.XMailer] = "Task #" + taskNo;
+								mimeMessage.Headers[HeaderId.XMailer] = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name +"  #" + taskNo;
 #endif
 							}
 							catch (MailMergeMessage.MailMergeMessageException ex)
@@ -207,7 +205,7 @@ namespace MailMergeLib
 			{
 				await Task.Run(() =>
 				{
-					var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+					var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
 					using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 					{
 						SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig);
@@ -259,7 +257,7 @@ namespace MailMergeLib
 				var startTime = DateTime.Now;
 				var numOfRecords = dataSource.Count();
 
-				var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+				var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
 				using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 				{
 					OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
@@ -314,7 +312,7 @@ namespace MailMergeLib
 
 			try
 			{
-				var smtpClientConfig = SmtpClientConfig[0]; // use the standard configuration
+				var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
 				using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
 				{
 					SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig);
@@ -391,7 +389,7 @@ namespace MailMergeLib
 						// on first SMTP failure switch to the backup configuration, if one exists
 						if (failureCounter == 1 && config.MaxFailures > 1)
 						{
-							var backupConfig = SmtpClientConfig.FirstOrDefault(c => c != config);
+							var backupConfig = Config.SmtpClientConfig.FirstOrDefault(c => c != config);
 							if (backupConfig == null) continue;
 
 							backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
@@ -546,16 +544,7 @@ namespace MailMergeLib
 		}
 		
 
-		/// <summary>
-		/// Gets or sets the array of configurations the SmtpClients will use.
-		/// The first SmtpClientConfig is the "standard", any second is the "backup".
-		/// Other instances of SmtpClientConfig in the array are used for parallel sending messages.
-		/// </summary>
-		public ISmtpClientConfig[] SmtpClientConfig
-		{
-			get { return _smtpClientConfig; }
-			set { _smtpClientConfig = value ?? new ISmtpClientConfig[] {new SmtpClientConfig()}; }
-		}
+
 
 		/// <summary>
 		/// Event raising before sending a mail message.
@@ -591,6 +580,11 @@ namespace MailMergeLib
 		/// Event raising after completing mail merge.
 		/// </summary>
 		public event EventHandler<MailSenderMergeCompleteEventArgs> OnMergeComplete;
+
+		/// <summary>
+		/// The settings for a MailMergeSender.
+		/// </summary>
+		public SenderConfig Config { get; set; }
 
 		/// <summary>
 		/// Cancel any transactions sending or merging mail.
