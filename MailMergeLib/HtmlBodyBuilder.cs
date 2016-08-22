@@ -178,6 +178,14 @@ namespace MailMergeLib
 
 				// replace any placeholders with variables
 				currSrc = _mailMergeMessage.SearchAndReplaceVars(currSrc, _dataItem);
+
+				// img scr is not a local file (e.g. starting with "http"), so we just save the value with placeholders replaced
+				if (new Uri(currSrc).IsFile)
+				{
+					img.Attributes["src"].Value = currSrc;
+					continue;
+				}
+
 				// this will succeed only with local files (at this time, they don't need to exist yet)
 				var filename = MakeFullPath(MakeLocalPath(currSrc));
 				try
@@ -232,7 +240,7 @@ namespace MailMergeLib
 		private static string MakeLocalPath(string uri)
 		{
 			return uri.StartsWith(Uri.UriSchemeFile) ? new Uri(uri).LocalPath : uri;
-
+			
 			/* Note:
 			 * In case the filename does not contain the Uri.UriSchemeFile prefix,
 			 * it will not be decoded. Then the follwing line should be used.
