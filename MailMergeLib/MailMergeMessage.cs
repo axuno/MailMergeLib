@@ -111,7 +111,7 @@ namespace MailMergeLib
 		/// <param name="subject">Mail message subject.</param>
 		/// <param name="plainText">Plain text part of the mail message.</param>
 		/// <param name="fileAtt">File attachments of the mail message.</param>
-		public MailMergeMessage(string subject, string plainText, HashSet<FileAttachment> fileAtt)
+		public MailMergeMessage(string subject, string plainText, IEnumerable<FileAttachment> fileAtt)
 			: this(subject, plainText, string.Empty, fileAtt)
 		{
 		}
@@ -123,10 +123,10 @@ namespace MailMergeLib
 		/// <param name="plainText">Plain text part of the mail message.</param>
 		/// <param name="htmlText">HTML message part of the mail message.</param>
 		/// <param name="fileAtt">File attachments of the mail message.</param>
-		public MailMergeMessage(string subject, string plainText, string htmlText, HashSet<FileAttachment> fileAtt)
+		public MailMergeMessage(string subject, string plainText, string htmlText, IEnumerable<FileAttachment> fileAtt)
 			: this(subject, plainText, htmlText)
 		{
-			FileAttachments = fileAtt;
+			fileAtt.ToList().ForEach(fa => FileAttachments.Add(fa));
 		}
 
 		#endregion
@@ -136,7 +136,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// The settings for a MailMergeMessage.
 		/// </summary>
-		public MessageConfig Config { get; set; }
+		public MessageConfig Config { get; set; } = new MessageConfig();
 
 		/// <summary>
 		/// Gets or sets the mail message subject.

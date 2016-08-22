@@ -176,7 +176,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="License.txt" />
     <Content Include="SmartFormatMail\license.txt" />
     <Content Include="SmartFormatMail\SmartFormat.csproj" />
   </ItemGroup>

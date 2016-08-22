@@ -76,7 +76,12 @@ namespace MailMergeLib
 			// read the <base href="..."> tag in order to find the embedded image files later on
 			var baseEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlBaseElement) as IHtmlBaseElement;
 			var baseDir = baseEle?.Href ?? string.Empty;
-			_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
+
+			// only replace the base url if it was not set programmatically
+			if (string.IsNullOrEmpty(_docBaseUrl))
+			{
+				_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
+			}
 
 			// remove if base tag is local file reference, because it's not usable in the resulting HTML
 			if (baseEle != null && baseDir.StartsWith(Uri.UriSchemeFile))
@@ -124,7 +129,7 @@ namespace MailMergeLib
 				try
 				{
 					// create an inline image attachment for the file located at path
-					var attachment = new AttachmentBuilder(new FileAttachment(ia.Filename, ia.DisplayName, ia.MimeType), CharacterEncoding,
+					var attachment = new AttachmentBuilder(ia, CharacterEncoding,
 							TextTransferEncoding, BinaryTransferEncoding).GetAttachment();
 					attachment.ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Inline);
 
@@ -180,7 +185,7 @@ namespace MailMergeLib
 				currSrc = _mailMergeMessage.SearchAndReplaceVars(currSrc, _dataItem);
 
 				// img scr is not a local file (e.g. starting with "http"), so we just save the value with placeholders replaced
-				if (new Uri(currSrc).IsFile)
+				if (!string.IsNullOrEmpty(currSrc) && ! new Uri(MakeUri(currSrc)).IsFile)
 				{
 					img.Attributes["src"].Value = currSrc;
 					continue;
@@ -195,10 +200,10 @@ namespace MailMergeLib
 						var fileInfo = new FileInfo(filename);
 						var contentType = MimeTypes.GetMimeType(filename);
 						var cid = MimeUtils.GenerateMessageId();
-						InlineAtt.Add(new FileAttachment(filename, MakeCid(string.Empty, cid, new FileInfo(filename).Extension), contentType));
+						InlineAtt.Add(new FileAttachment(fileInfo.FullName, MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
 
 						img.Attributes["src"].Value = MakeCid("cid:", cid, fileInfo.Extension);
-						fileList.Add(filename);
+						fileList.Add(fileInfo.FullName);
 					}
 				}
 				catch
