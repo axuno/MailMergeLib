@@ -44,6 +44,7 @@ namespace MailMergeLib
 
 		public new void Add(MailMergeAddress address)
 		{
+			address.DisplayNameCharacterEncoding = _mailMergeMessage.Config.CharacterEncoding;
 			base.Add(address);
 		}
 

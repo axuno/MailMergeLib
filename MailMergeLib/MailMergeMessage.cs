@@ -534,8 +534,7 @@ namespace MailMergeLib
 			MailMergeAddress testAddress = null;
 			foreach (MailMergeAddress mmAddr in MailMergeAddresses.Where(mmAddr => mmAddr.AddrType == MailAddressType.TestAddress))
 			{
-				testAddress = new MailMergeAddress(MailAddressType.TestAddress, mmAddr.Address, mmAddr.DisplayName,
-				                                   mmAddr.DisplayNameCharacterEncoding);
+				testAddress = new MailMergeAddress(MailAddressType.TestAddress, mmAddr.Address, mmAddr.DisplayName);
 			}
 
 			if (Config.StandardFromAddress != null)

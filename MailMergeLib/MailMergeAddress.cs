@@ -15,7 +15,7 @@ namespace MailMergeLib
 		/// <param name="addrType">MailAddressType of the e-mail address.</param>
 		/// <param name="address">A string that contains an e-mail address. Can include display name and address in one string, e.g. "recipient" &lt;recipient@mail.com&gt;.</param>
 		public MailMergeAddress(MailAddressType addrType, string address)
-			: this(addrType, address, string.Empty)
+			: this(addrType, string.Empty, address)
 		{
 		}
 
@@ -26,24 +26,10 @@ namespace MailMergeLib
 		/// <param name="address">A string that contains an e-mail address.</param>
 		/// <param name="displayName">A string that contains the display name associated with address. This parameter can be null.</param>
 		public MailMergeAddress(MailAddressType addrType, string displayName, string address)
-			: this(addrType, address, displayName, Encoding.Default)
-		{
-		}
-
-		/// <summary>
-		/// Represents the address of an electronic mail sender or recipient for use with a MailMergeMessage.
-		/// </summary>
-		/// <param name="addrType">MailAddressType of the e-mail address.</param>
-		/// <param name="address">A string that contains an e-mail address.</param>
-		/// <param name="displayName">A string that contains the display name associated with address. This parameter can be null.</param>
-		/// <param name="displayNameCharacterEncoding">Encoding that defines the character set used for displayName.</param>
-		public MailMergeAddress(MailAddressType addrType, string displayName, string address,
-								Encoding displayNameCharacterEncoding)
 		{
 			AddrType = addrType;
 			Address = address;
 			DisplayName = displayName;
-			DisplayNameCharacterEncoding = displayNameCharacterEncoding;
 		}
 
 		/// <summary>
@@ -86,9 +72,8 @@ namespace MailMergeLib
 		/// <summary>
 		/// Gets or sets the Encoding that defines the character set used for displayName.
 		/// </summary>
-		public Encoding DisplayNameCharacterEncoding { get; set; }
-
-
+		internal Encoding DisplayNameCharacterEncoding { get; set; }
+		
 		/// <summary>
 		/// Gets the MailAddress representation of the MailMergeAddress.
 		/// </summary>
