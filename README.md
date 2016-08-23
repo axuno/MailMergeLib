@@ -14,7 +14,7 @@
 ### 2. Sending email messages:
 * Practically unlimited number of parallel tasks to send out individualized emails to a big number of recipients.
 * SmptClients for each task can get their own preconfigured settings, so that e.g. several mail servers can be used for one send job.
-* Progress of processing emails can easily be observed with a number of delegates.
+* Progress of processing emails can easily be observed with a number of events.
 * SMTP failures can automatically be resolved supplying a backup configuration. This fault-tolerance is essential for unattended production systems.
 * SMTP configuration can be stored/restored to/from standard XML files.
 * Emails are sent using the SmtpClient from [MailKit](https://github.com/jstedfast/MailKit), the sister project to MimeKit. SmtpClient is highly flexible and can be configured for literally every scenario you can think of.
@@ -23,8 +23,9 @@
 
 ### 3. Both:
 * Fine grained control over the whole process of email message generation and distribution.
-* By far better performance than with .NET ```System.Net.Mail```.
+* Better performance than with .NET ```System.Net.Mail```.
+* RFC standards compliant.
 
 #### History
 MailMergeLib was introduced back in 2007 on [CodeProject](http://www.codeproject.com/Articles/19546/MailMergeLib-A-NET-Mail-Client-Library). The last version published there is 4.0. It is based on ```System.Net.Mail```.
-Version 5 published on GitHub is a major rewrite, and it is not backwards compatible.
+MailMergeLib 5 published on GitHub is a major rewrite, and it is not backwards compatible.
