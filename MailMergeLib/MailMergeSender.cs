@@ -584,7 +584,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// The settings for a MailMergeSender.
 		/// </summary>
-		public SenderConfig Config { get; set; }
+		public SenderConfig Config { get; set; } = new SenderConfig();
 
 		/// <summary>
 		/// Cancel any transactions sending or merging mail.
