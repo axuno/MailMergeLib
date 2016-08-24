@@ -33,7 +33,7 @@ namespace MailMergeLib
 		/// If MailMergeLib runs on an IIS web application, it can load the following settings from system.net/mailSettings/smtp configuration section of web.donfig:
 		/// DeliveryMethod, MessageOutput, EnableSsl, Network.UserName, Network.Password, Network.Host, Network.Port, Network.ClientDomain
 		/// </summary>
-		public void SmtpConfigurationFromWebConfig()
+		public void ReadSmtpConfigurationFromWebConfig()
 		{
 			var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
 			if (smtpSection == null) return;

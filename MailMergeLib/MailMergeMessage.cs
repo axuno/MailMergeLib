@@ -539,6 +539,8 @@ namespace MailMergeLib
 
 			if (Config.StandardFromAddress != null)
 			{
+				Config.StandardFromAddress.Address = SearchAndReplaceVars(Config.StandardFromAddress.Address, dataItem);
+				Config.StandardFromAddress.Name = SearchAndReplaceVars(Config.StandardFromAddress.Name, dataItem);
 				mimeMessage.From.Add(Config.StandardFromAddress);
 			}
 
