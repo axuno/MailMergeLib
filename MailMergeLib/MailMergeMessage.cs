@@ -60,8 +60,8 @@ namespace MailMergeLib
 		/// </summary>
 		public MailMergeMessage()
 		{
-			IgnoreIllegalRecipientAddr = true;
-			Priority = MessagePriority.Normal;
+			Config.IgnoreIllegalRecipientAddresses = true;
+			Config.Priority = MessagePriority.Normal;
 			Headers = new HeaderList();
 			Subject = string.Empty;
 
@@ -518,13 +518,6 @@ namespace MailMergeLib
 
 
 		/// <summary>
-		/// If true, empty merge recipient addresses will be skipped.
-		/// If false, empty addresses will throw an exception.
-		/// </summary>
-		public bool IgnoreIllegalRecipientAddr { get; set; }
-
-
-		/// <summary>
 		/// Prepares all recipient address and the corresponding header fields of a mail message.
 		/// </summary>
 		private void AddAddressesToMailMessage(MimeMessage mimeMessage, object dataItem)
@@ -562,7 +555,7 @@ namespace MailMergeLib
 
 					SmartFormatter.MissingVariables.ToList().ForEach(f => _badVariableNames.Add(f));
 
-					if (IgnoreIllegalRecipientAddr && mailboxAddr == null)
+					if (Config.IgnoreIllegalRecipientAddresses && mailboxAddr == null)
 						continue;
 					
 					switch (mmAddr.AddrType)
@@ -614,11 +607,6 @@ namespace MailMergeLib
 		public HeaderList Headers { get; set; }
 
 		/// <summary>
-		/// Gets or sets the priority of a mail message.
-		/// </summary>
-		public MessagePriority Priority { get; set; }
-
-		/// <summary>
 		/// Gets or sets the delivery notification options, which will be used by DsnSmtpClient()
 		/// Bitwise-or whatever combination of flags you want to be notified about.
 		/// </summary>
@@ -634,7 +622,7 @@ namespace MailMergeLib
 		/// </summary>
 		private void AddAttributesToMailMessage(MimeMessage mimeMessage, object dataItem)
 		{
-			mimeMessage.Priority = Priority;
+			mimeMessage.Priority = Config.Priority;
 
 			if (!string.IsNullOrEmpty(Config.Xmailer))
 			{
