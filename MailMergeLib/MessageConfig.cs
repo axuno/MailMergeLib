@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -86,7 +87,7 @@ namespace MailMergeLib
 		public string StandardFromAddressText
 		{
 			get { return StandardFromAddress?.ToString(); }
-			set { if (!string.IsNullOrEmpty(value)) StandardFromAddress = MailboxAddress.Parse(ParserOptions.Default, value); }
+			set { StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value) : null; }
 		}
 
 		/// <summary>

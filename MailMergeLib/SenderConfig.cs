@@ -12,14 +12,12 @@ namespace MailMergeLib
 	/// </summary>
 	public class SenderConfig
 	{
-		private SmtpClientConfig[] _smtpClientConfig = { new SmtpClientConfig() };
-
 		/// <summary>
 		/// CTOR for MailMergeSender configuration.
 		/// </summary>
 		public SenderConfig()
 		{}
-		
+
 		/// <summary>
 		/// Gets or sets the array of configurations the SmtpClients will use.
 		/// The first SmtpClientConfig is the "standard", any second is the "backup".
@@ -27,10 +25,6 @@ namespace MailMergeLib
 		/// </summary>
 		[XmlArray("SmtpClients")]
 		[XmlArrayItem(ElementName = "SmtpClient")]
-		public SmtpClientConfig[] SmtpClientConfig
-		{
-			get { return _smtpClientConfig; }
-			set { _smtpClientConfig = value ?? new [] { new SmtpClientConfig() }; }
-		}
+		public SmtpClientConfig[] SmtpClientConfig { get; set; } = {new SmtpClientConfig()};
 	}
 }
