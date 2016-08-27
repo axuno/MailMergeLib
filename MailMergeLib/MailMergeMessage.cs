@@ -375,7 +375,7 @@ namespace MailMergeLib
 		{
 			var subject = SearchAndReplaceVars(Subject, dataItem);
 			msg.Subject = subject;
-			//msg.Headers.Add(HeaderId.Subject, CharacterEncoding, subject);
+			msg.Headers.Replace(HeaderId.Subject, Config.CharacterEncoding, subject);
 		}
 
 
