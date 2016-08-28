@@ -1,5 +1,5 @@
-![logo](https://github.com/axuno/MailMergeLib/blob/master/MailMergeLlib.png)
-# MailMergeLib
+<img src="https://github.com/axuno/MailMergeLib/blob/master/MailMergeLlib.png" width="300" alt="Logo">
+
 ```MailMergeLib``` version 5.0 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` comes with the following features:
 
 ### 1. Mail message generation:
