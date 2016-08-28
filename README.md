@@ -25,6 +25,7 @@
 * Fine grained control over the whole process of email message generation and distribution.
 * Better performance than with .NET ```System.Net.Mail```.
 * RFC standards compliant.
+* We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
 ### Get started
 Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
