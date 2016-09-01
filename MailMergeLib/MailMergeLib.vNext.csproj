@@ -186,6 +186,7 @@
     <Content Include="Binaries-Snapshot\MailMergeLib.xml" />
     <Content Include="Binaries-Snapshot\MimeKit.dll" />
     <Content Include="Binaries-Snapshot\MimeKit.xml" />
+    <Content Include="Binaries-Snapshot\readme.txt" />
     <Content Include="SmartFormatMail\license.txt" />
     <Content Include="SmartFormatMail\SmartFormat.csproj" />
   </ItemGroup>
