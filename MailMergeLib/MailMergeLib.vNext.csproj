@@ -105,6 +105,7 @@
     <Compile Include="MailSmartFormatter.cs" />
     <Compile Include="PlainBodyBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Binaries-Snapshot\2016-08-27_13-47-51.zip" />
     <None Include="MailMergeLib.snk" />
     <None Include="packages.config" />
     <Compile Include="MailMergeSender.cs">
@@ -176,16 +177,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Binaries-Snapshot\AngleSharp.dll" />
-    <Content Include="Binaries-Snapshot\AngleSharp.xml" />
-    <Content Include="Binaries-Snapshot\BouncyCastle.Crypto.dll" />
-    <Content Include="Binaries-Snapshot\MailKit.dll" />
-    <Content Include="Binaries-Snapshot\MailKit.xml" />
-    <Content Include="Binaries-Snapshot\MailMergeLib.dll" />
-    <Content Include="Binaries-Snapshot\MailMergeLib.pdb" />
-    <Content Include="Binaries-Snapshot\MailMergeLib.xml" />
-    <Content Include="Binaries-Snapshot\MimeKit.dll" />
-    <Content Include="Binaries-Snapshot\MimeKit.xml" />
     <Content Include="Binaries-Snapshot\readme.txt" />
     <Content Include="SmartFormatMail\license.txt" />
     <Content Include="SmartFormatMail\SmartFormat.csproj" />
