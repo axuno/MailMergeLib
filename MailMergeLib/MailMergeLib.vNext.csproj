@@ -176,6 +176,16 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Binaries-Snapshot\AngleSharp.dll" />
+    <Content Include="Binaries-Snapshot\AngleSharp.xml" />
+    <Content Include="Binaries-Snapshot\BouncyCastle.Crypto.dll" />
+    <Content Include="Binaries-Snapshot\MailKit.dll" />
+    <Content Include="Binaries-Snapshot\MailKit.xml" />
+    <Content Include="Binaries-Snapshot\MailMergeLib.dll" />
+    <Content Include="Binaries-Snapshot\MailMergeLib.pdb" />
+    <Content Include="Binaries-Snapshot\MailMergeLib.xml" />
+    <Content Include="Binaries-Snapshot\MimeKit.dll" />
+    <Content Include="Binaries-Snapshot\MimeKit.xml" />
     <Content Include="SmartFormatMail\license.txt" />
     <Content Include="SmartFormatMail\SmartFormat.csproj" />
   </ItemGroup>
