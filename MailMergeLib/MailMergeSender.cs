@@ -99,7 +99,7 @@ namespace MailMergeLib
 			var sendTasks = new Task[_maxNumOfSmtpClients];
 
 			// The max. number of configurations used is the number of parallel smtp clients
-			var smtpConfigForTask = new ISmtpClientConfig[_maxNumOfSmtpClients];
+			var smtpConfigForTask = new SmtpClientConfig[_maxNumOfSmtpClients];
 			// Set as many smtp configs as we have for each task
 			// Example: 5 tasks with 2 configs: task 0 => config 0, task 1 => config 1, task 2 => config 0, task 3 => config 1, task 4 => config 0, task 5 => config 1
 			for (var i = 0; i < _maxNumOfSmtpClients; i++)
@@ -339,7 +339,7 @@ namespace MailMergeLib
 		/// <exception cref="SmtpProtocolException"></exception>
 		/// <exception cref="AuthenticationException"></exception>
 		/// <exception cref="System.Net.Sockets.SocketException"></exception>
-		private void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, ISmtpClientConfig config)
+		private void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
 		{
 			var startTime = DateTime.Now;
 			Exception sendException = null;
@@ -429,7 +429,7 @@ namespace MailMergeLib
 		/// <param name="smtpClient"></param>
 		/// <param name="message"></param>
 		/// <param name="config"></param>
-		private void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message, ISmtpClientConfig config)
+		private void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message, SmtpClientConfig config)
 		{
 			var hostPortConfig = $"{config.SmtpHost}:{config.SmtpPort} using configuration '{config.Name}'";
 			const string errorConnect = "Error trying to connect";
@@ -507,7 +507,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Get pre-configured SmtpClient
 		/// </summary>
-		private static SmtpClient GetInitializedSmtpClient(ISmtpClientConfig config)
+		private static SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
 		{
 			//var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
 			var smtpClient = config.EnableLogOutput ? new SmtpClient(config.GetProtocolLogger()) : new SmtpClient();
@@ -527,7 +527,7 @@ namespace MailMergeLib
 		/// </remarks>
 		/// <param name="smtpClient"></param>
 		/// <param name="config"></param>
-		private static void SetConfigForSmtpClient(SmtpClient smtpClient, ISmtpClientConfig config)
+		private static void SetConfigForSmtpClient(SmtpClient smtpClient, SmtpClientConfig config)
 		{
 			try
 			{	

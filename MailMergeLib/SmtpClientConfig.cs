@@ -14,7 +14,7 @@ namespace MailMergeLib
 	/// <summary>
 	/// Class which is used by MailMergeSender in order to build preconfigured SmtpClients.
 	/// </summary>
-	public class SmtpClientConfig : ISmtpClientConfig
+	public class SmtpClientConfig
 	{
 		private int _maxFailures = 1;
 		private int _retryDelayTime;

@@ -96,9 +96,9 @@ namespace MailMergeLib
 		public readonly Exception Error;
 		public readonly int FailureCounter;
 		public readonly MimeMessage MimeMessage;
-		public readonly ISmtpClientConfig SmtpClientConfig;
+		public readonly SmtpClientConfig SmtpClientConfig;
 
-		internal MailSenderSendFailureEventArgs(Exception error, int failureCounter, ISmtpClientConfig smtpClientConfig,
+		internal MailSenderSendFailureEventArgs(Exception error, int failureCounter, SmtpClientConfig smtpClientConfig,
 		                                        MimeMessage mimeMessage)
 		{
 			Error = error;

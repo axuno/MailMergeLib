@@ -46,7 +46,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>bin\Debug\MailMergeLib.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\MailMergeLib.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -94,7 +94,6 @@
     <Compile Include="FileAttachment.cs" />
     <Compile Include="HtmlBodyBuilderRegEx.cs" />
     <Compile Include="IHtmlConverter.cs" />
-    <Compile Include="ISmtpClientConfig.cs" />
     <Compile Include="MailMergeAddress.cs" />
     <Compile Include="MailMergeAddressCollection.cs" />
     <Compile Include="MailMergeMessage_Exception.cs" />
