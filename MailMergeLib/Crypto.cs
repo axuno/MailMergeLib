@@ -19,19 +19,24 @@ namespace MailMergeLib
 		public static string CryptoKey { get; set; } = "MailMergeLibCrypt";
 
 		/// <summary>
+		/// Encoding used to encrypt or decrypt. Defaults to Encoding.UTF8
+		/// </summary>
+		public static Encoding Encoding { get; set; } = Encoding.UTF8;
+
+		/// <summary>
 		/// Encrypts the string parameter.
 		/// </summary>
-		/// <param name="s">The UTF-8 string to encrypt.</param>
+		/// <param name="s">The string to encrypt.</param>
 		/// <returns>Returns the encrypted and base64 encoded string.</returns>
 		public static string Encrypt(string s)
 		{
 			if (string.IsNullOrEmpty(s))
 				return s;
 		
-			var buffer = Encoding.UTF8.GetBytes(s);
+			var buffer = Encoding.GetBytes(s);
 			var des = new TripleDESCryptoServiceProvider
 			{
-				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.UTF8.GetBytes(CryptoKey)),
+				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.GetBytes(CryptoKey)),
 				IV = _Iv
 			};
 			return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
@@ -41,7 +46,7 @@ namespace MailMergeLib
 		/// Decrypts the string parameter
 		/// </summary>
 		/// <param name="s">The base64 encoded, encrypted string.</param>
-		/// <returns>Returns the decrypted, UTF8 encoded string.</returns>
+		/// <returns>Returns the decrypted, encoded string.</returns>
 		public static string Decrypt(string s)
 		{
 			if (string.IsNullOrEmpty(s))
@@ -50,10 +55,10 @@ namespace MailMergeLib
 			var buffer = Convert.FromBase64String(s);
 			var des = new TripleDESCryptoServiceProvider
 			{
-				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.UTF8.GetBytes(CryptoKey)),
+				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.GetBytes(CryptoKey)),
 				IV = _Iv
 			};
-			return Encoding.UTF8.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+			return Encoding.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
 		}
 	}
 }
