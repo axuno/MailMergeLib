@@ -9,16 +9,18 @@ namespace MailMergeLib
 	public class MailSenderAfterSendEventArgs : EventArgs
 	{
 		public readonly bool Cancelled;
-		public readonly DateTime EndTime;
 		public readonly Exception Error;
+		public readonly SmtpClientConfig SmtpClientConfig;
 		public readonly MimeMessage MimeMessage;
 		public readonly DateTime StartTime;
+		public readonly DateTime EndTime;
 
-		internal MailSenderAfterSendEventArgs(Exception error, bool cancelled, MimeMessage mailMergeMessage,
-		                                      DateTime startTime, DateTime endTime)
+		internal MailSenderAfterSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mailMergeMessage, DateTime startTime, DateTime endTime,
+			Exception error, bool cancelled)
 		{
 			Error = error;
 			Cancelled = cancelled;
+			SmtpClientConfig = smtpConfig;
 			MimeMessage = mailMergeMessage;
 			StartTime = startTime;
 			EndTime = endTime;
@@ -32,15 +34,17 @@ namespace MailMergeLib
 	{
 		public readonly bool Cancelled;
 		public readonly Exception Error;
+		public readonly SmtpClientConfig SmtpClientConfig;
 		public readonly MimeMessage MimeMessage;
 		public readonly DateTime StartTime;
 
-		internal MailSenderBeforeSendEventArgs(Exception error, bool cancelled, MimeMessage mimeMessage,
-		                                       DateTime startTime)
+		internal MailSenderBeforeSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mimeMessage, DateTime startTime, Exception error,
+			bool cancelled)
 		{
 			Error = error;
 			Cancelled = cancelled;
 			MimeMessage = mimeMessage;
+			SmtpClientConfig = smtpConfig;
 			StartTime = startTime;
 		}
 	}

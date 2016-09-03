@@ -345,7 +345,7 @@ namespace MailMergeLib
 			Exception sendException = null;
 
 			// the client can rely on the sequence of events: OnBeforeSend, OnSendFailure (if any), OnAfterSend
-			OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(null, _cancellationTokenSource.Token.IsCancellationRequested, mimeMsg, startTime));
+			OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(config, mimeMsg, startTime, null, _cancellationTokenSource.Token.IsCancellationRequested));
 
 			var failureCounter = 0;
 			do
@@ -407,7 +407,7 @@ namespace MailMergeLib
 			} while (failureCounter < config.MaxFailures && failureCounter > 0);
 
 			OnAfterSend?.Invoke(smtpClient,
-				new MailSenderAfterSendEventArgs(sendException, _cancellationTokenSource.Token.IsCancellationRequested, mimeMsg, startTime, DateTime.Now));
+				new MailSenderAfterSendEventArgs(config, mimeMsg, startTime, DateTime.Now, sendException, _cancellationTokenSource.Token.IsCancellationRequested));
 
 			// Do some clean-up with the message
 			foreach (var mimeEntity in mimeMsg.Attachments)
@@ -543,9 +543,6 @@ namespace MailMergeLib
 			smtpClient.ServerCertificateValidationCallback = config.ServerCertificateValidationCallback;
 		}
 		
-
-
-
 		/// <summary>
 		/// Event raising before sending a mail message.
 		/// </summary>
