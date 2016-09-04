@@ -1,0 +1,3 @@
+﻿    Database maintenance {Success:choose(True|):succeeded|failed} on {Date}
+	{Name}, your Log file is attached.
+
