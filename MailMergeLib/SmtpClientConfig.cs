@@ -48,6 +48,7 @@ namespace MailMergeLib
 					break;
 				case System.Net.Mail.SmtpDeliveryMethod.SpecifiedPickupDirectory:
 					MessageOutput = MessageOutput.Directory;
+					_mailOutputDirectory = string.IsNullOrEmpty(smtpSection.SpecifiedPickupDirectory?.PickupDirectoryLocation) ? null : smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation;
 					break;
 			}
 
