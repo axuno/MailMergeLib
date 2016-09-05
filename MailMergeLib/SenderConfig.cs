@@ -12,11 +12,23 @@ namespace MailMergeLib
 	/// </summary>
 	public class SenderConfig
 	{
+		private int _maxNumOfSmtpClients = 5;
+
 		/// <summary>
 		/// CTOR for MailMergeSender configuration.
 		/// </summary>
 		public SenderConfig()
 		{}
+
+		/// <summary>
+		/// Gets or sets the maximum number of SmtpClient to send messages concurrently.
+		/// Valid numbers are 1 to 20, defaults to 5.
+		/// </summary>
+		public int MaxNumOfSmtpClients
+		{
+			get { return _maxNumOfSmtpClients; }
+			set { _maxNumOfSmtpClients = value > 0 && value <= 20 ? value : 5; }
+		}
 
 		/// <summary>
 		/// Gets or sets the array of configurations the SmtpClients will use.

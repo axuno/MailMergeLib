@@ -18,8 +18,6 @@ namespace MailMergeLib
 	/// </summary>
 	public class MailMergeSender : IDisposable
 	{
-		private int _maxNumOfSmtpClients = 5;
-
 		private bool _disposed;
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -31,24 +29,12 @@ namespace MailMergeLib
 			IsBusy = false;
 		}
 
-
-		/// <summary>
-		/// Gets or sets the maximum number of SmtpClient to send messages concurrently.
-		/// Valid numbers are 1 to 20, defaults to 5.
-		/// </summary>
-		public int MaxNumOfSmtpClients
-		{
-			get { return _maxNumOfSmtpClients; }
-			set { _maxNumOfSmtpClients = value > 0 && value <= 20 ? value : 5; }
-		}
-
 		/// <summary>
 		/// Returns true, while a Send method is pending.
 		/// Entering a Send method while IsBusy will raise an InvalidOperationException.
 		/// </summary>
 		public bool IsBusy { get; private set; }
-
-
+		
 		/// <summary>
 		/// Sends mail messages asynchronously to all recipients supplied in the data source
 		/// of the mail merge message.
@@ -96,13 +82,13 @@ namespace MailMergeLib
 			var queue = new ConcurrentQueue<T>(dataSource);
 
 			var numOfRecords = queue.Count;
-			var sendTasks = new Task[_maxNumOfSmtpClients];
+			var sendTasks = new Task[Config.MaxNumOfSmtpClients];
 
 			// The max. number of configurations used is the number of parallel smtp clients
-			var smtpConfigForTask = new SmtpClientConfig[_maxNumOfSmtpClients];
+			var smtpConfigForTask = new SmtpClientConfig[Config.MaxNumOfSmtpClients];
 			// Set as many smtp configs as we have for each task
 			// Example: 5 tasks with 2 configs: task 0 => config 0, task 1 => config 1, task 2 => config 0, task 3 => config 1, task 4 => config 0, task 5 => config 1
-			for (var i = 0; i < _maxNumOfSmtpClients; i++)
+			for (var i = 0; i < Config.MaxNumOfSmtpClients; i++)
 			{
 				smtpConfigForTask[i] = Config.SmtpClientConfig[i% Config.SmtpClientConfig.Length];
 			}
