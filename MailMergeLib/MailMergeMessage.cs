@@ -573,13 +573,13 @@ namespace MailMergeLib
 							mimeMessage.ReplyTo.Add(mailboxAddr);
 							break;
 						case MailAddressType.ConfirmReadingTo:
-							mimeMessage.Headers.Remove(HeaderId.Received);
-							mimeMessage.Headers.Remove(HeaderId.DispositionNotificationTo);
+							mimeMessage.Headers.RemoveAll(CConfirmReading);
+							mimeMessage.Headers.RemoveAll(HeaderId.DispositionNotificationTo);
 							mimeMessage.Headers.Add(CConfirmReading, mailboxAddr.Address);
 							mimeMessage.Headers.Add(HeaderId.DispositionNotificationTo, mailboxAddr.Address);
 							break;
 						case MailAddressType.ReturnReceiptTo:
-							mimeMessage.Headers.Remove(HeaderId.ReturnReceiptTo);
+							mimeMessage.Headers.RemoveAll(HeaderId.ReturnReceiptTo);
 							mimeMessage.Headers.Add(HeaderId.ReturnReceiptTo, mailboxAddr.Address);
 							break;
 						case MailAddressType.Sender:
@@ -626,12 +626,12 @@ namespace MailMergeLib
 
 			if (!string.IsNullOrEmpty(Config.Xmailer))
 			{
-				mimeMessage.Headers[HeaderId.XMailer] = Config.Xmailer;
+				mimeMessage.Headers.Replace(HeaderId.XMailer, Config.CharacterEncoding, Config.Xmailer);
 			}
 
 			if (!string.IsNullOrEmpty(Config.Organization))
 			{
-				mimeMessage.Headers[HeaderId.Organization] = Config.Organization;
+				mimeMessage.Headers.Replace(HeaderId.Organization, Config.CharacterEncoding, Config.Organization);
 			}
 
 			// collect any headers already present, e.g. headers for mailbox addresses like return-receipt
