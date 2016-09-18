@@ -42,6 +42,12 @@ namespace MailMergeLib
 			_mailMergeMessage = msg;
 		}
 
+		/// <summary>
+		/// Adds the address to the address collection.
+		/// For MailAddressType.Sender, MailAddressType.ConfirmReadingTo and MailAddressType.ReturnReceiptTo 
+		/// only the last-in address of this type will be included in the mail message.
+		/// </summary>
+		/// <param name="address"></param>
 		public new void Add(MailMergeAddress address)
 		{
 			address.DisplayNameCharacterEncoding = _mailMergeMessage.Config.CharacterEncoding;
