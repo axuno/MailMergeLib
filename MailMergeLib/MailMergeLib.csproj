@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F6ABBAC7-F7B8-4010-BA9D-75495E35AA15}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MailMergeLib</RootNamespace>
+    <AssemblyName>MailMergeLib</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\net45\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\net45\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\net45\MailMergeLib.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AngleSharp, Version=0.9.8.1, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.0.9.8.1\lib\net45\AngleSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MailKit, Version=1.6.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\packages\MailKit.1.6.0\lib\net45\MailKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MimeKit, Version=1.6.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\packages\MimeKit.1.6.0\lib\net45\MimeKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AttachmentBuilder.cs" />
+    <Compile Include="BodyBuilderBase.cs" />
+    <Compile Include="AngleSharpHtmlConverter.cs" />
+    <Compile Include="Crypto.cs" />
+    <Compile Include="EmailValidator.cs" />
+    <Compile Include="HtmlBodyBuilder.cs" />
+    <Compile Include="HtmlTagHelper.cs" />
+    <Compile Include="FileAttachment.cs" />
+    <Compile Include="HtmlBodyBuilderRegEx.cs" />
+    <Compile Include="IHtmlConverter.cs" />
+    <Compile Include="MailMergeAddress.cs" />
+    <Compile Include="MailMergeAddressCollection.cs" />
+    <Compile Include="MailMergeMessage_Exception.cs" />
+    <Compile Include="MailMergeMessage.cs" />
+    <Compile Include="MailMergeSender_EventArgs.cs" />
+    <Compile Include="MessageConfig.cs" />
+    <Compile Include="MessageOutput.cs" />
+    <Compile Include="MailSmartFormatter.cs" />
+    <Compile Include="PlainBodyBuilder.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="MailMergeLib.snk" />
+    <None Include="packages.config" />
+    <Compile Include="MailMergeSender.cs" />
+    <Compile Include="RegExHtmlConverter.cs" />
+    <Compile Include="SenderConfig.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SmartFormatMail\Core\Extensions\IFormatter.cs" />
+    <Compile Include="SmartFormatMail\Core\Extensions\IFormattingInfo.cs" />
+    <Compile Include="SmartFormatMail\Core\Extensions\ISelectorInfo.cs" />
+    <Compile Include="SmartFormatMail\Core\Extensions\ISource.cs" />
+    <Compile Include="SmartFormatMail\Core\Formatting\FormatCache.cs" />
+    <Compile Include="SmartFormatMail\Core\Formatting\FormatDetails.cs" />
+    <Compile Include="SmartFormatMail\Core\Formatting\FormattingException.cs" />
+    <Compile Include="SmartFormatMail\Core\Formatting\FormattingInfo.cs" />
+    <Compile Include="SmartFormatMail\Core\Output\IOutput.cs" />
+    <Compile Include="SmartFormatMail\Core\Output\StringOutput.cs" />
+    <Compile Include="SmartFormatMail\Core\Output\TextWriterOutput.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\Format.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\FormatItem.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\LiteralText.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\Parser.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\ParsingErrors.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\Placeholder.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\Selector.cs" />
+    <Compile Include="SmartFormatMail\Core\Settings\CaseSensitivityType.cs" />
+    <Compile Include="SmartFormatMail\Core\Settings\ErrorAction.cs" />
+    <Compile Include="SmartFormatMail\Core\Settings\SmartSettings.cs" />
+    <Compile Include="SmartFormatMail\Extensions\ChooseFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\ConditionalFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\DefaultFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\DefaultSource.cs" />
+    <Compile Include="SmartFormatMail\Extensions\DictionarySource.cs" />
+    <Compile Include="SmartFormatMail\Extensions\ListFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\PluralLocalizationFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\ReflectionSource.cs" />
+    <Compile Include="SmartFormatMail\Extensions\TemplateFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\TimeFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\XElementFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\XmlSource.cs" />
+    <Compile Include="SmartFormatMail\Smart.cs" />
+    <Compile Include="SmartFormatMail\SmartExtensions.cs" />
+    <Compile Include="SmartFormatMail\SmartFormatter.cs" />
+    <Compile Include="SmartFormatMail\Utilities\FormatDelegate.cs" />
+    <Compile Include="SmartFormatMail\Utilities\PluralRules.cs" />
+    <Compile Include="SmartFormatMail\Utilities\PluralRules_Old.cs" />
+    <Compile Include="SmartFormatMail\Utilities\TimeSpanUtility.cs" />
+    <Compile Include="SmtpClientConfig.cs" />
+    <Compile Include="StreamAttachment.cs" />
+    <Compile Include="StringAttachment.cs" />
+    <Compile Include="TextVariableManager.cs" />
+    <Compile Include="Tools.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SmartFormatMail\license.txt" />
+    <Content Include="SmartFormatMail\SmartFormat.csproj" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -13,10 +13,154 @@ using MimeKit.Cryptography;
 
 namespace MailMergeLib
 {
+	public interface IMailMergeSender
+	{
+		/// <summary>
+		/// Returns true, while a Send method is pending.
+		/// Entering a Send method while IsBusy will raise an InvalidOperationException.
+		/// </summary>
+		bool IsBusy { get; }
+
+		/// <summary>
+		/// The settings for a MailMergeSender.
+		/// </summary>
+		SenderConfig Config { get; set; }
+
+		/// <summary>
+		/// Sends mail messages asynchronously to all recipients supplied in the data source
+		/// of the mail merge message.
+		/// </summary>
+		/// <param name="mailMergeMessage">Mail merge message.</param>
+		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.
+		/// IEnumerable&lt;T&gt; where T can be the following types:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
+		/// <remarks>
+		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
+		/// </remarks>
+		/// <exception>
+		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
+		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
+		/// </exception>
+		/// <exception cref="InvalidOperationException">A send operation is pending.</exception>
+		/// <exception cref="NullReferenceException"></exception>
+		/// <exception cref="Exception">The first exception found in one of the async tasks.</exception>
+		Task SendAsync<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource);
+
+		/// <summary>
+		/// Sends a single mail message asyncronously.
+		/// </summary>
+		/// <remarks>The method raises events before and after sending, as well as on send failure.</remarks>
+		/// <param name="mailMergeMessage">Mail merge message.</param>
+		/// <param name="dataItem">The following types are accepted:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
+		/// <exception>
+		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
+		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
+		/// </exception>
+		/// <exception cref="InvalidOperationException">A send operation is pending.</exception>
+		/// <exception cref="AggregateException"></exception>
+		Task SendAsync(MailMergeMessage mailMergeMessage, object dataItem);
+
+		/// <summary>
+		/// Sends mail messages syncronously to all recipients supplied in the data source
+		/// of the mail merge message.
+		/// </summary>
+		/// <param name="mailMergeMessage">Mail merge message.</param>
+		/// <param name="dataSource">IEnumerable data source with values for the placeholders of the MailMergeMessage.
+		/// IEnumerable&lt;T&gt; where T can be the following types:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
+		/// <remarks>
+		/// In order to use a DataTable as a dataSource, use System.Data.DataSetExtensions and convert it with DataTable.AsEnumerable()
+		/// </remarks>
+		/// <exception>
+		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
+		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
+		/// </exception>
+		/// <exception cref="InvalidOperationException">A send operation is pending.</exception>
+		/// <exception cref="SmtpCommandException"></exception>
+		/// <exception cref="SmtpProtocolException"></exception>
+		/// <exception cref="AuthenticationException"></exception>
+		void Send<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource);
+
+		/// <summary>
+		/// Sends a single mail merge message.
+		/// </summary>
+		/// <param name="mailMergeMessage">Message to send.</param>
+		/// <param name="dataItem">The following types are accepted:
+		/// Dictionary&lt;string,object&gt;, ExpandoObject, DataRow, class instances or anonymous types.
+		/// The named placeholders can be the name of a Property, Field, or a parameterless method.
+		/// They can also be chained together by using &quot;dot-notation&quot;.
+		/// </param>
+		/// <exception>
+		/// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
+		/// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
+		/// </exception>
+		/// <exception cref="InvalidOperationException">A send operation is pending.</exception>
+		/// <exception cref="SmtpCommandException"></exception>
+		/// <exception cref="SmtpProtocolException"></exception>
+		/// <exception cref="AuthenticationException"></exception>
+		void Send(MailMergeMessage mailMergeMessage, object dataItem);
+
+		/// <summary>
+		/// Event raising before sending a mail message.
+		/// </summary>
+		event EventHandler<MailMessageFailureEventArgs> OnMessageFailure;
+
+		/// <summary>
+		/// Event raising before sending a mail message.
+		/// </summary>
+		event EventHandler<MailSenderBeforeSendEventArgs> OnBeforeSend;
+
+		/// <summary>
+		/// Event raising after sending a mail message.
+		/// </summary>
+		event EventHandler<MailSenderAfterSendEventArgs> OnAfterSend;
+
+		/// <summary>
+		/// Event raising, if an error occurs when sending a mail message.
+		/// </summary>
+		event EventHandler<MailSenderSendFailureEventArgs> OnSendFailure;
+
+		/// <summary>
+		/// Event raising before starting with mail merge.
+		/// </summary>
+		event EventHandler<MailSenderMergeBeginEventArgs> OnMergeBegin;
+
+		/// <summary>
+		/// Event raising during mail merge progress, i.e. after each message sent.
+		/// </summary>
+		event EventHandler<MailSenderMergeProgressEventArgs> OnMergeProgress;
+
+		/// <summary>
+		/// Event raising after completing mail merge.
+		/// </summary>
+		event EventHandler<MailSenderMergeCompleteEventArgs> OnMergeComplete;
+
+		/// <summary>
+		/// Cancel any transactions sending or merging mail.
+		/// </summary>
+		/// <param name="waitTime">The number of milliseconds to wait before cancelation.</param>
+		void SendCancel(int waitTime = 0);
+
+		/// <summary>
+		/// Releases all resources used by MailMergeSender
+		/// </summary>
+		void Dispose();
+	}
+
 	/// <summary>
 	/// Sends MailMergeMessages to an SMTP server. It uses MailKit.Net.Smtp.SmtpClient for low level operations.
 	/// </summary>
-	public class MailMergeSender : IDisposable
+	public class MailMergeSender : IDisposable, IMailMergeSender
 	{
 		private bool _disposed;
 		private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -96,7 +240,11 @@ namespace MailMergeLib
 			for (var i = 0; i < sendTasks.Length; i++)
 			{
 				var taskNo = i;
+#if NET40
+				sendTasks[i] = TaskEx.Run(() =>
+#else
 				sendTasks[i] = Task.Run(() =>
+#endif
 				{
 					using (var smtpClient = GetInitializedSmtpClient(smtpConfigForTask[taskNo]))
 					{
@@ -129,8 +277,11 @@ namespace MailMergeLib
 
 							OnMergeProgress?.Invoke(this,
 								new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-
+#if NET40
+							TaskEx.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages).Wait(_cancellationTokenSource.Token);
+#else
 							Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages).Wait(_cancellationTokenSource.Token);
+#endif
 						}
 
 						try
@@ -152,7 +303,12 @@ namespace MailMergeLib
 				OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
 
 				// Note await Task.WhenAll will only throw the FIRST exception of the aggregate exception!
+#if NET40
+				await TaskEx.WhenAll(sendTasks.AsEnumerable());
+#else
 				await Task.WhenAll(sendTasks.AsEnumerable());
+#endif
+
 			}
 			finally
 			{
@@ -189,7 +345,11 @@ namespace MailMergeLib
 
 			try
 			{
+#if NET40
+				await TaskEx.Run(() =>
+#else
 				await Task.Run(() =>
+#endif
 				{
 					var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
 					using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
@@ -370,8 +530,11 @@ namespace MailMergeLib
 						sendException = ex;
 						OnSendFailure?.Invoke(smtpClient,
 							new MailSenderSendFailureEventArgs(sendException, failureCounter, config, mimeMsg));
+#if NET40
+						TaskEx.Delay(config.RetryDelayTime).Wait(_cancellationTokenSource.Token);
+#else
 						Task.Delay(config.RetryDelayTime).Wait(_cancellationTokenSource.Token);
-
+#endif
 						// on first SMTP failure switch to the backup configuration, if one exists
 						if (failureCounter == 1 && config.MaxFailures > 1)
 						{
@@ -589,7 +752,7 @@ namespace MailMergeLib
 			Dispose(false);
 		}
 
-		#region IDisposable Members
+#region IDisposable Members
 
 		/// <summary>
 		/// Releases all resources used by MailMergeSender
@@ -600,7 +763,7 @@ namespace MailMergeLib
 			GC.SuppressFinalize(this);
 		}
 
-		#endregion
+#endregion
 
 		private void Dispose(bool disposing)
 		{

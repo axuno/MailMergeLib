@@ -99,9 +99,9 @@
     <Content Include="TestFiles\Mailtext.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MailMergeLib\MailMergeLib-5.csproj">
+    <ProjectReference Include="..\MailMergeLib\MailMergeLib.csproj">
       <Project>{f6abbac7-f7b8-4010-ba9d-75495e35aa15}</Project>
-      <Name>MailMergeLib-5</Name>
+      <Name>MailMergeLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
