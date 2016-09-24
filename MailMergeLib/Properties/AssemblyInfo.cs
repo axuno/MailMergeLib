@@ -44,6 +44,6 @@ sn -tp d:Mailmergelib.snk.PublicKey
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyInformationalVersion ("5.0.0.103")]
-[assembly: AssemblyFileVersion ("5.0.0.103")]
+[assembly: AssemblyInformationalVersion ("5.0.0.104")]
+[assembly: AssemblyFileVersion ("5.0.0.104")]
 [assembly: AssemblyVersion ("5.0.0.0")]
