@@ -109,7 +109,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="app.config" />
     <None Include="MailMergeLib.snk" />
-    <None Include="packages.config" />
     <None Include="packages.Net40.config" />
     <Compile Include="MailMergeSender.cs" />
     <Compile Include="RegExHtmlConverter.cs" />
