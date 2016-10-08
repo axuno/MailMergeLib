@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>MailMergeLib</id>
+    <version>5.0.0.104</version>
+    <title>MailMergeLib</title>
+    <authors>axuno gGmbH</authors>
+    <owners>axuno gGmbH</owners>
+    <licenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</licenseUrl>
+    <projectUrl>https://github.com/axuno/MailMergeLib</projectUrl>
+    <iconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MailMergeLib is a C# SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</description>
+    <releaseNotes>First Nuget Release.</releaseNotes>
+    <copyright>Copyright 2007-2016 by axuno gGmbH</copyright>
+    <tags>smtp mime mail email merge template net40 net45 c#</tags>
+    <dependencies>
+		<group targetFramework="net40">
+			<dependency id="MailKit" version="1.6" />
+			<dependency id="AngleSharp" version="0.9" />
+			<dependency id="Microsoft.Bcl" version="1.1.10"/>
+			<dependency id="Microsoft.Bcl.Async" version="1.0.168" />
+			<dependency id="Microsoft.Bcl.Build" version="1.0.21" />
+		</group>
+		<group targetFramework="net45">
+			<dependency id="MailKit" version="1.6" />
+			<dependency id="AngleSharp" version="0.9" />
+		</group>
+    </dependencies>
+  </metadata>
+  <files>
+		<file src="..\bin\Release\net40\MailMergeLib.dll" target="lib\net40\MailKit.dll" />
+		<file src="..\bin\Release\net40\MailMergeLib.xml" target="lib\net40\MailKit.xml" />
+		<file src="..\bin\Release\net45\MailMergeLib.dll" target="lib\net45\MailKit.dll" />
+		<file src="..\bin\Release\net45\MailMergeLib.xml" target="lib\net45\MailKit.xml" />
+  </files>
+</package>

@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using MailKit.Security;
 using MailMergeLib;
 using MailMergeLib.SmartFormatMail.Core.Settings;
 using MimeKit;
 using netDumbster.smtp;
-using netDumbster.smtp.Logging;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -26,9 +28,11 @@ namespace UnitTests
 
         private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null)
         {
-	        var data = new Dictionary<string, object>();
-			data.Add("MessageText", "This is just a sample plain text.");
-			data.Add("Date", DateTime.Now);
+	        var data = new Dictionary<string, object>
+	        {
+		        {"MessageText", "This is just a sample plain text."},
+		        {"Date", DateTime.Now}
+	        };
 
 	        var mmm = new MailMergeMessage("Mailsubject sent on {Date}", "{MessageText}") {Config = _settings.MessageConfig};
 			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
@@ -71,7 +75,60 @@ namespace UnitTests
 			Console.WriteLine(_server.ReceivedEmail[0].Data);
 		}
 
-		#region *** Test setup ***
+	    private class Recipient
+	    {
+			public string Name { get; set; }
+			public string Email { get; set; }
+
+	    }
+
+		[Test]
+	    public async Task SendSyncAndAsync()
+		{
+			// In this sample:
+			// With 100,000 messages and 10 MaxNumOfSmtpClients async is about twice as fast as sync.
+
+			var recipients = new List<Recipient>();
+			for (var i = 0; i < 1000; i++)
+			{
+				recipients.Add(new Recipient() {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
+			}
+			
+			var mmm = new MailMergeMessage("Async/Sync email test", "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+		    var mms = new MailMergeSender { Config = _settings.SenderConfig };
+
+		    mms.Config.MaxNumOfSmtpClients = 10;
+			var sw = new Stopwatch();
+
+			sw.Start();
+		    mms.Send(mmm, recipients);
+			sw.Stop();
+			Console.WriteLine($"Time to send {recipients.Count} messages sync: {sw.ElapsedMilliseconds} milliseconds.");
+			Console.WriteLine();
+			Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
+			Assert.IsFalse(mms.IsBusy);
+
+			sw.Reset();
+			_server.ClearReceivedEmail();
+
+			sw.Start();
+
+			int numOfSmtpClientsUsed = 0;
+			mms.OnMergeComplete += (s, args) => { numOfSmtpClientsUsed = args.NumOfSmtpClientsUsed; };
+
+			await mms.SendAsync(mmm, recipients);
+			sw.Stop();
+			Console.WriteLine($"Time to send {recipients.Count} messages async: {sw.ElapsedMilliseconds} milliseconds.");
+			
+			// Note: With too many SmtpClients and small emails some of the clients will never de-queue from the ConcurrentQueue of MailMergeSender
+			Console.WriteLine($"{numOfSmtpClientsUsed} tasks (and SmtpClients) used for sending async\n(max {mms.Config.MaxNumOfSmtpClients} were configured).");
+			
+			Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
+			Assert.IsFalse(mms.IsBusy);
+		}
+
+#region *** Test setup ***
 
 		[TestFixtureSetUp]
         public void FixtureSetUp()
@@ -111,6 +168,8 @@ namespace UnitTests
 				},
 				SenderConfig =
 				{
+					MaxNumOfSmtpClients = 5,
+
 					SmtpClientConfig = new[]
 					{
 						new SmtpClientConfig()
@@ -122,7 +181,7 @@ namespace UnitTests
 							SecureSocketOptions = SecureSocketOptions.None,
 							Name = "Standard",
 							MaxFailures = 3,
-							DelayBetweenMessages = 1000,
+							DelayBetweenMessages = 0,
 							ClientDomain = "mail.mailmergelib.net"
 						},
 						new SmtpClientConfig()
@@ -134,13 +193,13 @@ namespace UnitTests
 							SecureSocketOptions = SecureSocketOptions.None,
 							Name = "Backup",
 							MaxFailures = 3,
-							DelayBetweenMessages = 1000,
+							DelayBetweenMessages = 0,
 							ClientDomain = "mail.mailmergelib.net"
 						}
 					}
 				}
 			};
 		}
-		#endregion
+#endregion
 	}
 }

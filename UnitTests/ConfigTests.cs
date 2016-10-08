@@ -55,7 +55,8 @@ namespace UnitTests
 							Name = "Next best",
 							DelayBetweenMessages = 2000
 						}
-					}
+					},
+					MaxNumOfSmtpClients = 5
 				}
 			};
 			

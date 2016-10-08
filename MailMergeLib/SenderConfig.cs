@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace MailMergeLib
 {
@@ -22,12 +17,17 @@ namespace MailMergeLib
 
 		/// <summary>
 		/// Gets or sets the maximum number of SmtpClient to send messages concurrently.
-		/// Valid numbers are 1 to 20, defaults to 5.
+		/// Valid numbers are 1 to 50, defaults to 5.
 		/// </summary>
 		public int MaxNumOfSmtpClients
 		{
 			get { return _maxNumOfSmtpClients; }
-			set { _maxNumOfSmtpClients = value > 0 && value <= 20 ? value : 5; }
+			set
+			{
+				if (value <= 0) _maxNumOfSmtpClients = 1;
+				else if (value > 50) _maxNumOfSmtpClients = 50;
+				else _maxNumOfSmtpClients = value;
+			}
 		}
 
 		/// <summary>

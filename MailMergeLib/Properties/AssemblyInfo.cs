@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("MailMergeLib")]
-[assembly: AssemblyDescription(".NET library for email merge")]
+[assembly: AssemblyDescription("MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("axuno gGmbH")]
 [assembly: AssemblyProduct("MailMergeLib 5")]
-[assembly: AssemblyCopyright("Copyright © 2007-2016 by Norbert Bietsch")]
+[assembly: AssemblyCopyright("Copyright © 2007-2016 by axuno gGmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,6 +44,6 @@ sn -tp d:Mailmergelib.snk.PublicKey
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyInformationalVersion ("5.0.0.104")]
-[assembly: AssemblyFileVersion ("5.0.0.104")]
-[assembly: AssemblyVersion ("5.0.0.0")]
+[assembly: AssemblyInformationalVersion ("5.0.1.0")]
+[assembly: AssemblyFileVersion ("5.0.1.0")]
+[assembly: AssemblyVersion ("5.0.1.0")]

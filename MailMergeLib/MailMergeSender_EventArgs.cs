@@ -85,10 +85,12 @@ namespace MailMergeLib
 	public class MailSenderMergeCompleteEventArgs : MailSenderMergeProgressEventArgs
 	{
 		public readonly DateTime EndTime;
+		public readonly int NumOfSmtpClientsUsed;
 
-		internal MailSenderMergeCompleteEventArgs(DateTime startTime, DateTime endTime, int totalMsg, int sentMsg, int errorMsg) : base(startTime, totalMsg, sentMsg, errorMsg)
+		internal MailSenderMergeCompleteEventArgs(DateTime startTime, DateTime endTime, int totalMsg, int sentMsg, int errorMsg, int numOfSmtpClientsUsed) : base(startTime, totalMsg, sentMsg, errorMsg)
 		{
 			EndTime = endTime;
+			NumOfSmtpClientsUsed = numOfSmtpClientsUsed;
 		}
 	}
 
