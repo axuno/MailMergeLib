@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MailKit.Security;
 using MailMergeLib;
