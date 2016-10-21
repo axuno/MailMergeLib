@@ -16,7 +16,10 @@ namespace MailMergeLib
 		/// <summary>
 		/// Writes messages to the specified MailOutputDirectory.
 		/// </summary>
-		Directory,
+		Directory
+#if NET40 || NET45
+			,
+		
 		/// <summary>
 		/// Think twice about using the option &quot;IIS Pickup Directory&quot;. Then make sure that:
 		/// 1. SMTP is installed
@@ -27,5 +30,6 @@ namespace MailMergeLib
 		/// Otherwise you'll expect an SmtpException while method GetPickDirectoryFromIis() is called 
 		/// </summary>
 		PickupDirectoryFromIis
+#endif
 	}
 }

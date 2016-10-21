@@ -84,7 +84,7 @@ namespace MailMergeLib
 			}
 
 			// remove if base tag is local file reference, because it's not usable in the resulting HTML
-			if (baseEle != null && baseDir.StartsWith(Uri.UriSchemeFile))
+			if (baseEle != null && baseDir.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase))
 				baseEle.Remove();
 			
 			ReplaceImgSrcByCid();
@@ -102,8 +102,7 @@ namespace MailMergeLib
 						: ContentEncoding.QuotedPrintable,
 
 			};
-			htmlTextPart.SetText(CharacterEncoding, DocHtml);
-			htmlTextPart.ContentType.Charset = CharacterEncoding.HeaderName; // RFC 2045 Section 5.1 - http://www.ietf.org;
+			htmlTextPart.SetText(CharacterEncoding, DocHtml);  // MimeKit.ContentType.Charset is set using CharacterEncodig
 			htmlTextPart.ContentId = MimeUtils.GenerateMessageId();
 
 			if (!InlineAtt.Any())
@@ -244,7 +243,7 @@ namespace MailMergeLib
 		/// <returns>Local path for the given URI</returns>
 		private static string MakeLocalPath(string uri)
 		{
-			return uri.StartsWith(Uri.UriSchemeFile) ? new Uri(uri).LocalPath : uri;
+			return uri.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase) ? new Uri(uri).LocalPath : uri;
 			
 			/* Note:
 			 * In case the filename does not contain the Uri.UriSchemeFile prefix,
@@ -264,8 +263,8 @@ namespace MailMergeLib
 		/// <returns>A RFC1738 compliant URI: "file://" [ host | "localhost" ] "/" path</returns>
 		private static string MakeUri(string localPath)
 		{
-			return ! localPath.StartsWith(Uri.UriSchemeFile)
-			    ? $"{Uri.UriSchemeFile}{Uri.SchemeDelimiter}/{localPath}"
+			return ! localPath.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase)
+			    ? $"{UriScheme.File}{UriScheme.SchemeDelimiter}/{localPath}"
 				: localPath;
 		}
 	}

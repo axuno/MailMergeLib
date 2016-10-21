@@ -16,18 +16,6 @@ namespace MailMergeLib.SmartFormatMail
 	/// </summary>
 	public class SmartFormatter
 	{
-		// Added by axunonb 2016-08-15:
-
-		/// <summary>
-		/// Get the list of placeholders for which no variable name could be found.
-		/// </summary>
-		public HashSet<string> MissingVariables { get; } = new HashSet<string>();
-		/// <summary>
-		/// Get the list of placeholders for which no formatter could be found.
-		/// </summary>
-		public HashSet<string> MissingFormatters { get; } = new HashSet<string>();
-
-
 		#region: Constructor :
 
 		public SmartFormatter()
@@ -193,6 +181,15 @@ namespace MailMergeLib.SmartFormatMail
 
 		#endregion
 
+		#region : EventHandlers :
+
+		/// <summary>
+		/// Event raising, if an error occurs during formatting.
+		/// </summary>
+		public event EventHandler<FormattingErrorEventArgs> OnFormattingFailure;
+
+		#endregion
+
 		#region: Format :
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
@@ -220,7 +217,7 @@ namespace MailMergeLib.SmartFormatMail
 				{
 					// An error occurred while formatting.
 					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
-					MissingVariables.Add(item.RawText); // added by axunonb 2016-08-15
+					OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(item.RawText, errorIndex, ErrorAction != ErrorAction.ThrowError));
 					FormatError(item, ex, errorIndex, childFormattingInfo);
 					continue;
 				}
@@ -233,12 +230,10 @@ namespace MailMergeLib.SmartFormatMail
 				{
 					// An error occurred while formatting.
 					var errorIndex = placeholder.Format != null ? placeholder.Format.startIndex : placeholder.Selectors.Last().endIndex;
-					MissingFormatters.Add(item.RawText);  // added by axunonb 2016-08-15
 					FormatError(item, ex, errorIndex, childFormattingInfo);
 					continue;
 				}
 			}
-
 		}
 		
 		private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
@@ -337,6 +332,5 @@ namespace MailMergeLib.SmartFormatMail
 		}
 
 		#endregion
-
 	}
 }

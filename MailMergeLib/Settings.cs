@@ -61,7 +61,13 @@ namespace MailMergeLib
 		/// <param name="filename"></param>
 		public void Serialize(string filename)
 		{
-			Serialize(new StreamWriter(filename), false);
+			using (var fs = new FileStream(filename, FileMode.Create))
+			{
+				using (var sr = new StreamWriter(fs))
+				{
+					Serialize(sr, false);
+				}
+			}
 		}
 
 		/// <summary>
@@ -78,7 +84,9 @@ namespace MailMergeLib
 
 			if (isStream) return;
 
+#if NET40 || NET45
 			writer.Close();
+#endif
 			writer.Dispose();
 		}
 
@@ -99,7 +107,13 @@ namespace MailMergeLib
 		/// <param name="filename"></param>
 		public static Settings Deserialize(string filename)
 		{
-			return Deserialize(new StreamReader(filename), false);
+			using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				using (var sr = new StreamReader(fs))
+				{
+					return Deserialize(sr, false);
+				}
+			}
 		}
 
 		/// <summary>
@@ -114,24 +128,12 @@ namespace MailMergeLib
 			var s = serializer.Deserialize(reader) as Settings;
 
 			if (isStream) return s;
-
+#if NET40 || NET45
 			reader.Close();
+#endif
 			reader.Dispose();
 
 			return s;
-		}
-
-		[Obsolete("Can be eventually deleted.", true)]
-		private static XmlAttributeOverrides GetXmlOverrides()
-		{
-			var attributeOverrides = new XmlAttributeOverrides();
-
-			// do not serialize the SecurePassword member of NetworkCredential
-			attributeOverrides.Add(typeof(NetworkCredential), nameof(NetworkCredential.SecurePassword), new XmlAttributes { XmlIgnore = true });
-
-			// use properties as attributes instead of element
-			attributeOverrides.Add(typeof(NetworkCredential), nameof(NetworkCredential.UserName), new XmlAttributes { XmlAttribute = new XmlAttributeAttribute() });
-			return attributeOverrides;
 		}
 	}
 }

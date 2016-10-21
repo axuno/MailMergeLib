@@ -80,10 +80,10 @@ namespace MailMergeLib
 		/// <returns>Returns a MailAddress ready to be used for a MailAddress, or Null if no address part exists.</returns>
 		/// <exception cref="NullReferenceException">Throws a NullReferenceException if TextVariableManager is null.</exception>
 		/// <exception cref="FormatException">Throws a FormatException if the computed MailAddress is not valid.</exception>
-		internal MailboxAddress GetMailAddress(MailSmartFormatter formatter, object dataItem)
+		internal MailboxAddress GetMailAddress(MailMergeMessage mmm, object dataItem)
 		{
-			string address = formatter.Format(Address, dataItem);
-			string displayName = formatter.Format(DisplayName, dataItem);
+			string address = mmm.SearchAndReplaceVars(Address, dataItem);
+			string displayName = mmm.SearchAndReplaceVars(DisplayName, dataItem);
 			if (string.IsNullOrEmpty(displayName)) displayName = null;
 
 			// Exclude invalid address from further process

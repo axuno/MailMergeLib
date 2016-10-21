@@ -34,11 +34,10 @@ namespace MailMergeLib
 				return s;
 		
 			var buffer = Encoding.GetBytes(s);
-			var des = new TripleDESCryptoServiceProvider
-			{
-				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.GetBytes(CryptoKey)),
-				IV = _Iv
-			};
+			var des = TripleDES.Create();
+			des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
+			des.IV = _Iv;
+
 			return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
 		}
 
@@ -53,11 +52,10 @@ namespace MailMergeLib
 				return s;
 
 			var buffer = Convert.FromBase64String(s);
-			var des = new TripleDESCryptoServiceProvider
-			{
-				Key = new MD5CryptoServiceProvider().ComputeHash(Encoding.GetBytes(CryptoKey)),
-				IV = _Iv
-			};
+			var des = TripleDES.Create();
+			des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
+			des.IV = _Iv;
+
 			return Encoding.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
 		}
 	}

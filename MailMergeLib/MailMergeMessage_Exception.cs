@@ -20,12 +20,6 @@ namespace MailMergeLib
 				BadAddress = badAddress;
 			}
 
-			// necessary to ensure serialization is possible
-			protected AddressException(SerializationInfo info, StreamingContext context)
-				: base(info, context)
-			{
-			}
-
 			public HashSet<string> BadAddress { get; } = new HashSet<string>();
 		}
 
@@ -44,12 +38,6 @@ namespace MailMergeLib
 				BadAttachment = badAttachment;
 			}
 
-			// necessary to ensure serialization is possible
-			protected AttachmentException(SerializationInfo info, StreamingContext context)
-				: base(info, context)
-			{
-			}
-
 			public HashSet<string> BadAttachment { get; } = new HashSet<string>();
 		}
 
@@ -64,12 +52,6 @@ namespace MailMergeLib
 		{
 			public EmtpyContentException(string message, Exception innerException)
 				: base(message, innerException)
-			{
-			}
-
-			// necessary to ensure serialization is possible
-			protected EmtpyContentException(SerializationInfo info, StreamingContext context)
-				: base(info, context)
 			{
 			}
 		}
@@ -87,12 +69,6 @@ namespace MailMergeLib
 				: base(message, exceptions)
 			{
 				MimeMessage = mimeMessage;
-			}
-
-			// necessary to ensure serialization is possible
-			protected MailMergeMessageException(SerializationInfo info, StreamingContext context)
-				: base(info, context)
-			{
 			}
 
 			public AggregateException Exception { get; }
@@ -113,12 +89,6 @@ namespace MailMergeLib
 				: base(message, innerException)
 			{
 				MissingVariable = missingVariable;
-			}
-
-			// necessary to ensure serialization is possible
-			protected VariableException(SerializationInfo info, StreamingContext context)
-				: base(info, context)
-			{
 			}
 
 			public HashSet<string> MissingVariable { get; } = new HashSet<string>();

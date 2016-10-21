@@ -1,0 +1,15 @@
+﻿{
+  "frameworks": {
+    "net45": {}
+  },
+  "runtimes": {
+    "win-anycpu": {},
+    "win": {}
+  },
+  "dependencies": {
+    "AngleSharp": "0.9.9",
+    "BouncyCastle": "1.8.1",
+    "MailKit": "1.8.1",
+    "MimeKit": "1.8.0"
+  }
+}

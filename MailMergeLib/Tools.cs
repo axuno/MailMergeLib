@@ -103,12 +103,13 @@ namespace MailMergeLib
 
 		/// <summary>
 		/// Checks a Stream, whether it consists of pure seven bit bytes.
+		/// Assuming UTF8 encoding of the stream.
 		/// </summary>
 		/// <param name="stream">System.IO.Stream stream</param>
 		/// <returns>true, if Stream only contains seven bit bytes - else false.</returns>
 		public static bool IsSevenBit(Stream stream)
 		{
-			return IsSevenBit(stream, Encoding.Default);
+			return IsSevenBit(stream, Encoding.UTF8);
 		}
 
 		/// <summary>
@@ -124,13 +125,13 @@ namespace MailMergeLib
 
 
 		/// <summary>
-		/// Converts a stream to a string using systems's current ANSI codepage.
+		/// Converts a stream to a string using UTF8 Encoding.
 		/// </summary>
 		/// <param name="stream">System.IO.Stream stream</param>
 		/// <returns>string representation of the stream.</returns>
 		public static string Stream2String(Stream stream)
 		{
-			return Stream2String(stream, Encoding.Default);
+			return Stream2String(stream, Encoding.UTF8);
 		}
 
 		/// <summary>
@@ -231,6 +232,36 @@ namespace MailMergeLib
 		public static long CalcMessageSize(MimeMessage msg)
 		{
 			return msg?.ToString().Length ?? 0;
+		}
+
+
+		/// <summary>
+		/// Gets the header encoding (aka mime encoding) for the Encoding.
+		/// </summary>
+		/// <remarks>
+		/// Required, because Encoding.HeaderName is not supported in .Net Core.
+		/// </remarks>
+		/// <param name="encoding"></param>
+		/// <returns></returns>
+		internal static string GetMimeCharset(Encoding encoding)
+		{
+			// This method is part of CharsetUtils.cs of MimeKit
+			// Author: Jeffrey Stedfast <jeff@xamarin.com>
+			// Copyright (c) 2013-2016 Xamarin Inc.
+
+			if (encoding == null)
+				throw new ArgumentNullException(nameof(encoding));
+
+			// There are only these 4 differences between Encoding.HeaderName and Encoding.WebName
+			switch (encoding.CodePage)
+			{
+				case 932: return "iso-2022-jp"; // shift_jis
+				case 949: return "euc-kr";      // ks_c_5601-1987
+				case 50221: return "iso-2022-jp"; // csISO2022JP
+				case 50225: return "euc-kr";      // iso-2022-kr
+				default:
+					return encoding.WebName.ToLowerInvariant();
+			}
 		}
 	}
 }

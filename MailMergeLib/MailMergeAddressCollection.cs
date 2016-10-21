@@ -11,13 +11,37 @@ namespace MailMergeLib
 	/// </summary>
 	public enum MailAddressType
 	{
+		/// <summary>
+		/// TO mailbox address.
+		/// </summary>
 		To,
+		/// <summary>
+		/// CC carbon copy mailbox address.
+		/// </summary>
 		CC,
+		/// <summary>
+		/// BCC blind carbon copy mailbox address.
+		/// </summary>
 		Bcc,
+		/// <summary>
+		/// FROM mailbox address.
+		/// </summary>
 		From,
+		/// <summary>
+		/// SENDER mailbox address.
+		/// </summary>
 		Sender,
+		/// <summary>
+		/// REPLY-TO mailbox address.
+		/// </summary>
 		ReplyTo,
+		/// <summary>
+		/// Mailbox address where to send read confirmations.
+		/// </summary>
 		ConfirmReadingTo,
+		/// <summary>
+		/// Mailbox address where to send return receipts.
+		/// </summary>
 		ReturnReceiptTo,
 		/// <summary>
 		/// If this type is used, all address parts (but not the display names) will be replaced by this address (for test purposes)
@@ -54,14 +78,25 @@ namespace MailMergeLib
 			base.Add(address);
 		}
 
+		/// <summary>
+		/// Gets all MailMergeAddresses of the specified address type.
+		/// </summary>
+		/// <param name="addrType"></param>
+		/// <returns>Returns all MailMergeAddresses of the specified address type.</returns>
 		public IEnumerable<MailMergeAddress> Get(MailAddressType addrType)
 		{
 			return Items.Where(mmAddr => mmAddr.AddrType == addrType);
 		}
 
+		/// <summary>
+		/// Gets the string representation of the collection of mailbox addresses.
+		/// </summary>
+		/// <param name="addrType"></param>
+		/// <param name="dataItem"></param>
+		/// <returns>The string representation of the collection of mailbox addresses</returns>
 		public string ToString(MailAddressType addrType, object dataItem)
 		{
-			return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(_mailMergeMessage.SmartFormatter, dataItem).ToString()));
+			return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(_mailMergeMessage, dataItem).ToString()));
 		}
 	}
 }

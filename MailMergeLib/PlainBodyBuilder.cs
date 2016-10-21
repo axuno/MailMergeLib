@@ -26,7 +26,7 @@ namespace MailMergeLib
 									   ? TextTransferEncoding
 									   : ContentEncoding.QuotedPrintable;
 
-			plainTextPart.ContentType.Charset = CharacterEncoding.HeaderName; // RFC 2045 Section 5.1 - http://www.ietf.org;
+			plainTextPart.ContentType.Charset = Tools.GetMimeCharset(CharacterEncoding); // RFC 2045 Section 5.1 - http://www.ietf.org;
 			plainTextPart.ContentId = MimeUtils.GenerateMessageId();
 
 			return plainTextPart;

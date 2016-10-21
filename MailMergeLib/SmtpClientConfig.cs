@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Net;
-using System.Net.Configuration;
 using System.Reflection;
-using System.Security;
 using System.Xml.Serialization;
 using MailKit;
 using MailKit.Security;
-
+#if !NET_STANDARD
+using System.Configuration;
+using System.Net.Configuration;
+#endif
 
 namespace MailMergeLib
 {
@@ -28,7 +28,7 @@ namespace MailMergeLib
 			MailOutputDirectory = LogOutputDirectory = System.IO.Path.GetTempPath();
 		}
 
-
+#if NET40 || NET45
 		/// <summary>
 		/// If MailMergeLib runs on an IIS web application, it can load the following settings from system.net/mailSettings/smtp configuration section of web.donfig:
 		/// DeliveryMethod, MessageOutput, EnableSsl, Network.UserName, Network.Password, Network.Host, Network.Port, Network.ClientDomain
@@ -61,7 +61,7 @@ namespace MailMergeLib
 			SmtpHost = smtpSection.Network.Host;
 			ClientDomain = smtpSection.Network.ClientDomain;
 		}
-
+#endif
 		/// <summary>
 		/// Get or sets the name of configuration.
 		/// It's recommended to choose different names for each configuration.
@@ -123,8 +123,10 @@ namespace MailMergeLib
 						return null;
 					case MessageOutput.Directory:
 						return _mailOutputDirectory ?? System.IO.Path.GetTempPath();
+#if NET40 || NET45
 					case MessageOutput.PickupDirectoryFromIis:
 						return GetPickDirectoryFromIis();
+#endif
 					default:
 						throw new ArgumentOutOfRangeException();
 				}
@@ -202,6 +204,7 @@ namespace MailMergeLib
 			set { _retryDelayTime = (value >= 0 && value <= 10000) ? value : 0; }
 		}
 
+#if NET40 || NET45
 		private static string GetPickDirectoryFromIis()
 		{
 			try
@@ -228,7 +231,9 @@ namespace MailMergeLib
 				throw ex.InnerException ?? ex;
 			}
 		}
+#endif
 	}
+
 
 	/// <summary>
 	/// Class used for serialization of credentials.

@@ -129,13 +129,13 @@ namespace UnitTests
 
 #region *** Test setup ***
 
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
         public void FixtureSetUp()
         {
 			_server = SimpleSmtpServer.Start(_rnd.Next(50000, 60000));
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void FixtureTearDown()
         {
             _server.Stop();

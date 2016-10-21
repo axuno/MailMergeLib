@@ -28,8 +28,11 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		{
 			get
 			{
-				return
-					$"The format string has {Issues.Count} issue{(Issues.Count == 1 ? "" : "s")}: {string.Join(", ", Issues.Select(i => i.Issue).ToArray())}";
+				return string.Format("The format string has {0} issue{1}: {2}",
+									 Issues.Count,
+									 Issues.Count == 1 ? "" : "s",
+									 string.Join(", ", Issues.Select(i => i.Issue).ToArray())
+									 );
 			}
 		}
 

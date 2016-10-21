@@ -87,10 +87,10 @@ namespace MailMergeLib
 		}
 
 		private void SetTextAndBinarayAttachmentDefaults(Encoding characterEncoding, ContentEncoding textTransferEncoding, ContentEncoding binaryTransferEncoding)
-		{
+		{ 
 			if (_attachment.ContentType.MimeType.ToLower().StartsWith("text/"))
 			{
-				_attachment.ContentType.Charset = characterEncoding.HeaderName;
+				_attachment.ContentType.Charset = Tools.GetMimeCharset(characterEncoding);
 				_attachment.ContentTransferEncoding = Tools.IsSevenBit(_attachment.ContentObject.Stream, characterEncoding)
 												   ? ContentEncoding.SevenBit
 												   : textTransferEncoding;

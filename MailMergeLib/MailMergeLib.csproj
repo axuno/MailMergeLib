@@ -30,28 +30,12 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\net45\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\net45\MailMergeLib.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.0.9.9\lib\net45\AngleSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MailKit, Version=1.8.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>..\packages\MailKit.1.8.1\lib\net45\MailKit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MimeKit, Version=1.8.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\packages\MimeKit.1.8.0\lib\net45\MimeKit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -80,12 +64,6 @@
     <Compile Include="MailSmartFormatter.cs" />
     <Compile Include="PlainBodyBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="MailMergeLib.snk" />
-    <None Include="packages.config" />
-    <Compile Include="MailMergeSender.cs" />
-    <Compile Include="RegExHtmlConverter.cs" />
-    <Compile Include="SenderConfig.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormatter.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormattingInfo.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\ISelectorInfo.cs" />
@@ -101,6 +79,7 @@
     <Compile Include="SmartFormatMail\Core\Parsing\FormatItem.cs" />
     <Compile Include="SmartFormatMail\Core\Parsing\LiteralText.cs" />
     <Compile Include="SmartFormatMail\Core\Parsing\Parser.cs" />
+    <Compile Include="SmartFormatMail\Core\Parsing\ParsingErrorEventArgs.cs" />
     <Compile Include="SmartFormatMail\Core\Parsing\ParsingErrors.cs" />
     <Compile Include="SmartFormatMail\Core\Parsing\Placeholder.cs" />
     <Compile Include="SmartFormatMail\Core\Parsing\Selector.cs" />
@@ -119,6 +98,7 @@
     <Compile Include="SmartFormatMail\Extensions\TimeFormatter.cs" />
     <Compile Include="SmartFormatMail\Extensions\XElementFormatter.cs" />
     <Compile Include="SmartFormatMail\Extensions\XmlSource.cs" />
+    <Compile Include="SmartFormatMail\FormattingErrorEventArgs.cs" />
     <Compile Include="SmartFormatMail\Smart.cs" />
     <Compile Include="SmartFormatMail\SmartExtensions.cs" />
     <Compile Include="SmartFormatMail\SmartFormatter.cs" />
@@ -126,6 +106,12 @@
     <Compile Include="SmartFormatMail\Utilities\PluralRules.cs" />
     <Compile Include="SmartFormatMail\Utilities\PluralRules_Old.cs" />
     <Compile Include="SmartFormatMail\Utilities\TimeSpanUtility.cs" />
+    <Compile Include="UriScheme.cs" />
+    <None Include="MailMergeLib.snk" />
+    <Compile Include="MailMergeSender.cs" />
+    <Compile Include="RegExHtmlConverter.cs" />
+    <Compile Include="SenderConfig.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="SmtpClientConfig.cs" />
     <Compile Include="StreamAttachment.cs" />
     <Compile Include="StringAttachment.cs" />
@@ -134,8 +120,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SmartFormatMail\license.txt" />
-    <Content Include="SmartFormatMail\SmartFormat.csproj" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

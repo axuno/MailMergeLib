@@ -268,11 +268,13 @@ namespace MailMergeLib
 						case MessageOutput.Directory:
 							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
 							break;
+#if NET40 || NET45
 						case MessageOutput.PickupDirectoryFromIis:
 							// for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
 							// and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
 							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
 							break;
+#endif
 						default:
 							await SendMimeMessageToSmtpServerAsync(smtpClient, mimeMsg, config).ConfigureAwait(false);
 							break; // break switch
@@ -577,11 +579,13 @@ namespace MailMergeLib
 						case MessageOutput.Directory:
 							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
 							break;
+#if NET40 || NET45
 						case MessageOutput.PickupDirectoryFromIis:
 							// for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
 							// and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
 							mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
 							break;
+#endif
 						default:
 							SendMimeMessageToSmtpServer(smtpClient, mimeMsg, config);
 							break; // break switch

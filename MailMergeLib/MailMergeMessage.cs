@@ -1,14 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using MailKit;
-using MailMergeLib.SmartFormatMail.Core.Settings;
 using MimeKit;
 
 namespace MailMergeLib
@@ -26,16 +20,12 @@ namespace MailMergeLib
 
 		#endregion
 
-		#region *** Private fields for Encoding and Globalization ***
-
-		#endregion
-
 		#region *** Private lists for tracking errors ***
 
 		private readonly HashSet<string> _badAttachmentFiles = new HashSet<string>();
 		private readonly HashSet<string> _badMailAddr = new HashSet<string>();
-		private HashSet<string> _badInlineFiles = new HashSet<string>();
-		private HashSet<string> _badVariableNames = new HashSet<string>();
+		private readonly HashSet<string> _badInlineFiles = new HashSet<string>();
+		private readonly HashSet<string> _badVariableNames = new HashSet<string>();
 
 		#endregion
 
@@ -67,6 +57,8 @@ namespace MailMergeLib
 
 			SmartFormatter = new MailSmartFormatter(this);
 			// Smart.Format("{Name:choose(null|):N/A|empty|{Name}}", variable), where abc.Name NULL, string.Emtpy or a string
+
+			SmartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
 
 			MailMergeAddresses = new MailMergeAddressCollection(this);
 		}
@@ -198,13 +190,15 @@ namespace MailMergeLib
 		{
 			lock (_syncRoot)
 			{
+				_badVariableNames.Clear();
+#if !NET_STANDARD
 				// convert DataRow to Dictionary<string, object>
 				if (dataItem is DataRow)
 				{
 					var row = (DataRow) dataItem;
 					dataItem = row.Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c]);
 				}
-
+#endif
 				var mimeMessage = new MimeMessage();
 				AddSubjectToMailMessage(mimeMessage, dataItem);
 				AddAddressesToMailMessage(mimeMessage, dataItem);
@@ -324,6 +318,7 @@ namespace MailMergeLib
 		/// <summary>
 		/// Gets inline attachments (linked resources of the HTML body) of a mail message.
 		/// They are generated automatically with all image sources pointing to local files.
+		/// For adding non-automatic inline attachments, use <see cref="AddExternalInlineAttachment"/> ONLY.
 		/// </summary>
 		public HashSet<FileAttachment> InlineAttachments { get; private set; } = new HashSet<FileAttachment>();
 
@@ -443,8 +438,8 @@ namespace MailMergeLib
 			}
 			else
 			{
-				InlineAttachments = new HashSet<FileAttachment>();
-				_badInlineFiles = new HashSet<string>();
+				InlineAttachments.Clear();
+				_badInlineFiles.Clear();
 			}
 		}
 
@@ -471,11 +466,55 @@ namespace MailMergeLib
 				}
 				catch (FileNotFoundException)
 				{
-					_badAttachmentFiles.Add(filename);
+					_badAttachmentFiles.Add(fa.Filename);
 				}
 				catch (IOException)
 				{
-					_badAttachmentFiles.Add(filename);
+					_badAttachmentFiles.Add(fa.Filename);
+				}
+			}
+
+			// automatic inline attachments generated from html text
+			foreach (var ia in InlineAttachments)
+			{
+				var filename = MakeFullPath(SearchAndReplaceVars(ia.Filename, dataItem));
+				var displayName = SearchAndReplaceVars(ia.DisplayName, dataItem);
+
+				try
+				{
+					_attachmentParts.Add(
+						new AttachmentBuilder(new FileAttachment(filename, displayName, ia.MimeType), Config.CharacterEncoding,
+							Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
+				}
+				catch (FileNotFoundException)
+				{
+					_badAttachmentFiles.Add(ia.Filename);
+				}
+				catch (IOException)
+				{
+					_badAttachmentFiles.Add(ia.Filename);
+				}
+			}
+
+			// manually added inline attachments
+			foreach (var ia in _inlineAttExternal)
+			{
+				var filename = MakeFullPath(SearchAndReplaceVars(ia.Filename, dataItem));
+				var displayName = SearchAndReplaceVars(ia.DisplayName, dataItem);
+
+				try
+				{
+					_attachmentParts.Add(
+						new AttachmentBuilder(new FileAttachment(filename, displayName, ia.MimeType), Config.CharacterEncoding,
+							Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
+				}
+				catch (FileNotFoundException)
+				{
+					_badAttachmentFiles.Add(ia.Filename);
+				}
+				catch (IOException)
+				{
+					_badAttachmentFiles.Add(ia.Filename);
 				}
 			}
 
@@ -546,15 +585,13 @@ namespace MailMergeLib
 					if (testAddress != null)
 					{
 						testAddress.DisplayName = mmAddr.DisplayName;
-						mailboxAddr = testAddress.GetMailAddress(SmartFormatter, dataItem);
+						mailboxAddr = testAddress.GetMailAddress(this, dataItem);
 					}
 					else
 					{
-						mailboxAddr = mmAddr.GetMailAddress(SmartFormatter, dataItem);
+						mailboxAddr = mmAddr.GetMailAddress(this, dataItem);
 					}
-
-					SmartFormatter.MissingVariables.ToList().ForEach(f => _badVariableNames.Add(f));
-
+					
 					if (Config.IgnoreIllegalRecipientAddresses && mailboxAddr == null)
 						continue;
 					
@@ -615,7 +652,7 @@ namespace MailMergeLib
 		/// RCPT TO:&lt;test@sample.com&gt; NOTIFY=SUCCESS,DELAY ORCPT=rfc822;test@sample.com
 		/// </remarks>
 		// Don't think this brings too much benefit
-		// public DeliveryStatusNotification? DeliveryStatusNotification { get; set; }
+		//public DeliveryStatusNotification? DeliveryStatusNotification { get; set; }
 
 		/// <summary>
 		/// Sets all attributes of a mail message.

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -53,7 +52,7 @@ namespace MailMergeLib
 		public string CultureInfoName
 		{
 			get { return CultureInfo.Name; }
-			set { CultureInfo = CultureInfo.GetCultureInfo(value); }
+			set { CultureInfo = new CultureInfo(value); }
 		}
 
 		/// <summary>

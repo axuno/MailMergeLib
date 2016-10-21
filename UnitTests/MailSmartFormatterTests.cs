@@ -68,6 +68,20 @@ namespace UnitTests
 			Assert.AreEqual(expected, result);
 			Console.WriteLine("Anonymous type: passed");
 
+			// ******** List ********
+			dataItem = new List<string>() { "Lorem", "ipsum", "dolor" };  // this works
+			result = smf.Format("{0:list:{}|, |, and }", dataItem);
+			expected = "Lorem, ipsum, and dolor";
+			Assert.AreEqual(expected, result);
+			Console.WriteLine("List: passed");
+
+			// ******** Array ********
+			dataItem = new[] { "Lorem", "ipsum", "dolor" };
+			result = smf.Format("{0:list:{}|, |, and }", dataItem);
+			expected = "Lorem, ipsum, and dolor";
+			Assert.AreEqual(expected, result);
+			Console.WriteLine("Array: passed");
+
 			// ******** Dictionary ********
 			dataItem = new Dictionary<string, object>() { { "Email", "test@example.com" }, {"Continent", "Europe"} };
 
@@ -117,20 +131,26 @@ namespace UnitTests
 			Console.WriteLine("DataRow: passed");
 
 			// ******** Parser error ********
+			var parsingErrors = new List<string>();
 			try
 			{
+				smf.Parser.OnParsingFailure += (sender, args) => { parsingErrors.Add(args.RawText); };
 				result = smf.Format(culture, "{lorem", dataItem);
 				Assert.Fail("No parsing error.");
 			}
 			catch (ParsingErrors ex)
 			{
+				Assert.That(parsingErrors.Count == 1);
 				Assert.That(ex.Message.Contains("In: \"{lorem\""));
 				Console.WriteLine("Parsing error: passed");
 			}
 
 			// ******** Formatting error ********
+			var missingVariables = new List<string>();
+			smf.OnFormattingFailure += (sender, args) => { missingVariables.Add(args.Placeholder); };
 			result = smf.Format(culture, "{lorem}", dataItem);
-			Assert.That(smf.MissingVariables.Contains("{lorem}"));
+			
+			Assert.That(missingVariables.Contains("{lorem}"));
 			Console.WriteLine("Format error (missing variable): passed");
 
 			// ******** Culture ********

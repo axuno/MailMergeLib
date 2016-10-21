@@ -11,7 +11,7 @@ namespace MailMergeLib
 		protected BodyBuilderBase()
 		{
 			TextTransferEncoding = ContentEncoding.SevenBit;
-			CharacterEncoding = Encoding.Default;
+			CharacterEncoding = Encoding.UTF8;
 		}
 
 		/// <summary>
