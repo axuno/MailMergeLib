@@ -28,6 +28,11 @@
 * RFC standards compliant.
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
+### Supported Frameworks
+* .Net Framework 4.0
+* .Net Framework 4.5+
+* .Net Core (Standard 1.6)
+
 ### Get started
 * Install the [Nuget Package](https://www.nuget.org/packages/MailMergeLib/)
 * Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
