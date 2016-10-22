@@ -125,24 +125,25 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 		/// <remarks>
 		/// Wrap, so that CollectionIndex can be used without code changes.
 		/// </remarks>
-		private static readonly AsyncLocal<int> _collectionIndex = new AsyncLocal<int> {Value = -1};
+		private static readonly AsyncLocal<int?> _collectionIndex = new AsyncLocal<int?>();
 
 		/// <remarks>
 		/// System.Runtime.Remoting.Messaging and CallContext.Logical[Get|Set]Data 
 		/// not supported by .Net Core. Instead .Net Core provides AsyncLocal&lt;T&gt;
-		/// Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
+		/// Good examples are: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
+		/// and https://github.com/StephenCleary/AsyncLocal/blob/master/src/UnitTests/UnitTests.cs
 		/// </remarks>
 		private static int CollectionIndex
 		{
-			get { return _collectionIndex.Value; }
+			get { return _collectionIndex.Value ?? -1; }
 			set { _collectionIndex.Value = value; }
-		}		
+		}
 #endif
 		public bool TryEvaluateFormat(IFormattingInfo formattingInfo)
 		{
 			var format = formattingInfo.Format;
 			var current = formattingInfo.CurrentValue;
-			
+
 			// This method needs the Highest priority so that it comes before the PluralLocalizationExtension and ConditionalExtension
 
 			// This extension requires at least IEnumerable
@@ -200,7 +201,8 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 
 			int oldCollectionIndex = CollectionIndex; // In case we have nested arrays, we might need to restore the CollectionIndex
 			CollectionIndex = -1;
-			foreach (object item in items) {
+			foreach (object item in items)
+			{
 				CollectionIndex += 1; // Keep track of the index
 
 				// Determine which spacer to write:
@@ -208,7 +210,8 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 				{
 					// Don't write the spacer.
 				}
-				else if (CollectionIndex < items.Count - 1) {
+				else if (CollectionIndex < items.Count - 1)
+				{
 					formattingInfo.Write(spacer);
 				}
 				else if (CollectionIndex == 1)
