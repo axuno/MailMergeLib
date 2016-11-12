@@ -416,15 +416,13 @@ namespace MailMergeLib
 				// replacing any placeholders in the text or files with variable values
 				var htmlBody = new HtmlBodyBuilder(this, dataIteam)
 				{
-					DocBaseUrl = Config.FileBaseDirectory,
+					DocBaseUri = Config.FileBaseDirectory,
 					TextTransferEncoding = Config.TextTransferEncoding,
 					BinaryTransferEncoding = Config.BinaryTransferEncoding,
 					CharacterEncoding = Config.CharacterEncoding
 				};
 
 				_inlineAttExternal.ForEach(ia => htmlBody.InlineAtt.Add(ia));
-				InlineAttachments = htmlBody.InlineAtt;
-				htmlBody.BadInlineFiles.ToList().ForEach(f => _badInlineFiles.Add(f));
 
 				if (alternative != null)
 				{
@@ -435,6 +433,10 @@ namespace MailMergeLib
 				{
 					_textMessagePart = htmlBody.GetBodyPart();
 				}
+
+				// get inline attachments and bad inline files AFTER htmlBody.GetBodyPart()!
+				InlineAttachments = htmlBody.InlineAtt; // expose all resolved inline attachments in MailMergeMessage
+				htmlBody.BadInlineFiles.ToList().ForEach(f => _badInlineFiles.Add(f));
 			}
 			else
 			{
@@ -474,49 +476,9 @@ namespace MailMergeLib
 				}
 			}
 
-			// automatic inline attachments generated from html text
-			foreach (var ia in InlineAttachments)
-			{
-				var filename = MakeFullPath(SearchAndReplaceVars(ia.Filename, dataItem));
-				var displayName = SearchAndReplaceVars(ia.DisplayName, dataItem);
-
-				try
-				{
-					_attachmentParts.Add(
-						new AttachmentBuilder(new FileAttachment(filename, displayName, ia.MimeType), Config.CharacterEncoding,
-							Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
-				}
-				catch (FileNotFoundException)
-				{
-					_badAttachmentFiles.Add(ia.Filename);
-				}
-				catch (IOException)
-				{
-					_badAttachmentFiles.Add(ia.Filename);
-				}
-			}
-
-			// manually added inline attachments
-			foreach (var ia in _inlineAttExternal)
-			{
-				var filename = MakeFullPath(SearchAndReplaceVars(ia.Filename, dataItem));
-				var displayName = SearchAndReplaceVars(ia.DisplayName, dataItem);
-
-				try
-				{
-					_attachmentParts.Add(
-						new AttachmentBuilder(new FileAttachment(filename, displayName, ia.MimeType), Config.CharacterEncoding,
-							Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
-				}
-				catch (FileNotFoundException)
-				{
-					_badAttachmentFiles.Add(ia.Filename);
-				}
-				catch (IOException)
-				{
-					_badAttachmentFiles.Add(ia.Filename);
-				}
-			}
+			/* Changed: all inline attachments (read from html body text or externally added ones
+			 * are now processed in HtmlBodyBuilder
+			 */
 
 			foreach (var sa in StreamAttachments)
 			{

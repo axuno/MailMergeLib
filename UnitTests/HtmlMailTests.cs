@@ -20,7 +20,7 @@ namespace UnitTests
 		[Test]
 		public void HtmlMailMergeWithInlineAndAtt()
 		{
-			var testDataAbsPath = Path.Combine(Helper.GetCodeBaseDirectory(), _pathRelativeToCodebase);
+			var filesAbsPath = Path.Combine(Helper.GetCodeBaseDirectory(), _pathRelativeToCodebase);
 
 			var dataItem = new
 			{
@@ -33,14 +33,14 @@ namespace UnitTests
 
 			var mmm = new MailMergeMessage
 			{
-				HtmlText = File.ReadAllText(Path.Combine(testDataAbsPath, _htmlTextFile)), // contains image (<img src="..." />) which must be "inline-attached"
-				PlainText = File.ReadAllText(Path.Combine(testDataAbsPath, _plainTextFile)),
+				HtmlText = File.ReadAllText(Path.Combine(filesAbsPath, _htmlTextFile)), // contains image (<img src="..." />) which must be "inline-attached"
+				PlainText = File.ReadAllText(Path.Combine(filesAbsPath, _plainTextFile)),
 				Subject = _subject,
-				Config = {FileBaseDirectory = testDataAbsPath, Organization = "MailMergeLib Inc.", CharacterEncoding = Encoding.UTF8, Priority = MessagePriority.Urgent }
+				Config = {FileBaseDirectory = filesAbsPath, Organization = "MailMergeLib Inc.", CharacterEncoding = Encoding.UTF8, Priority = MessagePriority.Urgent }
 			};
 			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "{SenderAddr}"));
 			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "\"{Name}\" <{MailboxAddr}>", mmm.Config.CharacterEncoding));
-			mmm.FileAttachments.Add(new FileAttachment(Path.Combine(testDataAbsPath, _logFileName), "Log file from {Date:yyyy-MM-dd}.log"));
+			mmm.FileAttachments.Add(new FileAttachment(Path.Combine(filesAbsPath, _logFileName), "Log file from {Date:yyyy-MM-dd}.log"));
 			
 			var msg = mmm.GetMimeMessage(dataItem);
 			var msgFilename = Path.Combine(Path.GetTempPath(), "test-msg.eml");
@@ -57,6 +57,69 @@ namespace UnitTests
 			Assert.IsTrue(msg.HtmlBody.Contains(dataItem.Success ? "succeeded" : "failed"));
 			Assert.IsTrue(msg.TextBody.Contains(dataItem.Success ? "succeeded" : "failed"));
 			Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")));
+		}
+
+		[Test]
+	    public void AddLinkedResourceManually()
+		{
+			const string myContentId = "my.content.id";
+			var filesAbsPath = Path.Combine(Helper.GetCodeBaseDirectory(), _pathRelativeToCodebase);
+
+			var dataItem = new
+			{
+				Name = "John",
+				MailboxAddr = "john@example.com",
+				Success = true,
+				Date = DateTime.Now,
+				SenderAddr = "test@specimen.com"
+			};
+
+			var mmm = new MailMergeMessage
+			{
+				HtmlText = $"<html><body><img src=\"cid:{myContentId}\" width=\"100\"><br/>only an image</body></html>",
+				PlainText = "only an image",
+				Subject = "Message subject",
+				Config = { FileBaseDirectory = filesAbsPath }
+			};
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "{SenderAddr}"));
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "\"{Name}\" <{MailboxAddr}>", mmm.Config.CharacterEncoding));
+			mmm.AddExternalInlineAttachment(new FileAttachment(Path.Combine(filesAbsPath, "success.jpg"), myContentId));
+
+			var msg = mmm.GetMimeMessage(dataItem);
+			msg.WriteTo(@"c:\temp\cid.eml");
+			Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg") && bp.ContentId == myContentId));
+		}
+
+	    [Test]
+	    public void IgnoreImgSrcWithEmbeddedBase64Image()
+	    {
+			const string embeddedImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+			var mmm = new MailMergeMessage
+			{
+				// img is 1x1px black
+				HtmlText = $"<html><body><img src=\"{embeddedImage}\" width=\"30\" height=\"30\"></body></html>"
+			};
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "sender@sample.com"));
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@sample.com"));
+
+			var msg = mmm.GetMimeMessage();
+			Assert.IsTrue(msg.ToString().Contains(embeddedImage));
+		}
+
+		[Test]
+		public void IgnoreImgSrcWithUriTypeHttp()
+		{
+			const string httpImage = "http://example.com/sample.png";
+			var mmm = new MailMergeMessage
+			{
+				// img is 1x1px black
+				HtmlText = $"<html><base href=\"file:///\" /><body><img src=\"{httpImage}\"></body></html>"
+			};
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "sender@sample.com"));
+			mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@sample.com"));
+
+			var msg = mmm.GetMimeMessage();
+			Assert.IsTrue(msg.ToString().Contains(httpImage));
 		}
 	}
 }

@@ -22,11 +22,11 @@ namespace MailMergeLib
 		/// Creates a new file attachment information
 		/// </summary>
 		/// <param name="fileName">Full path of the file </param>
-		/// <param name="displayName">Name and extension as the reader of the mail should see it (in case of inline attachments displayName is used for CIDs</param>
-		public FileAttachment(string fileName, string displayName)
+		/// <param name="displayNameOrCid">Name and extension as the reader of the mail should see it (in case of inline attachments displayName is used for CIDs</param>
+		public FileAttachment(string fileName, string displayNameOrCid)
 		{
 			Filename = fileName;
-			DisplayName = displayName;
+			DisplayName = displayNameOrCid;
 			MimeType = MimeKit.MimeTypes.GetMimeType(fileName);
 		}
 

@@ -22,7 +22,7 @@ namespace MailMergeLib
 	{
 		private readonly MailMergeMessage _mailMergeMessage;
 		private readonly IHtmlDocument _htmlDocument;
-		private string _docBaseUrl;
+		private Uri _docBaseUri;
 		private readonly object _dataItem;
 
 		/// <summary>
@@ -32,7 +32,7 @@ namespace MailMergeLib
 		/// <param name="dataItem"></param>
 		public HtmlBodyBuilder(MailMergeMessage mailMergeMessage, object dataItem)
 		{
-			_docBaseUrl = string.Empty;
+			_docBaseUri = new Uri(string.Concat(UriScheme.File, UriScheme.SchemeDelimiter));
 			_mailMergeMessage = mailMergeMessage;
 			_dataItem = dataItem;
 			BinaryTransferEncoding = mailMergeMessage.Config.BinaryTransferEncoding;
@@ -75,16 +75,16 @@ namespace MailMergeLib
 
 			// read the <base href="..."> tag in order to find the embedded image files later on
 			var baseEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlBaseElement) as IHtmlBaseElement;
-			var baseDir = baseEle?.Href ?? string.Empty;
+			var baseDir = baseEle?.Href == null ? null : new Uri(baseEle.Href);
 
 			// only replace the base url if it was not set programmatically
-			if (string.IsNullOrEmpty(_docBaseUrl))
+			if (_docBaseUri == null)
 			{
-				_docBaseUrl = string.IsNullOrEmpty(baseDir) ? string.Empty : MakeUri(baseDir);
+				_docBaseUri = baseDir;
 			}
 
 			// remove if base tag is local file reference, because it's not usable in the resulting HTML
-			if (baseEle != null && baseDir.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase))
+			if (baseEle != null && baseDir != null && baseDir.Scheme == UriScheme.File)
 				baseEle.Remove();
 			
 			ReplaceImgSrcByCid();
@@ -102,7 +102,7 @@ namespace MailMergeLib
 						: ContentEncoding.QuotedPrintable,
 
 			};
-			htmlTextPart.SetText(CharacterEncoding, DocHtml);  // MimeKit.ContentType.Charset is set using CharacterEncodig
+			htmlTextPart.SetText(CharacterEncoding, DocHtml);  // MimeKit.ContentType.Charset is set using CharacterEncoding
 			htmlTextPart.ContentId = MimeUtils.GenerateMessageId();
 
 			if (!InlineAtt.Any())
@@ -127,10 +127,13 @@ namespace MailMergeLib
 			{
 				try
 				{
+					var readyInlineAtt = new FileAttachment(_mailMergeMessage.SearchAndReplaceVars(ia.Filename, _dataItem), _mailMergeMessage.SearchAndReplaceVars(ia.DisplayName, _dataItem));
 					// create an inline image attachment for the file located at path
-					var attachment = new AttachmentBuilder(ia, CharacterEncoding,
+					var attachment = new AttachmentBuilder(readyInlineAtt, CharacterEncoding,
 							TextTransferEncoding, BinaryTransferEncoding).GetAttachment();
-					attachment.ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Inline);
+					attachment.ContentDisposition = new ContentDisposition(ContentDisposition.Inline);
+					attachment.ContentId = ia.DisplayName;
+					attachment.FileName = null; // not needed for inline attachments, save some space
 
 					mpr.Add(attachment);
 				}
@@ -147,13 +150,14 @@ namespace MailMergeLib
 		}
 
 		/// <summary>
-		/// Gets or sets the Base URL of the HTML document. 
+		/// Gets or sets the absolute local base URL of the HTML document. 
 		/// This is used for building the path of embedded images.
+		/// Can be an UNC path string (e.g. \\server\path), a local folder string (e.g. C:\user\x\document), or a URI string (e.g. file://c:/user/x/document)
 		/// </summary>
-		public string DocBaseUrl
+		public string DocBaseUri
 		{
-			set { _docBaseUrl = MakeUri(value); }
-			get { return _docBaseUrl; }
+			set { _docBaseUri = new Uri(string.IsNullOrEmpty(value) ?  string.Concat(UriScheme.File, UriScheme.SchemeDelimiter) : value); }
+			get { return _docBaseUri.AbsolutePath; }
 		}
 
 		/// <summary>
@@ -177,21 +181,25 @@ namespace MailMergeLib
 			foreach (var element in _htmlDocument.All.Where(m => m is IHtmlImageElement))
 			{
 				var img = (IHtmlImageElement)element;
-				var currSrc = img.Attributes["src"]?.Value;
+				var currSrc = img.Attributes["src"]?.Value?.Trim();
 				if (currSrc == null) continue;
 
 				// replace any placeholders with variables
 				currSrc = _mailMergeMessage.SearchAndReplaceVars(currSrc, _dataItem);
+				// Note: if currSrc is a rooted path, _docBaseUrl will be ignored
+				var currSrcUri = new Uri(_docBaseUri, currSrc);
 
-				// img scr is not a local file (e.g. starting with "http"), so we just save the value with placeholders replaced
-				if (!string.IsNullOrEmpty(currSrc) && ! new Uri(MakeUri(currSrc)).IsFile)
+				// img src is not a local file (e.g. starting with "http" or is embedded base64 image), or manually included cid reference
+				// so we just save the value with placeholders replaced
+				if (string.IsNullOrEmpty(currSrc) || (currSrcUri.Scheme != UriScheme.File) ||
+				    currSrc.StartsWith("data:image", StringComparison.OrdinalIgnoreCase) || currSrc.StartsWith("cid:", StringComparison.OrdinalIgnoreCase))
 				{
-					img.Attributes["src"].Value = currSrc;
+					// leave img.Attributes["src"].Value as it is
 					continue;
 				}
 
 				// this will succeed only with local files (at this time, they don't need to exist yet)
-				var filename = MakeFullPath(MakeLocalPath(currSrc));
+				var filename = _mailMergeMessage.SearchAndReplaceVars(currSrcUri.LocalPath, _dataItem);
 				try
 				{
 					if (!fileList.Contains(filename))
@@ -223,49 +231,6 @@ namespace MailMergeLib
 		private static string MakeCid(string prefix, string contentId, string fileExt)
 		{
 			return prefix + contentId + fileExt.Replace('.', '-');
-		}
-
-		/// <summary>
-		/// Determines the full path for the given local file
-		/// </summary>
-		/// <param name="filename">local file name</param>
-		/// <returns>Full path for the given local file</returns>
-		private string MakeFullPath(string filename)
-		{
-			var fullpath = Tools.MakeFullPath(MakeLocalPath(_docBaseUrl), filename);
-			return fullpath;
-		}
-
-		/// <summary>
-		/// Determines the local path for the given URI
-		/// </summary>
-		/// <param name="uri">RFC1738: "file://" [ host | "localhost" ] "/" path</param>
-		/// <returns>Local path for the given URI</returns>
-		private static string MakeLocalPath(string uri)
-		{
-			return uri.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase) ? new Uri(uri).LocalPath : uri;
-			
-			/* Note:
-			 * In case the filename does not contain the Uri.UriSchemeFile prefix,
-			 * it will not be decoded. Then the follwing line should be used.
-
-			 * Pre-process for + sign space formatting since System.Uri doesn't handle it.
-			 * "Plus" literals are encoded as %2b so this should be safe enough:
-			 * 
-			 * return uri.StartsWith(Uri.UriSchemeFile) ? new Uri(uri).LocalPath : Uri.UnescapeDataString(uri.Replace("+", " "));
-			 */
-		}
-
-		/// <summary>
-		/// Makes a RFC1738 compliant URI, like: "file://" [ host | "localhost" ] "/" path
-		/// </summary>
-		/// <param name="localPath"></param>
-		/// <returns>A RFC1738 compliant URI: "file://" [ host | "localhost" ] "/" path</returns>
-		private static string MakeUri(string localPath)
-		{
-			return ! localPath.StartsWith(UriScheme.File, StringComparison.CurrentCultureIgnoreCase)
-			    ? $"{UriScheme.File}{UriScheme.SchemeDelimiter}/{localPath}"
-				: localPath;
 		}
 	}
 }

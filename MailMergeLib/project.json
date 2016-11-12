@@ -1,5 +1,5 @@
 {
-    "version": "5.1.0.1",
+    "version": "5.2.0.0",
     "copyright": "© 2007-2016 by axuno gGmbH",
     "title": "MailMergeLib 5",
     "description": "MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.",
@@ -7,15 +7,15 @@
 
     "dependencies": {
         "AngleSharp": "0.9.9",
-        "MailKit": "1.8.1",
-        "Microsoft.Extensions.Configuration.Xml": "1.0.0-rc2-final",
-        "MimeKit": "1.8.0",
+        "MailKit": "1.10.0",
+        "MimeKit": "1.10.0",
         "NETStandard.Library": "1.6.0",
         "System.Collections.Specialized": "4.0.1",
         "System.Data.Common": "4.1.0",
         "System.IO.FileSystem": "4.0.1",
         "System.Runtime": "4.1.0",
-        "System.Threading.Thread": "4.0.0"
+        "System.Threading.Thread": "4.0.0",
+        "System.Xml.XmlSerializer": "4.0.11"
     },
     "frameworks": {
         "netstandard1.6": {
