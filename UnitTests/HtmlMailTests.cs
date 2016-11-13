@@ -86,7 +86,6 @@ namespace UnitTests
 			mmm.AddExternalInlineAttachment(new FileAttachment(Path.Combine(filesAbsPath, "success.jpg"), myContentId));
 
 			var msg = mmm.GetMimeMessage(dataItem);
-			msg.WriteTo(@"c:\temp\cid.eml");
 			Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg") && bp.ContentId == myContentId));
 		}
 
