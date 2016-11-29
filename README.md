@@ -1,4 +1,4 @@
-<img src="https://github.com/axuno/MailMergeLib/blob/master/MailMergeLlib.png" width="300" alt="Logo">
+<img src="https://raw.githubusercontent.com/axuno/MailMergeLib/master/MailMergeLlib.png" width="300" alt="Logo">
 
 ```MailMergeLib``` version 5.0 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
 
