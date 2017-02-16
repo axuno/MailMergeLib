@@ -11,6 +11,9 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
 			CaseSensitivity = CaseSensitivityType.CaseSensitive;
 		}
 
+		/// <summary>
+		/// Determines whether placeholders are case-sensitive or not.
+		/// </summary>
 		public CaseSensitivityType CaseSensitivity { get; set; }
 
 		internal IEqualityComparer<string> GetCaseSensitivityComparer()
@@ -23,7 +26,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
 					case CaseSensitivityType.CaseInsensitive:
 						return StringComparer.CurrentCultureIgnoreCase;
 					default:
-						throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
+						throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
 				}
 			}
 		}
@@ -38,21 +41,8 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
 					case CaseSensitivityType.CaseInsensitive:
 						return StringComparison.CurrentCultureIgnoreCase;
 					default:
-						throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
+						throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
 				}
-			}
-		}
-
-		internal BindingFlags GetCaseSensitivityBindingFlag()
-		{
-			switch (CaseSensitivity)
-			{
-				case CaseSensitivityType.CaseSensitive:
-					return 0;
-				case CaseSensitivityType.CaseInsensitive:
-					return BindingFlags.IgnoreCase;
-				default:
-					throw new InvalidOperationException(string.Format("The case sensitivity type [{0}] is unknown.", CaseSensitivity));
 			}
 		}
 	}

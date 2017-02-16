@@ -8,10 +8,9 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 {
 	public class ConditionalFormatter : IFormatter
 	{
-		private string[] names = { "conditional", "cond", "" };
-		public string[] Names { get { return names; } set { names = value; } }
+		public string[] Names { get; set; } = { "conditional", "cond", "" };
 
-		private static readonly Regex complexConditionPattern
+		private static readonly Regex _complexConditionPattern
 			= new Regex(@"^  (?:   ([&/]?)   ([<>=!]=?)   ([0-9.-]+)   )+   \?",
 			//   Description:	  and/or	comparator	 value
 			RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -37,7 +36,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 				current is byte || current is short || current is int || current is long
 				|| current is float || current is double || current is decimal;
 			// An Enum is a number too:
-#if NET_STANDARD
+#if FXCORE
 			if (currentIsNumber == false && current != null && current.GetType().GetTypeInfo().IsEnum)
 #else
 			if (currentIsNumber == false && current != null && current.GetType().IsEnum)
@@ -192,7 +191,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 		{
 			conditionResult = false;
 			// Let's evaluate the conditions into a boolean value:
-			Match m = complexConditionPattern.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
+			Match m = _complexConditionPattern.Match(parameter.baseString, parameter.startIndex, parameter.endIndex - parameter.startIndex);
 			if (!m.Success) {
 				// Could not parse the "complex condition"
 				outputItem = parameter;

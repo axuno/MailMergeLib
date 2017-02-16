@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MailMergeLib.SmartFormatMail.Core.Parsing
+﻿namespace MailMergeLib.SmartFormatMail.Core.Parsing
 {
 	/// <summary>
 	/// Base class that represents a substring
@@ -17,9 +15,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 			this.startIndex = startIndex;
 			this.endIndex = endIndex;
 		}
-
-		[Obsolete("Please use RawText instead")]
-		public string Text { get { return RawText; } }
 
 		/// <summary>
 		/// Retrieves the raw text that this item represents.

@@ -24,11 +24,11 @@
           "lib/BouncyCastle.Crypto.dll": {}
         }
       },
-      "MailKit/1.10.0": {
+      "MailKit/1.10.2": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1",
-          "MimeKit": "1.10.0"
+          "MimeKit": "1.10.1"
         },
         "frameworkAssemblies": [
           "System",
@@ -80,7 +80,7 @@
       "Microsoft.Bcl.Build/1.0.21": {
         "type": "package"
       },
-      "MimeKit/1.10.0": {
+      "MimeKit/1.10.1": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1"
@@ -121,11 +121,11 @@
           "lib/BouncyCastle.Crypto.dll": {}
         }
       },
-      "MailKit/1.10.0": {
+      "MailKit/1.10.2": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1",
-          "MimeKit": "1.10.0"
+          "MimeKit": "1.10.1"
         },
         "frameworkAssemblies": [
           "System",
@@ -177,7 +177,7 @@
       "Microsoft.Bcl.Build/1.0.21": {
         "type": "package"
       },
-      "MimeKit/1.10.0": {
+      "MimeKit/1.10.1": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1"
@@ -218,11 +218,11 @@
           "lib/BouncyCastle.Crypto.dll": {}
         }
       },
-      "MailKit/1.10.0": {
+      "MailKit/1.10.2": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1",
-          "MimeKit": "1.10.0"
+          "MimeKit": "1.10.1"
         },
         "frameworkAssemblies": [
           "System",
@@ -274,7 +274,7 @@
       "Microsoft.Bcl.Build/1.0.21": {
         "type": "package"
       },
-      "MimeKit/1.10.0": {
+      "MimeKit/1.10.1": {
         "type": "package",
         "dependencies": {
           "BouncyCastle": "1.8.1"
@@ -325,12 +325,12 @@
         "lib/BouncyCastle.Crypto.dll"
       ]
     },
-    "MailKit/1.10.0": {
-      "sha512": "7T05zYx1EU/Jgput8Xvwcvc1yQaS12GvKquMpU7URvBqo8lveiyyEWNSErapCmd2+qKjKJvhTicMDczEd1TmyQ==",
+    "MailKit/1.10.2": {
+      "sha512": "VOtuXtFkytfda65OMzonx3sUtLmBaavPH4Gx77AopczcstEXUxPd4eDJAg7dWUupEvI5MWrMFz+n6GBeS0Ewqg==",
       "type": "package",
-      "path": "MailKit/1.10.0",
+      "path": "MailKit/1.10.2",
       "files": [
-        "MailKit.1.10.0.nupkg.sha512",
+        "MailKit.1.10.2.nupkg.sha512",
         "MailKit.nuspec",
         "lib/MonoAndroid10/MailKit.dll",
         "lib/MonoAndroid10/MailKit.xml",
@@ -506,12 +506,12 @@
         "build/Microsoft.Bcl.Build.targets"
       ]
     },
-    "MimeKit/1.10.0": {
-      "sha512": "aYKyFJAic0GLfXvRQYEowhv4ZmibwhwpsEK1B0mlkGsSRbnR94yFBhLbal5D6qgJEpEdDBZJOuInICEEwEfN0w==",
+    "MimeKit/1.10.1": {
+      "sha512": "n5c0DKPQG8xx84Qafipd0+0Mw6iGKFUH4dUMDI37ahehVjqKy55YKmvBBwEcCkyjPrazcF/yaBIVRNN0iyr9NA==",
       "type": "package",
-      "path": "MimeKit/1.10.0",
+      "path": "MimeKit/1.10.1",
       "files": [
-        "MimeKit.1.10.0.nupkg.sha512",
+        "MimeKit.1.10.1.nupkg.sha512",
         "MimeKit.nuspec",
         "lib/MonoAndroid10/BouncyCastle.dll",
         "lib/MonoAndroid10/MimeKit.dll",
@@ -542,11 +542,11 @@
     "": [
       "AngleSharp >= 0.9.9",
       "BouncyCastle >= 1.8.1",
-      "MailKit >= 1.10.0",
+      "MailKit >= 1.10.2",
       "Microsoft.Bcl >= 1.1.10",
       "Microsoft.Bcl.Async >= 1.0.168",
       "Microsoft.Bcl.Build >= 1.0.21",
-      "MimeKit >= 1.10.0"
+      "MimeKit >= 1.10.1"
     ],
     ".NETFramework,Version=v4.0": []
   },

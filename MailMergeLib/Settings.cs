@@ -80,7 +80,7 @@ namespace MailMergeLib
 			var xmlNamespace = new XmlSerializerNamespaces();
 			xmlNamespace.Add(string.Empty, "http://www.axuno.net/MailMergeLib/XmlSchema/5.0");
 			var serializer = new XmlSerializer(typeof(Settings));
-			serializer.Serialize(writer, this);
+			serializer.Serialize(writer, this, xmlNamespace);
 
 			if (isStream) return;
 

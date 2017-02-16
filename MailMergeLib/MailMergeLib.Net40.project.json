@@ -9,10 +9,10 @@
   "dependencies": {
     "AngleSharp": "0.9.9",
     "BouncyCastle": "1.8.1",
-    "MailKit": "1.10.0",
+    "MailKit": "1.10.2",
     "Microsoft.Bcl": "1.1.10",
     "Microsoft.Bcl.Async": "1.0.168",
     "Microsoft.Bcl.Build": "1.0.21",
-    "MimeKit": "1.10.0"
+    "MimeKit": "1.10.1"
   }
 }

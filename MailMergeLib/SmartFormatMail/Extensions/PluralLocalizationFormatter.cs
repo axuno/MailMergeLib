@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Collections.Generic;
 using MailMergeLib.SmartFormatMail.Core.Extensions;
 using MailMergeLib.SmartFormatMail.Core.Formatting;
 using MailMergeLib.SmartFormatMail.Utilities;
@@ -9,9 +10,8 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 {
 	public class PluralLocalizationFormatter : IFormatter
 	{
-		private string[] names = { "plural", "p", "" };
-		public string[] Names { get { return names; } set { names = value; } }
-		
+		public string[] Names { get; set; } = { "plural", "p", "" };
+
 		/// <summary>
 		/// Initializes the plugin with rules for many common languages.
 		/// If no CultureInfo is supplied to the formatter, the
@@ -19,7 +19,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 		/// </summary>
 		public PluralLocalizationFormatter(string defaultTwoLetterISOLanguageName)
 		{
-			this.DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
+			DefaultTwoLetterISOLanguageName = defaultTwoLetterISOLanguageName;
 		}
 
 		private PluralRules.PluralRuleDelegate defaultPluralRule;
@@ -28,12 +28,12 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 		{
 			get
 			{
-				return this.defaultTwoLetterISOLanguageName;
+				return defaultTwoLetterISOLanguageName;
 			}
 			set
 			{
-				this.defaultTwoLetterISOLanguageName = value;
-				this.defaultPluralRule = PluralRules.GetPluralRule(value);
+				defaultTwoLetterISOLanguageName = value;
+				defaultPluralRule = PluralRules.GetPluralRule(value);
 			}
 		}
 
@@ -67,9 +67,9 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 
 
 			// Use the default, if provided:
-			if (this.defaultPluralRule != null)
+			if (defaultPluralRule != null)
 			{
-				return this.defaultPluralRule;
+				return defaultPluralRule;
 			}
 
 			return null;
@@ -91,15 +91,28 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 			// This extension requires at least two plural words:
 			if (pluralWords.Count == 1) return false;
 
-			// See if the value is a number:
-			var currentIsNumber =
-				current is byte || current is short || current is int || current is long
-				|| current is float || current is double || current is decimal;
-			// This extension only formats numbers:
-			if (!currentIsNumber) return false;
+			decimal value;
 
-			// Normalize the number to decimal:
-			var value = Convert.ToDecimal(current);
+			// We can format numbers, and IEnumerables. For IEnumerables we look at the number of items
+			// in the collection: this means the user can e.g. use the same parameter for both plural and list, for example
+			// 'Smart.Format("The following {0:plural:person is|people are} impressed: {0:list:{}|, |, and}", new[] { "bob", "alice" });'
+			if (current is byte || current is short || current is int || current is long
+				|| current is float || current is double || current is decimal)
+			{
+				// Normalize the number to decimal:
+				value = Convert.ToDecimal(current);
+			}
+			else if (current is IEnumerable<object>)
+			{
+				// Relay on IEnumerable covariance, but don't care about non-generic IEnumerable
+				value = ((IEnumerable<object>)current).Count();
+			}
+			else
+			{
+				// This extension only permits numbers and IEnumerables
+				return false;
+			}
+
 
 			// Get the plural rule:
 			var pluralRule = GetPluralRule(formattingInfo);
@@ -137,15 +150,15 @@ namespace MailMergeLib.SmartFormatMail.Extensions
 			return (formatType == typeof(CustomPluralRuleProvider)) ? this : null;
 		}
 
-		private readonly PluralRules.PluralRuleDelegate pluralRule;
+		private readonly PluralRules.PluralRuleDelegate _pluralRule;
 		public CustomPluralRuleProvider(PluralRules.PluralRuleDelegate pluralRule)
 		{
-			this.pluralRule = pluralRule;
+			_pluralRule = pluralRule;
 		}
 
 		public PluralRules.PluralRuleDelegate GetPluralRule()
 		{
-			return pluralRule;
+			return _pluralRule;
 		}
 	}
 

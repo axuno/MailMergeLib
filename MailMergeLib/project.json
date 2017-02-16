@@ -7,15 +7,15 @@
 
     "dependencies": {
         "AngleSharp": "0.9.9",
-        "MailKit": "1.10.0",
-        "MimeKit": "1.10.0",
-        "NETStandard.Library": "1.6.0",
-        "System.Collections.Specialized": "4.0.1",
-        "System.Data.Common": "4.1.0",
-        "System.IO.FileSystem": "4.0.1",
-        "System.Runtime": "4.1.0",
-        "System.Threading.Thread": "4.0.0",
-        "System.Xml.XmlSerializer": "4.0.11"
+        "MailKit": "1.10.2",
+        "MimeKit": "1.10.1",
+        "NETStandard.Library": "1.6.1",
+        "System.Collections.Specialized": "4.3.0",
+        "System.Data.Common": "4.3.0",
+        "System.IO.FileSystem": "4.3.0",
+        "System.Runtime": "4.3.0",
+        "System.Threading.Thread": "4.3.0",
+        "System.Xml.XmlSerializer": "4.3.0"
     },
     "frameworks": {
         "netstandard1.6": {
@@ -23,7 +23,7 @@
         }
     },
     "buildOptions": {
-        "define": [ "NET_STANDARD" ],
+        "define": [ "FXCORE" ],
         "compile": {
             "excludeFiles": [ "TextVariableManager.cs", "HtmlAgilityPackHtmlConverter.cs" ],
             "exclude": [ "Properties", "SmartFormatMail/Properties", "packages.*.config" ]

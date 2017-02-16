@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MailMergeLib.SmartFormatMail.Core.Settings;
 
 namespace MailMergeLib.SmartFormatMail.Core.Parsing
@@ -12,7 +12,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 	{
 		#region: Constructor :
 
-		public Parser(ErrorAction errorAction)
+		public Parser(ErrorAction errorAction = ErrorAction.Ignore)
 		{
 			ErrorAction = errorAction;
 		}
@@ -29,14 +29,14 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		/// This allows optimized alpha-character detection.
 		/// Specify any additional selector chars in AllowedSelectorChars.
 		/// </summary>
-		private bool alphanumericSelectors = false;
+		private bool _alphanumericSelectors = false;
 		/// <summary>
 		/// A list of allowable selector characters,
 		/// to support additional selector syntaxes such as math.
 		/// Digits are always included, and letters can be included 
 		/// with AlphanumericSelectors.
 		/// </summary>
-		private string allowedSelectorChars = "";
+		private string _allowedSelectorChars = "";
 
 		/// <summary>
 		/// A list of characters that come between selectors.
@@ -44,26 +44,26 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		/// or even math symbols.
 		/// By default, there are no operators.
 		/// </summary>
-		private string operators = "";
+		private string _operators = "";
 
 		/// <summary>
 		/// If false, double-curly braces are escaped.
 		/// If true, the AlternativeEscapeChar is used for escaping braces.
 		/// </summary>
-		private bool alternativeEscaping = false;
+		private bool _alternativeEscaping = false;
 
 		/// <summary>
 		/// If AlternativeEscaping is true, then this character is
 		/// used to escape curly braces.
 		/// </summary>
-		private char alternativeEscapeChar = '\\';
+		private char _alternativeEscapeChar = '\\';
 
 		/// <summary>
 		/// Includes a-z and A-Z in the list of allowed selector chars.
 		/// </summary>
 		public void AddAlphanumericSelectors()
 		{
-			alphanumericSelectors = true;
+			_alphanumericSelectors = true;
 		}
 		/// <summary>
 		/// Adds specific characters to the allowed selector chars.
@@ -73,9 +73,9 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		{
 			foreach (var c in chars)
 			{
-				if (allowedSelectorChars.IndexOf(c) == -1)
+				if (_allowedSelectorChars.IndexOf(c) == -1)
 				{
-					allowedSelectorChars += c;
+					_allowedSelectorChars += c;
 				}
 			}
 
@@ -90,9 +90,9 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		{
 			foreach (var c in chars)
 			{
-				if (operators.IndexOf(c) == -1)
+				if (_operators.IndexOf(c) == -1)
 				{
-					operators += c;
+					_operators += c;
 				}
 			}
 		}
@@ -102,11 +102,11 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		/// so that braces will only be escaped after the
 		/// specified character.
 		/// </summary>
-		/// <param name="alternativeEscapeChar"></param>
-		public void UseAlternativeEscapeChar(char alternativeEscapeChar)
+		/// <param name="alternativeEscapeChar">Defaults to backslash</param>
+		public void UseAlternativeEscapeChar(char alternativeEscapeChar = '\\')
 		{
-			this.alternativeEscapeChar = alternativeEscapeChar;
-			this.alternativeEscaping = true;
+			_alternativeEscapeChar = alternativeEscapeChar;
+			_alternativeEscaping = true;
 		}
 		/// <summary>
 		/// [Default] 
@@ -116,17 +116,17 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 		/// </summary>
 		public void UseBraceEscaping()
 		{
-			this.alternativeEscaping = false;
+			_alternativeEscaping = false;
 		}
 
 
-		private char openingBrace = '{';
-		private char closingBrace = '}';
+		private char _openingBrace = '{';
+		private char _closingBrace = '}';
 
 		public void UseAlternativeBraces(char opening, char closing)
 		{
-			openingBrace = opening;
-			closingBrace = closing;
+			_openingBrace = opening;
+			_closingBrace = closing;
 		}
 
 		#endregion
@@ -142,7 +142,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 
 		#region: Parsing :
 
-		public Format ParseFormat(string format)
+		public Format ParseFormat(string format, string[] formatterExtensionNames)
 		{
 			var result = new Format(format);
 			var current = result;
@@ -156,14 +156,14 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 			var parsingErrorText = new ParsingErrorText();
 
 			// Cache properties:
-			var openingBrace = this.openingBrace;
-			var closingBrace = this.closingBrace;
+			var openingBrace = _openingBrace;
+			var closingBrace = _closingBrace;
 
 
-			int nestedDepth = 0;
-			int lastI = 0;
-			int operatorIndex = 0;
-			int selectorIndex = 0;
+			var nestedDepth = 0;
+			var lastI = 0;
+			var operatorIndex = 0;
+			var selectorIndex = 0;
 			for (int i = 0, length = format.Length; i < length; i++)
 			{
 				var c = format[i];
@@ -179,7 +179,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 						lastI = i + 1;
 
 						// See if this brace should be escaped:
-						if (!this.alternativeEscaping)
+						if (!_alternativeEscaping)
 						{
 							var nextI = lastI;
 							if (nextI < length && format[nextI] == openingBrace)
@@ -206,7 +206,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 						lastI = i + 1;
 
 						// See if this brace should be escaped:
-						if (!this.alternativeEscaping)
+						if (!_alternativeEscaping)
 						{
 							var nextI = lastI;
 							if (nextI < length && format[nextI] == closingBrace)
@@ -230,7 +230,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 						current = current.parent.parent;
 						namedFormatterStartIndex = -1;
 					}
-					else if (this.alternativeEscaping && c == this.alternativeEscapeChar)
+					else if (_alternativeEscaping && c == _alternativeEscapeChar)
 					{
 						namedFormatterStartIndex = -1;
 						// See if the next char is a brace that should be escaped:
@@ -297,14 +297,34 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 							lastI = i + 1;
 
 							var parentPlaceholder = current.parent;
+
 							if (namedFormatterOptionsStartIndex == -1)
 							{
-								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
+								var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
+								
+								if (FormatterNameExists(formatterName, formatterExtensionNames))
+								{
+									parentPlaceholder.FormatterName = formatterName;
+								}
+								else
+								{
+									lastI = current.startIndex;
+								}
+
 							}
 							else
 							{
-								parentPlaceholder.FormatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
-								parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+								var formatterName = format.Substring(namedFormatterStartIndex, namedFormatterOptionsStartIndex - namedFormatterStartIndex);
+
+								if (FormatterNameExists(formatterName, formatterExtensionNames))
+								{
+									parentPlaceholder.FormatterName = formatterName;
+									parentPlaceholder.FormatterOptions = format.Substring(namedFormatterOptionsStartIndex + 1, namedFormatterOptionsEndIndex - (namedFormatterOptionsStartIndex + 1));
+								}
+								else
+								{
+									lastI = current.startIndex;
+								}
 							}
 							current.startIndex = lastI;
 
@@ -316,7 +336,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 				{
 					// Placeholder is NOT null, so that means 
 					// we're parsing the selectors:
-					if (operators.IndexOf(c) != -1)
+					if (_operators.IndexOf(c) != -1)
 					{
 						// Add the selector:
 						if (i != lastI)
@@ -376,8 +396,8 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 						// Make sure it's alphanumeric:
 						var isValidSelectorChar =
 							('0' <= c && c <= '9')
-							|| (alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
-							|| (allowedSelectorChars.IndexOf(c) != -1);
+							|| (_alphanumericSelectors && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'))
+							|| (_allowedSelectorChars.IndexOf(c) != -1);
 						if (!isValidSelectorChar)
 						{
 							// Invalid character in the selector.
@@ -411,6 +431,12 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 			return result;
 		}
 
+		private static bool FormatterNameExists(string name, string[] formatterExtensionNames)
+		{
+			return formatterExtensionNames.Any(n => n == name);
+		}
+
+
 		#endregion
 
 		#region: Errors :
@@ -438,7 +464,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
 			/// <summary>
 			/// CTOR.
 			/// </summary>
-			public ParsingErrorText()
+			internal ParsingErrorText()
 			{}
 
 			/// <summary>

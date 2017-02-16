@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Xml.Serialization;
 using MailKit;
 using MailKit.Security;
-#if !NET_STANDARD
+#if !FXCORE
 using System.Configuration;
 using System.Net.Configuration;
 #endif

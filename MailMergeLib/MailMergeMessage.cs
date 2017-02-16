@@ -123,7 +123,7 @@ namespace MailMergeLib
 
 		#endregion
 
-		#region *** Publilc methods and properties ***
+		#region *** Public methods and properties ***
 
 		/// <summary>
 		/// The settings for a MailMergeMessage.
@@ -191,7 +191,7 @@ namespace MailMergeLib
 			lock (_syncRoot)
 			{
 				_badVariableNames.Clear();
-#if !NET_STANDARD
+#if !FXCORE
 				// convert DataRow to Dictionary<string, object>
 				if (dataItem is DataRow)
 				{
