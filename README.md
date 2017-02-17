@@ -31,7 +31,7 @@
 ### Supported Frameworks
 * .Net Framework 4.0
 * .Net Framework 4.5+
-* .Net Core (Standard 1.6)
+* .Net Core
 
 ### Get started
 * Install the [Nuget Package](https://www.nuget.org/packages/MailMergeLib/)
