@@ -1,8 +1,8 @@
 ﻿namespace MailMergeLib.SmartFormatMail.Core.Settings
 {
-	public enum CaseSensitivityType
-	{
-		CaseSensitive,
-		CaseInsensitive
-	}
+    public enum CaseSensitivityType
+    {
+        CaseSensitive,
+        CaseInsensitive
+    }
 }
