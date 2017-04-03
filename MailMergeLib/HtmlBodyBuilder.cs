@@ -176,7 +176,7 @@ namespace MailMergeLib
         /// </summary>
         private void ReplaceImgSrcByCid()
         {
-            var fileList = new HashSet<string>();
+            var fileList = new Dictionary<string, string>();
 
             foreach (var element in _htmlDocument.All.Where(m => m is IHtmlImageElement))
             {
@@ -202,15 +202,20 @@ namespace MailMergeLib
                 var filename = _mailMergeMessage.SearchAndReplaceVars(currSrcUri.LocalPath, _dataItem);
                 try
                 {
-                    if (!fileList.Contains(filename))
+                    if (!fileList.ContainsKey(filename))
                     {
                         var fileInfo = new FileInfo(filename);
                         var contentType = MimeTypes.GetMimeType(filename);
                         var cid = MimeUtils.GenerateMessageId();
                         InlineAtt.Add(new FileAttachment(fileInfo.FullName, MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
-
                         img.Attributes["src"].Value = MakeCid("cid:", cid, fileInfo.Extension);
-                        fileList.Add(fileInfo.FullName);
+                        fileList.Add(fileInfo.FullName, cid);
+                    }
+                    else
+                    {
+                        var cidForExistingFile = fileList[filename];
+                        var fileInfo = new FileInfo(filename);
+                        img.Attributes["src"].Value = MakeCid("cid:", cidForExistingFile, fileInfo.Extension);
                     }
                 }
                 catch

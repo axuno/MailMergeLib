@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("axuno gGmbH")]
 [assembly: AssemblyProduct("MailMergeLib 5 UnitTests")]
-[assembly: AssemblyCopyright("Copyright © 2007-2016 by Norbert Bietsch")]
+[assembly: AssemblyCopyright("Copyright © 2007-2017 by axuno gGmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyInformationalVersion ("5.0.0.103")]
-[assembly: AssemblyFileVersion ("5.0.0.103")]
-[assembly: AssemblyVersion ("5.0.0.0")]
+[assembly: AssemblyInformationalVersion ("5.2.0.1")]
+[assembly: AssemblyFileVersion ("5.2.0.1")]
+[assembly: AssemblyVersion ("5.2.0.1")]

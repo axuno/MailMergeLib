@@ -1,6 +1,6 @@
 {
-    "version": "5.2.0.0",
-    "copyright": "© 2007-2016 by axuno gGmbH",
+    "version": "5.2.0.1",
+    "copyright": "© 2007-2017 by axuno gGmbH",
     "title": "MailMergeLib 5",
     "description": "MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.",
     "authors": [ "axuno gGmbH" ],

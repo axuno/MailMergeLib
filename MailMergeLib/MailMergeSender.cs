@@ -630,12 +630,8 @@ namespace MailMergeLib
             OnAfterSend?.Invoke(smtpClient,
                 new MailSenderAfterSendEventArgs(config, mimeMsg, startTime, DateTime.Now, sendException, _cancellationTokenSource.Token.IsCancellationRequested));
 
-            // Do some clean-up with the message
-            foreach (var mimeEntity in mimeMsg.Attachments)
-            {
-                var att = mimeEntity as MimePart;
-                att?.ContentObject.Stream.Dispose();
-            }
+            // Dispose the streams of file attachments and inline file attachments
+            MailMergeMessage.DisposeFileStreams(mimeMsg);
 
             if (sendException != null)
             {

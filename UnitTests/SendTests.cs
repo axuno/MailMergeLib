@@ -127,7 +127,7 @@ namespace UnitTests
             Assert.IsFalse(mms.IsBusy);
         }
 
-#region *** Test setup ***
+        #region *** Test setup ***
 
         [OneTimeSetUp]
         public void FixtureSetUp()

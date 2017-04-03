@@ -648,5 +648,29 @@ namespace MailMergeLib
         }
 
         #endregion
+        
+        #region *** Helper methods ***
+
+        /// <summary>
+        /// Dispose the streams of file attachments and HTML inline file attachments,
+        /// so that files are fully accessible again
+        /// </summary>
+        /// <param name="mimeMessage"></param>
+        public static void DisposeFileStreams(MimeMessage mimeMessage)
+        {
+            // Dispose the streams of file attachments
+            foreach (var mimePart in mimeMessage.Attachments.Where(mp => mp is MimePart).Cast<MimePart>())
+            {
+                mimePart?.ContentObject?.Stream?.Dispose();
+            }
+
+            // Dispose the streams of HTML inline file attachments
+            foreach (var mimePart in mimeMessage.BodyParts.Where(mp => mp is MimePart).Cast<MimePart>())
+            {
+                mimePart?.ContentObject?.Stream?.Dispose();
+            }
+        }
+
+        #endregion
     }
 }

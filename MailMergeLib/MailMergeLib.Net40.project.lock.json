@@ -298,10 +298,10 @@
     "AngleSharp/0.9.9": {
       "sha512": "z3h0p8u7p7QFSStWaC+u9cx7+IaRvMmLXqczx5WYW5V9t58kGQg3xMyb4iRI2mIEnePQq2pp2sQAadEl4GhmBg==",
       "type": "package",
-      "path": "AngleSharp/0.9.9",
+      "path": "anglesharp/0.9.9",
       "files": [
-        "AngleSharp.0.9.9.nupkg.sha512",
-        "AngleSharp.nuspec",
+        "anglesharp.0.9.9.nupkg.sha512",
+        "anglesharp.nuspec",
         "lib/net40/AngleSharp.dll",
         "lib/net40/AngleSharp.xml",
         "lib/net45/AngleSharp.dll",
@@ -328,10 +328,8 @@
     "MailKit/1.10.2": {
       "sha512": "VOtuXtFkytfda65OMzonx3sUtLmBaavPH4Gx77AopczcstEXUxPd4eDJAg7dWUupEvI5MWrMFz+n6GBeS0Ewqg==",
       "type": "package",
-      "path": "MailKit/1.10.2",
+      "path": "mailkit/1.10.2",
       "files": [
-        "MailKit.1.10.2.nupkg.sha512",
-        "MailKit.nuspec",
         "lib/MonoAndroid10/MailKit.dll",
         "lib/MonoAndroid10/MailKit.xml",
         "lib/Xamarin.iOS10/MailKit.dll",
@@ -347,17 +345,17 @@
         "lib/win81/MailKit.dll",
         "lib/win81/MailKit.xml",
         "lib/wpa81/MailKit.dll",
-        "lib/wpa81/MailKit.xml"
+        "lib/wpa81/MailKit.xml",
+        "mailkit.1.10.2.nupkg.sha512",
+        "mailkit.nuspec"
       ]
     },
     "Microsoft.Bcl/1.1.10": {
       "sha512": "+tTqoh/M1pyL8El3qLy30EcwnAtyvFoDZJtdG9Cbg/WdFbh4N8kyrq198XHuEL7lnJbeD0DRO8jcX5IIOh05cQ==",
       "type": "package",
-      "path": "Microsoft.Bcl/1.1.10",
+      "path": "microsoft.bcl/1.1.10",
       "files": [
         "License-Stable.rtf",
-        "Microsoft.Bcl.1.1.10.nupkg.sha512",
-        "Microsoft.Bcl.nuspec",
         "lib/Xamarin.iOS10/_._",
         "lib/monoandroid/_._",
         "lib/monotouch/_._",
@@ -437,17 +435,17 @@
         "lib/sl5/System.Threading.Tasks.xml",
         "lib/win8/_._",
         "lib/wp8/_._",
-        "lib/wpa81/_._"
+        "lib/wpa81/_._",
+        "microsoft.bcl.1.1.10.nupkg.sha512",
+        "microsoft.bcl.nuspec"
       ]
     },
     "Microsoft.Bcl.Async/1.0.168": {
       "sha512": "tUNC02eBwDKpGre0BcNIvblLv1q0Q3DnS/vtkRHj2FE1sXwt386HAudztyl5C0U88hllrqHDvtlz8bK0Y8cHDA==",
       "type": "package",
-      "path": "Microsoft.Bcl.Async/1.0.168",
+      "path": "microsoft.bcl.async/1.0.168",
       "files": [
         "License-Stable.rtf",
-        "Microsoft.Bcl.Async.1.0.168.nupkg.sha512",
-        "Microsoft.Bcl.Async.nuspec",
         "lib/net40/Microsoft.Threading.Tasks.Extensions.Desktop.dll",
         "lib/net40/Microsoft.Threading.Tasks.Extensions.Desktop.xml",
         "lib/net40/Microsoft.Threading.Tasks.Extensions.dll",
@@ -491,28 +489,28 @@
         "lib/wpa81/Microsoft.Threading.Tasks.Extensions.dll",
         "lib/wpa81/Microsoft.Threading.Tasks.Extensions.xml",
         "lib/wpa81/Microsoft.Threading.Tasks.dll",
-        "lib/wpa81/Microsoft.Threading.Tasks.xml"
+        "lib/wpa81/Microsoft.Threading.Tasks.xml",
+        "microsoft.bcl.async.1.0.168.nupkg.sha512",
+        "microsoft.bcl.async.nuspec"
       ]
     },
     "Microsoft.Bcl.Build/1.0.21": {
       "sha512": "sgHu4mIt0+NVGyI12Bj4hLPypNK55UOH+ologj2LqDCjxq3EbIxe/uAtHjY+fEwbE1dtsAHG8SXHf+V/EYbKTg==",
       "type": "package",
-      "path": "Microsoft.Bcl.Build/1.0.21",
+      "path": "microsoft.bcl.build/1.0.21",
       "files": [
         "License-Stable.rtf",
-        "Microsoft.Bcl.Build.1.0.21.nupkg.sha512",
-        "Microsoft.Bcl.Build.nuspec",
         "build/Microsoft.Bcl.Build.Tasks.dll",
-        "build/Microsoft.Bcl.Build.targets"
+        "build/Microsoft.Bcl.Build.targets",
+        "microsoft.bcl.build.1.0.21.nupkg.sha512",
+        "microsoft.bcl.build.nuspec"
       ]
     },
     "MimeKit/1.10.1": {
       "sha512": "n5c0DKPQG8xx84Qafipd0+0Mw6iGKFUH4dUMDI37ahehVjqKy55YKmvBBwEcCkyjPrazcF/yaBIVRNN0iyr9NA==",
       "type": "package",
-      "path": "MimeKit/1.10.1",
+      "path": "mimekit/1.10.1",
       "files": [
-        "MimeKit.1.10.1.nupkg.sha512",
-        "MimeKit.nuspec",
         "lib/MonoAndroid10/BouncyCastle.dll",
         "lib/MonoAndroid10/MimeKit.dll",
         "lib/MonoAndroid10/MimeKit.xml",
@@ -534,7 +532,9 @@
         "lib/portable-net45+win+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10/Portable.Text.Encoding.dll",
         "lib/wpa81/MimeKit.dll",
         "lib/wpa81/MimeKit.xml",
-        "lib/wpa81/Portable.Text.Encoding.dll"
+        "lib/wpa81/Portable.Text.Encoding.dll",
+        "mimekit.1.10.1.nupkg.sha512",
+        "mimekit.nuspec"
       ]
     }
   },

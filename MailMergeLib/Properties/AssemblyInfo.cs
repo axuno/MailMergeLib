@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("axuno gGmbH")]
 [assembly: AssemblyProduct("MailMergeLib 5")]
-[assembly: AssemblyCopyright("Copyright © 2007-2016 by axuno gGmbH")]
+[assembly: AssemblyCopyright("Copyright © 2007-2017 by axuno gGmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,6 +44,6 @@ sn -tp d:Mailmergelib.snk.PublicKey
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyInformationalVersion ("5.2.0.0")]
-[assembly: AssemblyFileVersion ("5.2.0.0")]
-[assembly: AssemblyVersion ("5.2.0.0")]
+[assembly: AssemblyInformationalVersion ("5.2.0.1")]
+[assembly: AssemblyFileVersion ("5.2.0.1")]
+[assembly: AssemblyVersion ("5.2.0.1")]
