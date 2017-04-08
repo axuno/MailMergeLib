@@ -1,0 +1,37 @@
+# Smart.Format Method (String, Object, Object)
+ 
+
+**Namespace:**&nbsp;<a href="88cfadde-a921-7a6c-1e84-2ad3bb604d31">MailMergeLib.SmartFormatMail</a><br />**Assembly:**&nbsp;MailMergeLib (in MailMergeLib.dll) Version: 5.2.0.1
+
+## Syntax
+
+**C#**<br />
+``` C#
+public static string Format(
+	string format,
+	Object arg0,
+	Object arg1
+)
+```
+
+**VB**<br />
+``` VB
+Public Shared Function Format ( 
+	format As String,
+	arg0 As Object,
+	arg1 As Object
+) As String
+```
+
+
+#### Parameters
+&nbsp;<dl><dt>format</dt><dd>Type: <a href="http://msdn2.microsoft.com/en-us/library/s1wwdcbf" target="_blank">System.String</a><br /></dd><dt>arg0</dt><dd>Type: <a href="http://msdn2.microsoft.com/en-us/library/e5kfa45b" target="_blank">System.Object</a><br /></dd><dt>arg1</dt><dd>Type: <a href="http://msdn2.microsoft.com/en-us/library/e5kfa45b" target="_blank">System.Object</a><br /></dd></dl>
+
+#### Return Value
+Type: <a href="http://msdn2.microsoft.com/en-us/library/s1wwdcbf" target="_blank">String</a>
+
+## See Also
+
+
+#### Reference
+<a href="5f70604b-6ef1-6b40-65cf-9f0735e2c7b7">Smart Class</a><br /><a href="18737cb2-43a2-c795-f42a-67f8a4186437">Format Overload</a><br /><a href="88cfadde-a921-7a6c-1e84-2ad3bb604d31">MailMergeLib.SmartFormatMail Namespace</a><br />
