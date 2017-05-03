@@ -61,7 +61,7 @@ namespace MailMergeLib
         public override MimeEntity GetBodyPart()
         {
             // remove all Script elements, because they cannot be used in mail messages
-            foreach (var element in _htmlDocument.All.Where(e => e is IHtmlScriptElement))
+            foreach (var element in _htmlDocument.All.Where(e => e is IHtmlScriptElement).ToList())
             {
                 element.Remove();
             }
