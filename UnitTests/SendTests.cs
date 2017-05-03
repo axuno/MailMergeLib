@@ -25,7 +25,7 @@ namespace UnitTests
             // LogManager.GetLogger = type => new ConsoleLogger(type);
         }
 
-        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null)
+        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null, EventHandler<MailSenderSmtpConnectedEventArgs> onSmtpConnected = null)
         {
             var data = new Dictionary<string, object>
             {
@@ -41,17 +41,23 @@ namespace UnitTests
             if (onAfterSend != null)
                 mms.OnAfterSend += onAfterSend;
 
+            if (onSmtpConnected != null)
+                mms.OnSmtpConnected += onSmtpConnected;
+
             mms.Send(mmm, (object) data);
         }
 
         [Test]
         public void SendMailWithStandardConfig()
         {
+            var connCounter = 0;
             SmtpClientConfig usedClientConfig = null;
             EventHandler<MailSenderAfterSendEventArgs> onAfterSend = (sender, args) => { usedClientConfig = args.SmtpClientConfig; };
+            EventHandler<MailSenderSmtpConnectedEventArgs> onSmtpConnected = (sender, args) => { connCounter++; };
 
-            SendMail(onAfterSend);
+            SendMail(onAfterSend, onSmtpConnected);
 
+            Assert.AreEqual(connCounter, 1);
             Assert.AreEqual(1, _server.ReceivedEmailCount);
             Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig.Name);
 

@@ -658,7 +658,6 @@ namespace MailMergeLib
                 {
                     smtpClient.Connect(config.SmtpHost, config.SmtpPort, config.SecureSocketOptions,
                         _cancellationTokenSource.Token);
-
                 }
             }
             catch (SmtpCommandException ex)
@@ -725,13 +724,12 @@ namespace MailMergeLib
         /// <summary>
         /// Get pre-configured SmtpClient
         /// </summary>
-        private static SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
+        private SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
         {
             //var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
             var smtpClient = config.EnableLogOutput ? new SmtpClient(config.GetProtocolLogger()) : new SmtpClient();
+            smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpConnectedEventArgs(config)); };
             SetConfigForSmtpClient(smtpClient, config);
-
-            // smtpClient.AuthenticationMechanisms.Remove("XOAUTH2");
             return smtpClient;
         }
 
@@ -770,6 +768,11 @@ namespace MailMergeLib
         /// Event raising before sending a mail message.
         /// </summary>
         public event EventHandler<MailSenderBeforeSendEventArgs> OnBeforeSend;
+
+        /// <summary>
+        /// Event raising right after the connection to the server is up (but not yet authenticated).
+        /// </summary>
+        public event EventHandler<MailSenderSmtpConnectedEventArgs> OnSmtpConnected;
 
         /// <summary>
         /// Event raising after sending a mail message.

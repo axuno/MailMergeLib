@@ -50,6 +50,18 @@ namespace MailMergeLib
     }
 
     /// <summary>
+    /// Argument used by the event right after the connection to the server is up (but not yet authenticated).
+    /// </summary>
+    public class MailSenderSmtpConnectedEventArgs : EventArgs
+    {
+        public readonly SmtpClientConfig SmtpClientConfig;
+
+        internal MailSenderSmtpConnectedEventArgs(SmtpClientConfig smtpConfig)
+        {
+            SmtpClientConfig = smtpConfig;
+        }
+    }
+    /// <summary>
     /// Argument used by the event before starting a mail merge.
     /// </summary>
     public class MailSenderMergeBeginEventArgs : EventArgs
