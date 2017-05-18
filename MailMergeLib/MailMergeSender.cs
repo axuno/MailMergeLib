@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MailKit;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -305,8 +306,8 @@ namespace MailMergeLib
                             if (backupConfig == null) continue;
 
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
-                            SetConfigForSmtpClient(smtpClient, backupConfig);
                             config = backupConfig;
+                            smtpClient = GetInitializedSmtpClient(config);
                         }
                     }
                     else
@@ -614,8 +615,8 @@ namespace MailMergeLib
                             if (backupConfig == null) continue;
 
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
-                            SetConfigForSmtpClient(smtpClient, backupConfig);
                             config = backupConfig;
+                            smtpClient = GetInitializedSmtpClient(config);
                         }
                     }
                     else
@@ -722,43 +723,27 @@ namespace MailMergeLib
 #endregion
 
         /// <summary>
-        /// Get pre-configured SmtpClient
+        /// Get a new instance of a pre-configured SmtpClient
         /// </summary>
         private SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
         {
-            //var smtpClient = new SmtpClient(new ProtocolLogger(@"C:\temp\mail\SmtpLog_" + System.IO.Path.GetRandomFileName() + ".txt"));
-            var smtpClient = config.EnableLogOutput ? new SmtpClient(config.GetProtocolLogger()) : new SmtpClient();
-            smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpConnectedEventArgs(config)); };
-            SetConfigForSmtpClient(smtpClient, config);
-            return smtpClient;
-        }
+            var smtpClient = config.ProtocolLoggerDelegate != null ? new SmtpClient(config.ProtocolLoggerDelegate?.Invoke()) : new SmtpClient();
 
-        /// <summary>
-        /// Disconnects the SmtpClient if connected, and sets the new configuration.
-        /// </summary>
-        /// <remarks>
-        /// Note: 
-        /// Part of configuration will only be used by SmtpClient during Connect() or Authorize().
-        /// Protocol logger settings do not change.
-        /// </remarks>
-        /// <param name="smtpClient"></param>
-        /// <param name="config"></param>
-        private static void SetConfigForSmtpClient(SmtpClient smtpClient, SmtpClientConfig config)
-        {
-            try
-            {    
-                if (smtpClient.IsConnected)
-                    smtpClient.Disconnect(false);
-            }
-            catch (Exception)
-            {}
-            
             smtpClient.Timeout = config.Timeout;
             smtpClient.LocalDomain = config.ClientDomain;
             smtpClient.LocalEndPoint = config.LocalEndPoint;
+            smtpClient.ClientCertificates = config.ClientCertificates;
             smtpClient.ServerCertificateValidationCallback = config.ServerCertificateValidationCallback;
+            smtpClient.SslProtocols = config.SslProtocols;
+
+            // redirect SmtpClient events
+            smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+            smtpClient.Authenticated += (sender, args) => { OnSmtpAuthenticated?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+            smtpClient.Disconnected += (sender, args) => { OnSmtpDisconnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+
+            return smtpClient;
         }
-        
+
         /// <summary>
         /// Event raising before sending a mail message.
         /// </summary>
@@ -770,9 +755,19 @@ namespace MailMergeLib
         public event EventHandler<MailSenderBeforeSendEventArgs> OnBeforeSend;
 
         /// <summary>
-        /// Event raising right after the connection to the server is up (but not yet authenticated).
+        /// Event raising right after the <see cref="SmtpClient"/>'s connection to the server is up (but not yet authenticated).
         /// </summary>
-        public event EventHandler<MailSenderSmtpConnectedEventArgs> OnSmtpConnected;
+        public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpConnected;
+
+        /// <summary>
+        /// Event raising after the <see cref="SmtpClient"/> has authenticated on the server.
+        /// </summary>
+        public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpAuthenticated;
+
+        /// <summary>
+        /// Event raising after the <see cref="SmtpClient"/> has disconnected from the server.
+        /// </summary>
+        public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpDisconnected;
 
         /// <summary>
         /// Event raising after sending a mail message.

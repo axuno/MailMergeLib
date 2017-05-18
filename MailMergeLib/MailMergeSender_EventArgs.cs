@@ -52,11 +52,11 @@ namespace MailMergeLib
     /// <summary>
     /// Argument used by the event right after the connection to the server is up (but not yet authenticated).
     /// </summary>
-    public class MailSenderSmtpConnectedEventArgs : EventArgs
+    public class MailSenderSmtpClientEventArgs : EventArgs
     {
         public readonly SmtpClientConfig SmtpClientConfig;
 
-        internal MailSenderSmtpConnectedEventArgs(SmtpClientConfig smtpConfig)
+        internal MailSenderSmtpClientEventArgs(SmtpClientConfig smtpConfig)
         {
             SmtpClientConfig = smtpConfig;
         }

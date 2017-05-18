@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Globalization;
 using System.IO;
+using System.Security.Authentication;
 using System.Text;
 using MailMergeLib;
 using MailMergeLib.SmartFormatMail.Core.Settings;
@@ -43,8 +44,11 @@ namespace UnitTests
                             SmtpPort = 123,
                             NetworkCredential = new Credential("user", "password"),
                             Name = "Best",
-                            MaxFailures = 10,
-                            DelayBetweenMessages = 543
+                            MaxFailures = 12,
+                            RetryDelayTime = 1234,
+                            DelayBetweenMessages = 543,
+                            SslProtocols = SslProtocols.Ssl3,
+                            ClientDomain = "TestDomain"
                         },
                         new SmtpClientConfig()
                         {

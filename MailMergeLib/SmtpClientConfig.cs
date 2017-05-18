@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Xml.Serialization;
 using MailKit;
 using MailKit.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Authentication;
 #if !FXCORE
 using System.Configuration;
 using System.Net.Configuration;
@@ -25,7 +27,7 @@ namespace MailMergeLib
         /// </summary>
         public SmtpClientConfig()
         {
-            MailOutputDirectory = LogOutputDirectory = System.IO.Path.GetTempPath();
+            MailOutputDirectory = System.IO.Path.GetTempPath();
         }
 
 #if NET40 || NET45
@@ -68,8 +70,7 @@ namespace MailMergeLib
         /// </summary>
         [XmlAttribute]
         public string Name { get; set; }
-
-
+        
         /// <summary>
         /// Gets or sets the name or IP address of the SMTP host to be used for sending mails.
         /// </summary>
@@ -87,13 +88,18 @@ namespace MailMergeLib
         /// of an SMTP transaction. Defaults to the windows machine name.
         /// </summary>
         public string ClientDomain { get; set; }
-
-
+        
         /// <summary>
         /// Gets or sets the local IP end point or null to use the default end point.
         /// </summary>
         [XmlIgnore]
         public IPEndPoint LocalEndPoint { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the certificates the <see cref="MailKit.Net.Smtp.SmtpClient"/> will use.
+        /// </summary>
+        [XmlIgnore]
+        public X509CertificateCollection ClientCertificates { get; set; }
 
         /// <summary>
         /// Verifies the remote Secure Sockets Layer (SSL) certificate used for authentication.
@@ -138,46 +144,38 @@ namespace MailMergeLib
         /// Gets or sets the location where to send mail messages.
         /// </summary>
         public MessageOutput MessageOutput { get; set; } = MessageOutput.None;
+        
+        /// <summary>
+        /// Gets or sets the SSL/TLS protocols the <see cref="MailKit.Net.Smtp.SmtpClient"/> is allowed to use.
+        /// </summary>
+        public SslProtocols SslProtocols { get; set; } = SslProtocols.None;
 
         /// <summary>
-        /// Gets or sets the SecureSocketOptions the SmtpClient will use (e.g. SSL or STARTLS
+        /// Gets or sets the SecureSocketOptions the <see cref="MailKit.Net.Smtp.SmtpClient"/> will use (e.g. SSL or STARTLS
         /// In case a secure socket is needed, setting options to SecureSocketOptions.Auto is recommended.
         /// </summary>
-        /// <remarks>Used during SmtpClient connect.</remarks>
+        /// <remarks>Used during <see cref="MailKit.Net.Smtp.SmtpClient"/> connect.</remarks>
         public SecureSocketOptions SecureSocketOptions { get; set; } = SecureSocketOptions.None;
 
         /// <summary>
         /// Gets or sets the timeout for sending a message, after which a time-out exception will raise.
-        /// Time-out value in milliseconds. The default value is 100,000 (100 seconds). 
+        /// Timeout value in milliseconds. The default value is 100,000 (100 seconds). 
         /// </summary>
         public int Timeout { get; set; } = 100000;
 
-
         /// <summary>
-        /// Gets the IProtocolLogger the SmtpClient will use to log the dialogue with the SMTP server.
+        /// The delegate for an <see cref="IProtocolLogger"/> that <see cref="MailKit.Net.Smtp.SmtpClient"/> will use to log the dialogue with the SMTP server.
+        /// This logger is dedicated to debugging, not for production use.
         /// </summary>
         /// <remarks>
-        /// Have in mind that MailMergeLib may use several SmtpClients concurrently.
-        /// Switch logging for new SmtpClients on/off using EnableLogOutput.
-        /// Used when creating a new instance of SmtpClient.
+        /// Have in mind that MailMergeLib may use several <see cref="MailKit.Net.Smtp.SmtpClient"/> concurrently.
+        /// The delegate is called when creating a new instance of an <see cref="MailKit.Net.Smtp.SmtpClient"/> is created.
         /// </remarks>
-        public IProtocolLogger GetProtocolLogger()
-        {
-            return new ProtocolLogger(System.IO.Path.Combine(LogOutputDirectory, "Smtp-" + System.IO.Path.GetRandomFileName()+".log"));
-        }
-
-        /// <summary>
-        /// Gets or sets the directory where ProtocolLogger will write its logs.
-        /// </summary>
-        /// <remarks>
-        /// Defaults to System.IO.Path.GetTempPath()
-        /// </remarks>
-        public string LogOutputDirectory { get; set; }
-
-        /// <summary>
-        /// If true, ProcolLogger is enabled.
-        /// </summary>
-        public bool EnableLogOutput { get; set; }
+        /// <example>
+        /// ProtocolLoggerDelegate = () =&gt; new ProtocolLogger(System.IO.Path.Combine("targetDirectory", "Smtp-" + System.IO.Path.GetRandomFileName() + ".log"));
+        /// </example>
+        [XmlIgnore]
+        public Func<IProtocolLogger> ProtocolLoggerDelegate;
 
         /// <summary>
         /// Gets or sets the delay time in milliseconds (0-10000) between the messages.
@@ -187,12 +185,12 @@ namespace MailMergeLib
         public int DelayBetweenMessages { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of failures (1-5) for which a retry to send will be performed.
+        /// Gets or sets the number of failures (1-10) for which a retry to send will be performed.
         /// </summary>
         public int MaxFailures
         {
             get { return _maxFailures; }
-            set { _maxFailures = (value >= 1 && value < 5) ? value : 1; }
+            set { _maxFailures = (value >= 1 && value <= 10) ? value : 1; }
         }
 
         /// <summary>
@@ -203,6 +201,7 @@ namespace MailMergeLib
             get { return _retryDelayTime; }
             set { _retryDelayTime = (value >= 0 && value <= 10000) ? value : 0; }
         }
+
 
 #if NET40 || NET45
         private static string GetPickDirectoryFromIis()

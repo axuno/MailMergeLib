@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
@@ -22,10 +23,11 @@ namespace UnitTests
         
         public SendTests()
         {
-            // LogManager.GetLogger = type => new ConsoleLogger(type);
+            // Uncomment for getting netDumbster logs to the console
+            // netDumbster.smtp.Logging.LogManager.GetLogger = type => new netDumbster.smtp.Logging.ConsoleLogger(type);
         }
 
-        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null, EventHandler<MailSenderSmtpConnectedEventArgs> onSmtpConnected = null)
+        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = null)
         {
             var data = new Dictionary<string, object>
             {
@@ -38,12 +40,10 @@ namespace UnitTests
 
             var mms = new MailMergeSender() {Config = _settings.SenderConfig};
 
-            if (onAfterSend != null)
-                mms.OnAfterSend += onAfterSend;
-
-            if (onSmtpConnected != null)
-                mms.OnSmtpConnected += onSmtpConnected;
-
+            mms.OnAfterSend += onAfterSend;
+            mms.OnSmtpConnected += onSmtpConnected;
+            mms.OnSmtpDisconnected += onSmtpDisconnected;
+           
             mms.Send(mmm, (object) data);
         }
 
@@ -51,13 +51,16 @@ namespace UnitTests
         public void SendMailWithStandardConfig()
         {
             var connCounter = 0;
+            var disconnCounter = 0;
             SmtpClientConfig usedClientConfig = null;
             EventHandler<MailSenderAfterSendEventArgs> onAfterSend = (sender, args) => { usedClientConfig = args.SmtpClientConfig; };
-            EventHandler<MailSenderSmtpConnectedEventArgs> onSmtpConnected = (sender, args) => { connCounter++; };
+            EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = (sender, args) => { connCounter++;};
+            EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = (sender, args) => { disconnCounter++; };
 
-            SendMail(onAfterSend, onSmtpConnected);
+            SendMail(onAfterSend, onSmtpConnected, onSmtpDisconnected);
 
             Assert.AreEqual(connCounter, 1);
+            Assert.AreEqual(disconnCounter, 1);
             Assert.AreEqual(1, _server.ReceivedEmailCount);
             Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig.Name);
 
