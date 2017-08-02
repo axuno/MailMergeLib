@@ -1,16 +1,23 @@
 using System;
 using System.Text;
 using MimeKit;
+using YAXLib;
 
 namespace MailMergeLib
 {
     /// <summary>
     /// Container for a mail merge address.
     /// </summary>
+    [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly)]
     public class MailMergeAddress
     {
         /// <summary>
-        /// Represents the address of an electronic mail sender or recipient for use with a MailMergeMessage.
+        /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
+        /// </summary>
+        public MailMergeAddress() { }
+
+        /// <summary>
+        /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
         /// </summary>
         /// <param name="addrType">MailAddressType of the e-mail address.</param>
         /// <param name="address">A string that contains an e-mail address. Can include display name and address in one string, e.g. "recipient" &lt;recipient@mail.com&gt;.</param>
@@ -30,6 +37,7 @@ namespace MailMergeLib
             AddrType = addrType;
             Address = address;
             DisplayName = displayName;
+            DisplayNameCharacterEncoding = null;
         }
 
         /// <summary>
@@ -43,7 +51,7 @@ namespace MailMergeLib
             AddrType = addrType;
             DisplayNameCharacterEncoding = displayNameCharacterEncoding;
             MailboxAddress mba;
-            if (MailboxAddress.TryParse(displayNameCharacterEncoding.GetBytes(fullMailAddress), out mba))
+            if (MailboxAddress.TryParse(displayNameCharacterEncoding?.GetBytes(fullMailAddress), out mba))
             {
                 Address = mba.Address;
                 DisplayName = mba.Name;
@@ -57,23 +65,39 @@ namespace MailMergeLib
         /// <summary>
         /// Gets or sets the type of the MailMergeAddress.
         /// </summary>
+        [YAXSerializableField]
         public MailAddressType AddrType { get; set; }
 
         /// <summary>
         /// Gets or sets the mail address of the recipient, e.g. "test@example.com"
         /// </summary>
+        [YAXSerializableField]
         public string Address { get; set; }
 
         /// <summary>
         /// Gets or sets the display name of the recipient.
         /// </summary>
+        [YAXSerializableField]
         public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets or sets the Encoding that defines the character set used for displayName.
         /// </summary>
+        [YAXDontSerialize]
         internal Encoding DisplayNameCharacterEncoding { get; set; }
-        
+
+        /// <summary>
+        /// Character encoding for the display name.
+        /// Used for serialization. It is the string representation of <see cref="DisplayNameCharacterEncoding"/>.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXSerializeAs("DisplayNameCharacterEncoding")]
+        internal string DisplayNameCharacterEncodingName
+        {
+            get { return DisplayNameCharacterEncoding.WebName; }
+            set { DisplayNameCharacterEncoding = Encoding.GetEncoding(value); }
+        }
+
         /// <summary>
         /// Gets the MailAddress representation of the MailMergeAddress.
         /// </summary>
@@ -82,8 +106,8 @@ namespace MailMergeLib
         /// <exception cref="FormatException">Throws a FormatException if the computed MailAddress is not valid.</exception>
         internal MailboxAddress GetMailAddress(MailMergeMessage mmm, object dataItem)
         {
-            string address = mmm.SearchAndReplaceVars(Address, dataItem);
-            string displayName = mmm.SearchAndReplaceVars(DisplayName, dataItem);
+            var address = mmm.SearchAndReplaceVars(Address, dataItem);
+            var displayName = mmm.SearchAndReplaceVars(DisplayName, dataItem);
             if (string.IsNullOrEmpty(displayName)) displayName = null;
 
             // Exclude invalid address from further process
@@ -96,5 +120,43 @@ namespace MailMergeLib
                         ? new MailboxAddress(DisplayNameCharacterEncoding, displayName, address)
                         : new MailboxAddress(DisplayNameCharacterEncoding, address, address);
         }
+
+        #region *** Equality ***
+
+        /// <summary>
+        /// Determines whether the specified MailMergeAddress instances are equal.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((MailMergeAddress) obj);
+        }
+
+        protected bool Equals(MailMergeAddress other)
+        {
+            return AddrType == other.AddrType && string.Equals(Address, other.Address) && string.Equals(DisplayName, other.DisplayName) && Equals(DisplayNameCharacterEncoding, other.DisplayNameCharacterEncoding);
+        }
+
+        /// <summary>
+        /// Returns the hash code for the MailMergeAddress
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (int) AddrType;
+                hashCode = (hashCode * 397) ^ (Address != null ? Address.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (DisplayName != null ? DisplayName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (DisplayNameCharacterEncoding != null ? DisplayNameCharacterEncoding.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,6 +1,5 @@
 ﻿using MailMergeLib.SmartFormatMail;
 using MailMergeLib.SmartFormatMail.Core.Extensions;
-using MailMergeLib.SmartFormatMail.Core.Settings;
 using MailMergeLib.SmartFormatMail.Extensions;
 
 namespace MailMergeLib
@@ -28,7 +27,7 @@ namespace MailMergeLib
             // will be executed in this order:
             var listFormatter = new ListFormatter(this);
 
-            base.AddExtensions(
+            AddExtensions(
                 (ISource)listFormatter,
                 new ReflectionSource(this),
                 new DictionarySource(this),
@@ -36,7 +35,7 @@ namespace MailMergeLib
                 // These default extensions reproduce the String.Format behavior:
                 new DefaultSource(this)
                 );
-            base.AddExtensions(
+            AddExtensions(
                 (IFormatter)listFormatter,
                 new PluralLocalizationFormatter("en"),
                 new ConditionalFormatter(),
@@ -45,6 +44,9 @@ namespace MailMergeLib
                 new ChooseFormatter(),
                 new DefaultFormatter()
                 );
+
+            Templates = new TemplateFormatter(this);
+            AddExtensions(Templates);
         }
 
         /// <summary>
@@ -52,11 +54,27 @@ namespace MailMergeLib
         /// Create an instance which loads the Formatters and Source extensions required by MailMergeLib.
         /// Error actions are SmartFormatters defaults.
         /// </summary>
-        /// <param name="mailMergeMessage"></param>
-        internal MailSmartFormatter(MailMergeMessage mailMergeMessage) : this()
+        /// <param name="config"></param>
+        internal MailSmartFormatter(SmartFormatterConfig config) : this()
         {
-            ErrorAction = mailMergeMessage.Config.SmartFormatterConfig.FormatErrorAction;
-            Parser.ErrorAction = mailMergeMessage.Config.SmartFormatterConfig.ParseErrorAction;
+            if (config == null) return;
+            
+            SetConfig(config);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="TemplateFormatter"/> where the templates can be registered later on.
+        /// </summary>
+        internal TemplateFormatter Templates { get; set; }
+
+        internal void SetConfig(SmartFormatterConfig sfConfig)
+        {
+            if (sfConfig == null) return;
+
+            Settings.FormatErrorAction = sfConfig.FormatErrorAction;
+            Settings.ParseErrorAction = sfConfig.ParseErrorAction;
+            Settings.CaseSensitivity = sfConfig.CaseSensitivity;
+            Settings.ConvertCharacterStringLiterals = sfConfig.ConvertCharacterStringLiterals;
         }
     }
 }

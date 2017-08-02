@@ -1,12 +1,18 @@
 namespace MailMergeLib
 {
     /// <summary>
-    /// Class for file attachments of mail messages
+    /// Class for file attachments of a <see cref="MailMergeMessage"/>
     /// </summary>
     public class FileAttachment
     {
         /// <summary>
-        /// Creates a new file attachment information
+        /// Creates a new file attachment for a <see cref="MailMergeMessage"/>
+        /// </summary>
+        public FileAttachment()
+        {}
+
+        /// <summary>
+        /// Creates a new file attachment for a <see cref="MailMergeMessage"/>
         /// </summary>
         /// <param name="fileName">Full path of the file</param>
         /// <param name="displayName">Name and extension as the reader of the mail should see it (in case of inline attachments displayName is used for CIDs</param>
@@ -35,31 +41,38 @@ namespace MailMergeLib
         /// </summary>
         public string Filename
         {
-            get; private set;
+            get; set;
         }
 
         /// <summary>
         /// Gets the name used in the attachment (used for Cid with inline attachments)
         /// </summary>
-        public string DisplayName { get; private set; }
+        public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets the MimeType as a string, like "text/plain"
         /// </summary>
-        public string MimeType { get; private set; }
+        public string MimeType { get; set; }
 
+        #region *** Equality ***
+        
         /// <summary>
         /// Determines whether the specified FileAttachment instances are equal.
         /// </summary>
         /// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
-        /// <param name="obj"></param>
+        /// <param name="fa"></param>
         /// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object fa)
         {
-            var otherFa = obj as FileAttachment;
-            if (otherFa == null) return false;
+            if (ReferenceEquals(null, fa)) return false;
+            if (ReferenceEquals(this, fa)) return true;
+            if (fa.GetType() != this.GetType()) return false;
+            return Equals((FileAttachment) fa);
+        }
 
-            return otherFa.Filename == Filename && otherFa.DisplayName == DisplayName && otherFa.MimeType == MimeType;
+        protected bool Equals(FileAttachment fa)
+        {
+            return string.Equals(Filename, fa.Filename) && string.Equals(DisplayName, fa.DisplayName) && string.Equals(MimeType, fa.MimeType);
         }
 
         /// <summary>
@@ -69,7 +82,15 @@ namespace MailMergeLib
         /// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
         public override int GetHashCode()
         {
-            return string.Concat(Filename, DisplayName, MimeType).GetHashCode();
+            unchecked
+            {
+                var hashCode = (Filename != null ? Filename.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (DisplayName != null ? DisplayName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (MimeType != null ? MimeType.GetHashCode() : 0);
+                return hashCode;
+            }
         }
+
+        #endregion
     }
 }

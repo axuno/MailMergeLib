@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using MimeKit;
 
 namespace MailMergeLib
 {
@@ -55,26 +53,48 @@ namespace MailMergeLib
     /// </summary>
     public class MailMergeAddressCollection : Collection<MailMergeAddress>
     {
-        // the MailMergeMessage the MailMergeAddressCollection belongs to
-        private MailMergeMessage _mailMergeMessage;
+        /// <summary>
+        /// Property <c>MailMergeMessage</c> must be set after creating the instance!
+        /// </summary>
+        internal MailMergeAddressCollection() {}
 
         /// <summary>
         /// Constructor.
         /// </summary>
         internal MailMergeAddressCollection(MailMergeMessage msg)
         {
-            _mailMergeMessage = msg;
+            MailMergeMessage = msg;
+        }
+
+        /// <summary>
+        /// The MailMergeMessage the MailMergeAddressCollection belongs to
+        /// </summary>
+        internal MailMergeMessage MailMergeMessage { get; set; }
+
+        /// <summary>
+        /// Adds the address to the address collection.
+        /// For MailAddressType.Sender, MailAddressType.ConfirmReadingTo and MailAddressType.ReturnReceiptTo 
+        /// only the last-in address of this type will be included in the mail message.
+        /// <c>DisplayNameCharacterEncoding</c> will be overridden by <c>MailMergeMessage.Config.CharacterEncoding</c>.
+        /// </summary>
+        /// <param name="address"></param>
+        public new void Add(MailMergeAddress address)
+        {
+            if (address.DisplayNameCharacterEncoding == null)
+                address.DisplayNameCharacterEncoding = MailMergeMessage.Config.CharacterEncoding;
+
+            base.Add(address);
         }
 
         /// <summary>
         /// Adds the address to the address collection.
         /// For MailAddressType.Sender, MailAddressType.ConfirmReadingTo and MailAddressType.ReturnReceiptTo 
         /// only the last-in address of this type will be included in the mail message.
+        /// <c>DisplayNameCharacterEncoding</c> of the address will not be changed.
         /// </summary>
         /// <param name="address"></param>
-        public new void Add(MailMergeAddress address)
+        internal void AddWithCurrentCharacterEncoding(MailMergeAddress address)
         {
-            address.DisplayNameCharacterEncoding = _mailMergeMessage.Config.CharacterEncoding;
             base.Add(address);
         }
 
@@ -96,7 +116,42 @@ namespace MailMergeLib
         /// <returns>The string representation of the collection of mailbox addresses</returns>
         public string ToString(MailAddressType addrType, object dataItem)
         {
-            return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(_mailMergeMessage, dataItem).ToString()));
+            return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(MailMergeMessage, dataItem).ToString()));
         }
+
+        #region *** Equality ***
+
+        /// <summary>
+        /// Determines whether the specified <c>MailMergeAddressCollection</c> instances are equal, i.e. containing the same <c>MailMergeAddress</c>es never mind the sequence.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MailMergeAddressCollection)obj);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <c>MailMergeAddressCollection</c> instances are equal, i.e. containing the same <c>MailMergeAddress</c>es never mind the sequence.
+        /// </summary>
+        /// <param name="addressCollection"></param>
+        /// <returns></returns>
+        protected bool Equals(MailMergeAddressCollection addressCollection)
+        {
+            if (addressCollection == null) return false;
+            // not any address missing in this, nor in the other collection
+            return !this.Except(addressCollection).Union(addressCollection.Except(this)).Any();
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = (MailMergeMessage != null ? MailMergeMessage.GetHashCode() : 0);
+            return this.Aggregate(hashCode, (current, item) => (current * 397) ^ (item != null ? item.GetHashCode() : 0));
+        }
+
+        #endregion
     }
 }

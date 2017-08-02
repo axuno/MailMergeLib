@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MailKit;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using MimeKit.Cryptography;
-
 
 namespace MailMergeLib
 {
@@ -431,7 +427,7 @@ namespace MailMergeLib
 
 #endregion
 
-#region *** Sync Methods ***
+        #region *** Sync Methods ***
 
         /// <summary>
         /// Sends mail messages syncronously to all recipients supplied in the data source
@@ -722,27 +718,7 @@ namespace MailMergeLib
 
 #endregion
 
-        /// <summary>
-        /// Get a new instance of a pre-configured SmtpClient
-        /// </summary>
-        private SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
-        {
-            var smtpClient = config.ProtocolLoggerDelegate != null ? new SmtpClient(config.ProtocolLoggerDelegate?.Invoke()) : new SmtpClient();
-
-            smtpClient.Timeout = config.Timeout;
-            smtpClient.LocalDomain = config.ClientDomain;
-            smtpClient.LocalEndPoint = config.LocalEndPoint;
-            smtpClient.ClientCertificates = config.ClientCertificates;
-            smtpClient.ServerCertificateValidationCallback = config.ServerCertificateValidationCallback;
-            smtpClient.SslProtocols = config.SslProtocols;
-
-            // redirect SmtpClient events
-            smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
-            smtpClient.Authenticated += (sender, args) => { OnSmtpAuthenticated?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
-            smtpClient.Disconnected += (sender, args) => { OnSmtpDisconnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
-
-            return smtpClient;
-        }
+        # region *** Events ***
 
         /// <summary>
         /// Event raising before sending a mail message.
@@ -799,6 +775,30 @@ namespace MailMergeLib
         /// </summary>
         public SenderConfig Config { get; set; } = new SenderConfig();
 
+        #endregion
+
+        /// <summary>
+        /// Get a new instance of a pre-configured SmtpClient
+        /// </summary>
+        private SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
+        {
+            var smtpClient = config.ProtocolLoggerDelegate != null ? new SmtpClient(config.ProtocolLoggerDelegate?.Invoke()) : new SmtpClient();
+
+            smtpClient.Timeout = config.Timeout;
+            smtpClient.LocalDomain = config.ClientDomain;
+            smtpClient.LocalEndPoint = config.LocalEndPoint;
+            smtpClient.ClientCertificates = config.ClientCertificates;
+            smtpClient.ServerCertificateValidationCallback = config.ServerCertificateValidationCallback;
+            smtpClient.SslProtocols = config.SslProtocols;
+
+            // redirect SmtpClient events
+            smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+            smtpClient.Authenticated += (sender, args) => { OnSmtpAuthenticated?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+            smtpClient.Disconnected += (sender, args) => { OnSmtpDisconnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
+
+            return smtpClient;
+        }
+
         /// <summary>
         /// Destructor.
         /// </summary>
@@ -807,7 +807,7 @@ namespace MailMergeLib
             Dispose(false);
         }
 
-#region IDisposable Members
+        #region *** IDisposable Members ***
 
         /// <summary>
         /// Releases all resources used by MailMergeSender

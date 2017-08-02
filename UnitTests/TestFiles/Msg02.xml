@@ -1,0 +1,72 @@
+<MailMergeMessage>
+  <Info>
+    <Id>2</Id>
+    <Category>Another category</Category>
+    <Description>Another Message description</Description>
+    <Comments>Another comment to a message</Comments>
+    <Data><![CDATA[This could even be an SQL query]]></Data>
+  </Info>
+  <MailMergeAddresses>
+    <MailMergeAddress>
+      <AddrType>From</AddrType>
+      <Address>{SenderAddr}</Address>
+      <DisplayName></DisplayName>
+      <DisplayNameCharacterEncoding>utf-8</DisplayNameCharacterEncoding>
+    </MailMergeAddress>
+    <MailMergeAddress>
+      <AddrType>To</AddrType>
+      <Address>{MailboxAddr}</Address>
+      <DisplayName>{Name}</DisplayName>
+      <DisplayNameCharacterEncoding>utf-8</DisplayNameCharacterEncoding>
+    </MailMergeAddress>
+  </MailMergeAddresses>
+  <Headers>
+    <Header Id="Comments" Value="some comments for header" />
+  </Headers>
+  <Subject>Logfile for {Date:yyyy-MM-dd}</Subject>
+  <PlainText><![CDATA[    Database maintenance {Success:choose(True|):succeeded|failed} on {Date}
+	{Name}, your Log file is attached.
+]]></PlainText>
+  <HtmlText><![CDATA[<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Default title</title>
+    <base href="file:///../"/>
+</head>
+<body>
+    Database maintenance {Success:choose(True|):succeeded|failed} on {Date}<br/>
+    {Name}, your Log file is attached.<br/>
+    <img src="{Success:choose(True|):success.jpg|error.jpg}" alt="Status" width="100"/>
+</body>
+</html>]]></HtmlText>
+  <Templates>
+    <Template Name="Salutation">
+      <Text DefaultKey="Hi">
+        <Part Key="Hi" Type="Plain"><![CDATA[Hi {FirstName}]]></Part>
+        <Part Key="Dear" Type="Plain"><![CDATA[Dear {FirstName}]]></Part>
+        <Part Key="Formal" Type="Plain"><![CDATA[Dear Sir or Madam]]></Part>
+      </Text>
+    </Template>
+  </Templates>
+  <Config>
+    <TextTransferEncoding>SevenBit</TextTransferEncoding>
+    <BinaryTransferEncoding>Base64</BinaryTransferEncoding>
+    <CharacterEncoding>utf-32</CharacterEncoding>
+    <CultureInfo>de-DE</CultureInfo>
+    <FileBaseDirectory>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\</FileBaseDirectory>
+    <IgnoreIllegalRecipientAddresses>False</IgnoreIllegalRecipientAddresses>
+    <IgnoreMissingInlineAttachments>True</IgnoreMissingInlineAttachments>
+    <IgnoreMissingFileAttachments>True</IgnoreMissingFileAttachments>
+    <Priority>NonUrgent</Priority>
+    <StandardFromAddress>"from-name" &lt;from-addr@address.com&gt;</StandardFromAddress>
+    <Organization>axuno gGmbH</Organization>
+    <Xmailer>MailMergLib-for-UnitTests</Xmailer>
+    <SmartFormatterConfig>
+      <ParseErrorAction>ThrowError</ParseErrorAction>
+      <FormatErrorAction>Ignore</FormatErrorAction>
+	  <CaseSensitivity>CaseSensitive</CaseSensitivity>
+	  <ConvertCharacterStringLiterals>True</ConvertCharacterStringLiterals>
+    </SmartFormatterConfig>
+  </Config>
+</MailMergeMessage>

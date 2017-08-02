@@ -127,7 +127,7 @@ namespace MailMergeLib
             {
                 try
                 {
-                    var readyInlineAtt = new FileAttachment(_mailMergeMessage.SearchAndReplaceVars(ia.Filename, _dataItem), _mailMergeMessage.SearchAndReplaceVars(ia.DisplayName, _dataItem));
+                    var readyInlineAtt = new FileAttachment(_mailMergeMessage.SearchAndReplaceVarsInFilename(ia.Filename, _dataItem), _mailMergeMessage.SearchAndReplaceVars(ia.DisplayName, _dataItem));
                     // create an inline image attachment for the file located at path
                     var attachment = new AttachmentBuilder(readyInlineAtt, CharacterEncoding,
                             TextTransferEncoding, BinaryTransferEncoding).GetAttachment();
@@ -199,7 +199,7 @@ namespace MailMergeLib
                 }
 
                 // this will succeed only with local files (at this time, they don't need to exist yet)
-                var filename = _mailMergeMessage.SearchAndReplaceVars(currSrcUri.LocalPath, _dataItem);
+                var filename = _mailMergeMessage.SearchAndReplaceVarsInFilename(currSrcUri.LocalPath, _dataItem);
                 try
                 {
                     if (!fileList.ContainsKey(filename))

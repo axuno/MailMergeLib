@@ -18,5 +18,27 @@ namespace UnitTests
         {
             return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
         }
+
+        internal static int Compare(Stream a, Stream b)
+        {
+            if (a == null && b == null) return 0;
+
+            if (a == null || b == null) throw new ArgumentNullException(a == null ? "a" : "b");
+
+            a.Position = b.Position = 0;
+
+            if (a.Length < b.Length) return -1;
+
+            if (a.Length > b.Length) return 1;
+
+            int bufa;
+            while ((bufa = a.ReadByte()) != -1)
+            {
+                var bufb = b.ReadByte();
+                var diff = bufa.CompareTo(bufb);
+                if (diff != 0) return diff;
+            }
+            return 0;
+        }
     }
 }

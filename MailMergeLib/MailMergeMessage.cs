@@ -3,44 +3,51 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using MailMergeLib.MessageStore;
+using MailMergeLib.Serialization;
+using MailMergeLib.SmartFormatMail.Extensions;
+using MailMergeLib.Templates;
 using MimeKit;
+using YAXLib;
 
 namespace MailMergeLib
 {
     /// <summary>
     /// Represents an email message that can be sent using the MailMergeLib.MailMergeSender class.
     /// </summary>
+    [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly, Options = YAXSerializationOptions.DontSerializeNullObjects)]
     public partial class MailMergeMessage : IDisposable
     {
-        #region *** Private content fields ***
-
+        #region *** Private fields ***
+        
         private MimeEntity _textMessagePart;  // plain text and/or html text, maybe with inline attachments
         private List<MimePart> _attachmentParts;
-        private static readonly object _syncRoot = new object();
+
+        // backing fields for properties are necessary for private setters used in deserialization!
+        private MailMergeAddressCollection _mailMergeAddresses;
+        private HashSet<FileAttachment> _fileAttachments = new HashSet<FileAttachment>();
+        private List<StreamAttachment> _streamAttachments = new List<StreamAttachment>();
+        private HashSet<FileAttachment> _inlineAttachments = new HashSet<FileAttachment>();
+        private HashSet<StringAttachment> _stringAttachments = new HashSet<StringAttachment>();
+        private HashSet<FileAttachment> _externalInlineAttachments = new HashSet<FileAttachment>();
+        private HeaderList _headers = new HeaderList();
+        private MessageInfo _info = new MessageInfo();
+        private MessageConfig _config = new MessageConfig();
+        private Templates.Templates _templates = new MailMergeLib.Templates.Templates();
+
+        // disposal and sync
+        private bool _disposed;
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
-        #region *** Private lists for tracking errors ***
+        #region *** Private lists for tracking errors when generating a MimeMessage ***
 
         private readonly HashSet<string> _badAttachmentFiles = new HashSet<string>();
         private readonly HashSet<string> _badMailAddr = new HashSet<string>();
         private readonly HashSet<string> _badInlineFiles = new HashSet<string>();
         private readonly HashSet<string> _badVariableNames = new HashSet<string>();
-
-        #endregion
-
-        #region *** Private fields for Attachments ***
-
-        private readonly List<FileAttachment> _inlineAttExternal = new List<FileAttachment>();
-
-        #endregion
-
-        #region *** Private mail header constants ***
-
-        // special mail headers
-        private const string CConfirmReading = "x-confirm-reading-to";
         
-
         #endregion
 
         #region *** Constructor ***
@@ -52,15 +59,16 @@ namespace MailMergeLib
         {
             Config.IgnoreIllegalRecipientAddresses = true;
             Config.Priority = MessagePriority.Normal;
-            Headers = new HeaderList();
-            Subject = string.Empty;
 
-            SmartFormatter = new MailSmartFormatter(this);
+            if (Config.SmartFormatterConfig == null) Config.SmartFormatterConfig = new SmartFormatterConfig();
+
+            SmartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig);
+            Config.SmartFormatterConfig.OnConfigChanged += SmartFormatter.SetConfig;
             // Smart.Format("{Name:choose(null|):N/A|empty|{Name}}", variable), where abc.Name NULL, string.Emtpy or a string
 
             SmartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
 
-            MailMergeAddresses = new MailMergeAddressCollection(this);
+            _mailMergeAddresses = new MailMergeAddressCollection(this);
         }
 
         /// <summary>
@@ -123,33 +131,429 @@ namespace MailMergeLib
 
         #endregion
 
-        #region *** Public methods and properties ***
+        #region *** Info, addresses and headers ***
 
         /// <summary>
-        /// The settings for a MailMergeMessage.
+        /// Information about the <c>MailMergeMessage</c>
         /// </summary>
-        public MessageConfig Config { get; set; } = new MessageConfig();
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public MessageInfo Info
+        {
+            get => _info;
+            set => _info = value ?? new MessageInfo();
+        }
+
+        /// <summary>
+        /// Gets the collection of recipients and sender addresses of the message.
+        /// If the collection contains an address of type <see cref="MailAddressType.TestAddress"/>, then
+        /// all recipient addresses of the collection will be replaced with the mailbox address of the test address.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXCustomSerializer(typeof(MailMergeAddressesSerializer))]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public MailMergeAddressCollection MailMergeAddresses
+        {
+            get => _mailMergeAddresses;
+            set
+            {
+                _mailMergeAddresses = value ?? new MailMergeAddressCollection(this);
+                _mailMergeAddresses.MailMergeMessage = this;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the user defined headers of a mail message.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXCustomSerializer(typeof(HeaderListSerializer))]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public HeaderList Headers
+        {
+            get => _headers;
+            private set => _headers = value ?? new HeaderList();
+        }
+
+        #endregion
+
+        #region *** Content properties ***
 
         /// <summary>
         /// Gets or sets the mail message subject.
         /// </summary>
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
         public string Subject { get; set; }
 
         /// <summary>
         /// Gets or sets the mail message plain text content.
         /// </summary>
+        [YAXSerializableField]
+        [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
         public string PlainText { get; set; }
 
         /// <summary>
         /// Gets or sets the mail message HTML content.
         /// </summary>
+        [YAXSerializableField]
+        [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
         public string HtmlText { get; set; }
+
+        /// <summary>
+        /// Gets a collection of type <see cref="MailMergeLib.Templates.Templates"/>.
+        /// Templates can be part of <see cref="PlainText"/> or <see cref="HtmlText"/>.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public MailMergeLib.Templates.Templates Templates
+        {
+            get => _templates;
+            private set => _templates = value ?? new Templates.Templates();
+        }
 
         /// <summary>
         /// Gets or sets the instance of the MailSmartFormatter (derived from SmartFormat.NET's SmartFormatter) which will be used with MailMergeLib.
         /// </summary>
-        public MailSmartFormatter SmartFormatter { get; set; }
+        [YAXDontSerialize]
+        public MailSmartFormatter SmartFormatter { get; private set; }
+
+        /// <summary>
+        /// The settings for a MailMergeMessage.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public MessageConfig Config
+        {
+            get => _config;
+            set
+            {
+                _config = value ?? new MessageConfig();
+                if (_config.SmartFormatterConfig == null) _config.SmartFormatterConfig = new SmartFormatterConfig();
+
+                SmartFormatter.SetConfig(_config.SmartFormatterConfig);
+                _config.SmartFormatterConfig.OnConfigChanged += SmartFormatter.SetConfig;
+            }
+        }
+
+        #endregion
+
+        #region *** Attachment properties ***
+
+        /// <summary>
+        /// Gets or sets files that will be attached to a mail message.
+        /// File names may contain placeholders.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public HashSet<FileAttachment> FileAttachments
+        {
+            get => _fileAttachments;
+            private set => _fileAttachments = value ?? new HashSet<FileAttachment>();
+        }
+
+        /// <summary>
+        /// Gets or sets streams that will be attached to a mail message.
+        /// </summary>
+        [YAXDontSerialize]
+        public List<StreamAttachment> StreamAttachments
+        {
+            get => _streamAttachments;
+            private set => _streamAttachments = value ?? new List<StreamAttachment>();
+        }
+
+        /// <summary>
+        /// Gets inline attachments (linked resources of the HTML body) of a mail message.
+        /// They are generated automatically with all image sources pointing to local files.
+        /// For adding non-automatic inline attachments, use <see cref="AddExternalInlineAttachment"/> ONLY.
+        /// </summary>
+        [YAXDontSerialize]
+        public HashSet<FileAttachment> InlineAttachments
+        {
+            get => _inlineAttachments;
+            private set => _inlineAttachments = value ?? new HashSet<FileAttachment>();
+        }
+
+        /// <summary>
+        /// Gets or sets string attachments that will be attached to a mail message.
+        /// String attachments can be text or binary.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        public HashSet<StringAttachment> StringAttachments
+        {
+            get => _stringAttachments;
+            private set => _stringAttachments = value ?? new HashSet<StringAttachment>();
+        }
+
+        [YAXSerializableField]
+        [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
+        private HashSet<FileAttachment> ExternalInlineAttachments
+        {
+            get => _externalInlineAttachments;
+            set => _externalInlineAttachments = value ?? new HashSet<FileAttachment>();
+        }
+
+        /// <summary>
+        /// Replaces all variables in the text with their corresponding values.
+        /// Used for subject, body and attachment.
+        /// </summary>
+        /// <param name="text">Text to search and replace.</param>
+        /// <param name="dataItem"></param>
+        /// <returns>Returns the text with all variables replaced.</returns>
+        internal string SearchAndReplaceVars(string text, object dataItem)
+        {
+            if (text == null) return null;
+            SmartFormatter.SetConfig(Config?.SmartFormatterConfig); // make sure we use the latest settings
+            return SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
+        }
+
+        /// <summary>
+        /// Replaces all variables in the text with their corresponding values.
+        /// Filenames may contain backslashes which may not be interpreted as literals.
+        /// That's why "ConvertCharacterStringLiterals" must be false in this method.
+        /// </summary>
+        /// <param name="text">Text to search and replace.</param>
+        /// <param name="dataItem"></param>
+        /// <returns>Returns the text with all variables replaced.</returns>
+        internal string SearchAndReplaceVarsInFilename(string text, object dataItem)
+        {
+            if (text == null) return null;
+            var currentConfig = Config.SmartFormatterConfig;
+            var fileConfig = new SmartFormatterConfig
+            {
+                ConvertCharacterStringLiterals = false,
+                FormatErrorAction = SmartFormatter.Settings.FormatErrorAction,
+                ParseErrorAction = SmartFormatter.Settings.ParseErrorAction,
+                CaseSensitivity = SmartFormatter.Settings.CaseSensitivity
+            };
+
+            SmartFormatter.SetConfig(fileConfig);
+            var result = SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
+            SmartFormatter.SetConfig(currentConfig);
+            return result;
+        }
+
+        /// <summary>
+        /// Adds external inline attachments (linked resources of the HTML body) of a mail message.
+        /// They are normally generated automatically with all image sources pointing to local files,
+        /// but with this method such files can be added as well.
+        /// </summary>
+        /// <param name="att"></param>
+        public void AddExternalInlineAttachment(FileAttachment att)
+        {
+            ExternalInlineAttachments.Add(att);
+        }
+
+        /// <summary>
+        /// Clears external inline attachments (linked resources of the HTML body) of a mail message.
+        /// They are normally generated automatically with all image sources pointing to local files.
+        /// This method only removes attachments formerly added with AddExternalInlineAttachment.
+        /// </summary>
+        public void ClearExternalInlineAttachment()
+        {
+            ExternalInlineAttachments.Clear();
+        }
+
+        #endregion
+
+        #region *** Private Methods ***
         
+        /// <summary>
+        /// Prepares the mail message subject:
+        /// Replacing placeholders with their values and setting correct encoding.
+        /// </summary>
+        private void AddSubjectToMailMessage(MimeMessage msg, object dataItem)
+        {
+            var subject = SearchAndReplaceVars(Subject, dataItem);
+            msg.Subject = subject ?? string.Empty;
+            msg.Headers.Replace(HeaderId.Subject, Config.CharacterEncoding, msg.Subject);
+        }
+
+        /// <summary>
+        /// Prepares the mail message part (plain text and/or HTML:
+        /// Replacing placeholders with their values and setting correct encoding.
+        /// </summary>
+        private void BuildTextMessagePart(object dataIteam)
+        {
+            _badInlineFiles.Clear();
+            _textMessagePart = null;
+
+            MultipartAlternative alternative = null;
+
+            // create the plain text body part
+            TextPart plainTextPart = null;
+
+            if (!string.IsNullOrEmpty(PlainText))
+            {
+                RegisterPlainTextTemplates();
+                var plainText = SearchAndReplaceVars(PlainText, dataIteam);
+
+                plainTextPart = (TextPart)new PlainBodyBuilder(plainText)
+                {
+                    TextTransferEncoding = Config.TextTransferEncoding,
+                    CharacterEncoding = Config.CharacterEncoding
+                }.GetBodyPart();
+
+                if (!string.IsNullOrEmpty(HtmlText))
+                {
+                    // there is plain text AND html text
+                    alternative = new MultipartAlternative { plainTextPart };
+                    _textMessagePart = alternative;
+                }
+                else
+                {
+                    // there is only a plain text part, which could even be null
+                    _textMessagePart = plainTextPart;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(HtmlText))
+            {
+                RegisterHtmlTemplates();
+
+                // create the HTML text body part with any linked resources
+                // replacing any placeholders in the text or files with variable values
+                var htmlBody = new HtmlBodyBuilder(this, dataIteam)
+                {
+                    DocBaseUri = Config.FileBaseDirectory,
+                    TextTransferEncoding = Config.TextTransferEncoding,
+                    BinaryTransferEncoding = Config.BinaryTransferEncoding,
+                    CharacterEncoding = Config.CharacterEncoding
+                };
+
+                ExternalInlineAttachments.ToList().ForEach(ia => htmlBody.InlineAtt.Add(ia));
+
+                if (alternative != null)
+                {
+                    alternative.Add(htmlBody.GetBodyPart());
+                    _textMessagePart = alternative;
+                }
+                else
+                {
+                    _textMessagePart = htmlBody.GetBodyPart();
+                }
+
+                // get inline attachments and bad inline files AFTER htmlBody.GetBodyPart()!
+                InlineAttachments = htmlBody.InlineAtt; // expose all resolved inline attachments in MailMergeMessage
+                htmlBody.BadInlineFiles.ToList().ForEach(f => _badInlineFiles.Add(f));
+
+                SmartFormatter.Templates.Clear();
+            }
+            else
+            {
+                InlineAttachments.Clear();
+                _badInlineFiles.Clear();
+            }
+        }
+        
+        /// <summary>
+        /// Registers html parts if they exist, otherwise the plain text parts
+        /// </summary>
+        private void RegisterHtmlTemplates()
+        {
+            if (SmartFormatter.Templates == null)
+                SmartFormatter.Templates = new TemplateFormatter(SmartFormatter);
+
+            SmartFormatter.Templates.Clear();
+
+            foreach (var template in this.Templates)
+            {
+                var parts = template.GetParts();
+                var htmlPart = parts.FirstOrDefault(p => p.Type == PartType.Html);
+                if (htmlPart != null)
+                {
+                    SmartFormatter.Templates.Register(template.Name, htmlPart.Value ?? string.Empty);
+                }
+                else
+                {
+                    var plainPart = parts.FirstOrDefault(p => p.Type == PartType.Plain);
+                    SmartFormatter.Templates.Register(template.Name, plainPart?.Value ?? string.Empty);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Registers only plain text parts
+        /// </summary>
+        private void RegisterPlainTextTemplates()
+        {
+            SmartFormatter.Templates.Clear();
+
+            foreach (var template in this.Templates)
+            {
+                var plainPart = template.GetParts().FirstOrDefault(p => p.Type == PartType.Plain);
+                SmartFormatter.Templates.Register(template.Name, plainPart?.Value ?? string.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Prepares the mail message file and string attachments:
+        /// Replacing placeholders with their values and setting correct encoding.
+        /// </summary>
+        private void BuildAttachmentPartsForMessage(object dataItem)
+        {
+            _badAttachmentFiles.Clear();
+            _attachmentParts = new List<MimePart>();
+
+            foreach (var fa in FileAttachments)
+            {
+                var filename = MakeFullPath(SearchAndReplaceVarsInFilename(fa.Filename, dataItem));
+                var displayName = SearchAndReplaceVars(fa.DisplayName, dataItem);
+
+                try
+                {
+                    _attachmentParts.Add(
+                        new AttachmentBuilder(new FileAttachment(filename, displayName, fa.MimeType), Config.CharacterEncoding,
+                            Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
+                }
+                catch (FileNotFoundException)
+                {
+                    _badAttachmentFiles.Add(fa.Filename);
+                }
+                catch (IOException)
+                {
+                    _badAttachmentFiles.Add(fa.Filename);
+                }
+            }
+
+            /* Note: all inline attachments (read from html body text or externally added ones
+             * are processed in HtmlBodyBuilder
+             */
+
+            foreach (var sa in StreamAttachments)
+            {
+                var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
+                _attachmentParts.Add(
+                    new AttachmentBuilder(new StreamAttachment(sa.Stream, displayName, sa.MimeType), Config.CharacterEncoding,
+                        Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
+            }
+
+            foreach (var sa in StringAttachments)
+            {
+                var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
+                _attachmentParts.Add(
+                    new AttachmentBuilder(new StringAttachment(sa.Content, displayName, sa.MimeType), Config.CharacterEncoding,
+                        Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
+            }
+        }
+
+
+        /// <summary>
+        /// Calculates the full path of the file name, using the base directory if set.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns>The full path of the file.</returns>
+        private string MakeFullPath(string filename)
+        {
+            return Tools.MakeFullPath(Config.FileBaseDirectory, filename);
+        }
+
+        #endregion
+
+        #region *** Public methods ***
+
         /// <summary>
         /// Converts the HtmlText property into plain text (without tags or html entities)
         /// If the converter is null, the ParsingHtmlConverter will be used. If this fails,
@@ -163,17 +567,9 @@ namespace MailMergeLib
         /// <returns>Returns the plain text representation of the HTML string.</returns>
         public string ConvertHtmlToPlainText(IHtmlConverter converter = null)
         {
-            try
-            {
-                return converter == null
-                           ? (new AngleSharpHtmlConverter()).ToPlainText(HtmlText)
-                           : converter.ToPlainText(HtmlText);
-            }
-            catch (FileNotFoundException)
-            {
-                // AngleSharp.dll not found
-                return (new RegExHtmlConverter()).ToPlainText(HtmlText);
-            }
+            return converter == null
+                ? (new AngleSharpHtmlConverter()).ToPlainText(HtmlText)
+                : converter.ToPlainText(HtmlText);
         }
 
         /// <summary>
@@ -188,7 +584,7 @@ namespace MailMergeLib
         /// <exception cref="MailMergeMessageException">Throws a general MailMergeMessageException, which contains a list of exceptions giving more details.</exception>
         public MimeMessage GetMimeMessage(object dataItem = default(object))
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 _badVariableNames.Clear();
 #if !FXCORE
@@ -202,7 +598,7 @@ namespace MailMergeLib
                 var mimeMessage = new MimeMessage();
                 AddSubjectToMailMessage(mimeMessage, dataItem);
                 AddAddressesToMailMessage(mimeMessage, dataItem);
-                AddAttributesToMailMessage(mimeMessage, dataItem); // must be added before subject and addresses
+                AddAttributesToMailMessage(mimeMessage, dataItem);
 
                 BuildTextMessagePart(dataItem);
                 BuildAttachmentPartsForMessage(dataItem);
@@ -220,12 +616,12 @@ namespace MailMergeLib
                     exceptions.Add(
                         new AddressException($"Bad mail address(es): {string.Join(", ", _badMailAddr.ToArray())}",
                             _badMailAddr, null));
-                if (_badInlineFiles.Count > 0)
+                if (_badInlineFiles.Count > 0 && !Config.IgnoreMissingInlineAttachments)
                     exceptions.Add(
                         new AttachmentException(
                             $"Inline attachment(s) missing or not readable: {string.Join(", ", _badInlineFiles.ToArray())}",
                             _badInlineFiles, null));
-                if (_badAttachmentFiles.Count > 0)
+                if (_badAttachmentFiles.Count > 0 && !Config.IgnoreMissingFileAttachments)
                     exceptions.Add(
                         new AttachmentException(
                             $"File attachment(s) missing or not readable: {string.Join(", ", _badAttachmentFiles.ToArray())}",
@@ -268,8 +664,6 @@ namespace MailMergeLib
 
         #region *** Destructor and IDisposable Members ***
 
-        private bool _disposed;
-
         /// <summary>
         /// Destructor.
         /// </summary>
@@ -295,6 +689,7 @@ namespace MailMergeLib
                 {
                     _textMessagePart = null;
                     _attachmentParts = null;
+                    StreamAttachments = null;
                 }
             }
             _disposed = true;
@@ -302,222 +697,8 @@ namespace MailMergeLib
 
         #endregion
 
-        #region *** Content methods and properties ***
-
-        /// <summary>
-        /// Gets or sets files that will be attached to a mail message.
-        /// File names may contain placeholders.
-        /// </summary>
-        public HashSet<FileAttachment> FileAttachments { get; set; } = new HashSet<FileAttachment>();
-
-        /// <summary>
-        /// Gets or sets streams that will be attached to a mail message.
-        /// </summary>
-        public List<StreamAttachment> StreamAttachments { get; set; } = new List<StreamAttachment>();
-
-        /// <summary>
-        /// Gets inline attachments (linked resources of the HTML body) of a mail message.
-        /// They are generated automatically with all image sources pointing to local files.
-        /// For adding non-automatic inline attachments, use <see cref="AddExternalInlineAttachment"/> ONLY.
-        /// </summary>
-        public HashSet<FileAttachment> InlineAttachments { get; private set; } = new HashSet<FileAttachment>();
-
-        /// <summary>
-        /// Gets or sets string attachments that will be attached to a mail message.
-        /// String attachments can be text or binary.
-        /// </summary>
-        public List<StringAttachment> StringAttachments { get; set; } = new List<StringAttachment>();
-
-        /// <summary>
-        /// Replaces all variables in the text with their corresponding values.
-        /// Used for subject, body and attachment.
-        /// </summary>
-        /// <param name="text">Text to search and replace.</param>
-        /// <param name="dataItem"></param>
-        /// <returns>Returns the text with all variables replaced.</returns>
-        internal string SearchAndReplaceVars(string text, object dataItem)
-        {
-            return SmartFormatter.Format(Config.CultureInfo, text, dataItem);
-        }
-
-        /// <summary>
-        /// Adds external inline attachments (linked resources of the HTML body) of a mail message.
-        /// They are normally generated automatically with all image sources pointing to local files,
-        /// but with this method such files can be added as well.
-        /// </summary>
-        /// <param name="att"></param>
-        public void AddExternalInlineAttachment(FileAttachment att)
-        {
-            _inlineAttExternal.Add(att);
-        }
-
-        /// <summary>
-        /// Clears external inline attachments (linked resources of the HTML body) of a mail message.
-        /// They are normally generated automatically with all image sources pointing to local files.
-        /// This method only removes attachments formerly added with AddExternalInlineAttachment.
-        /// </summary>
-        public void ClearExternalInlineAttachment()
-        {
-            _inlineAttExternal.Clear();
-        }
-
-
-        /// <summary>
-        /// Prepares the mail message subject:
-        /// Replacing placeholders with their values and setting correct encoding.
-        /// </summary>
-        private void AddSubjectToMailMessage(MimeMessage msg, object dataItem)
-        {
-            var subject = SearchAndReplaceVars(Subject, dataItem);
-            msg.Subject = subject;
-            msg.Headers.Replace(HeaderId.Subject, Config.CharacterEncoding, subject);
-        }
-
-
-        /// <summary>
-        /// Prepares the mail message part (plain text and/or HTML:
-        /// Replacing placeholders with their values and setting correct encoding.
-        /// </summary>
-        private void BuildTextMessagePart(object dataIteam)
-        {
-            _badInlineFiles.Clear();
-            _textMessagePart = null;
-            
-            MultipartAlternative alternative = null;
-
-            // create the plain text body part
-            TextPart plainTextPart = null;
-
-            if (!string.IsNullOrEmpty(PlainText))
-            {
-                var plainText = SearchAndReplaceVars(PlainText, dataIteam);
-                plainTextPart = (TextPart) new PlainBodyBuilder(plainText)
-                {
-                    TextTransferEncoding = Config.TextTransferEncoding,
-                    CharacterEncoding = Config.CharacterEncoding
-                }.GetBodyPart();
-                
-                if (!string.IsNullOrEmpty(HtmlText))
-                {
-                    // there is plain text AND html text
-                    alternative = new MultipartAlternative { plainTextPart };
-                    _textMessagePart = alternative;
-                }
-                else
-                {
-                    // there is only a plain text part, which could even be null
-                    _textMessagePart = plainTextPart;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(HtmlText))
-            {
-                // create the HTML text body part with any linked resources
-                // replacing any placeholders in the text or files with variable values
-                var htmlBody = new HtmlBodyBuilder(this, dataIteam)
-                {
-                    DocBaseUri = Config.FileBaseDirectory,
-                    TextTransferEncoding = Config.TextTransferEncoding,
-                    BinaryTransferEncoding = Config.BinaryTransferEncoding,
-                    CharacterEncoding = Config.CharacterEncoding
-                };
-
-                _inlineAttExternal.ForEach(ia => htmlBody.InlineAtt.Add(ia));
-
-                if (alternative != null)
-                {
-                    alternative.Add(htmlBody.GetBodyPart());
-                    _textMessagePart = alternative;
-                }
-                else
-                {
-                    _textMessagePart = htmlBody.GetBodyPart();
-                }
-
-                // get inline attachments and bad inline files AFTER htmlBody.GetBodyPart()!
-                InlineAttachments = htmlBody.InlineAtt; // expose all resolved inline attachments in MailMergeMessage
-                htmlBody.BadInlineFiles.ToList().ForEach(f => _badInlineFiles.Add(f));
-            }
-            else
-            {
-                InlineAttachments.Clear();
-                _badInlineFiles.Clear();
-            }
-        }
-
-
-        /// <summary>
-        /// Prepares the mail message file and string attachments:
-        /// Replacing placeholders with their values and setting correct encoding.
-        /// </summary>
-        private void BuildAttachmentPartsForMessage(object dataItem)
-        {
-            _badAttachmentFiles.Clear();
-            _attachmentParts = new List<MimePart>();
-
-            foreach (var fa in FileAttachments)
-            {
-                var filename = MakeFullPath(SearchAndReplaceVars(fa.Filename, dataItem));
-                var displayName = SearchAndReplaceVars(fa.DisplayName, dataItem);
-
-                try
-                {
-                    _attachmentParts.Add(
-                        new AttachmentBuilder(new FileAttachment(filename, displayName, fa.MimeType), Config.CharacterEncoding,
-                            Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
-                }
-                catch (FileNotFoundException)
-                {
-                    _badAttachmentFiles.Add(fa.Filename);
-                }
-                catch (IOException)
-                {
-                    _badAttachmentFiles.Add(fa.Filename);
-                }
-            }
-
-            /* Changed: all inline attachments (read from html body text or externally added ones
-             * are now processed in HtmlBodyBuilder
-             */
-
-            foreach (var sa in StreamAttachments)
-            {
-                var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
-                _attachmentParts.Add(
-                    new AttachmentBuilder(new StreamAttachment(sa.Stream, displayName, sa.MimeType), Config.CharacterEncoding,
-                        Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
-            }
-
-            foreach (var sa in StringAttachments)
-            {
-                var displayName = SearchAndReplaceVars(sa.DisplayName, dataItem);
-                _attachmentParts.Add(
-                    new AttachmentBuilder(new StringAttachment(sa.Content, displayName, sa.MimeType), Config.CharacterEncoding,
-                        Config.TextTransferEncoding, Config.BinaryTransferEncoding).GetAttachment());
-            }
-        }
-
-
-        /// <summary>
-        /// Calculates the full path of the file name, using the base directory if set.
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns>The full path of the file.</returns>
-        private string MakeFullPath(string filename)
-        {
-            return Tools.MakeFullPath(Config.FileBaseDirectory, filename);
-        }
-
-        #endregion
-
-        #region *** Address methods and properties ***
-
-        /// <summary>
-        /// Gets the collection of recipients and sender addresses of the message.
-        /// </summary>
-        public MailMergeAddressCollection MailMergeAddresses { get; private set; }
-
-
+        #region *** Private methods ***
+        
         /// <summary>
         /// Prepares all recipient address and the corresponding header fields of a mail message.
         /// </summary>
@@ -572,9 +753,7 @@ namespace MailMergeLib
                             mimeMessage.ReplyTo.Add(mailboxAddr);
                             break;
                         case MailAddressType.ConfirmReadingTo:
-                            mimeMessage.Headers.RemoveAll(CConfirmReading);
                             mimeMessage.Headers.RemoveAll(HeaderId.DispositionNotificationTo);
-                            mimeMessage.Headers.Add(CConfirmReading, mailboxAddr.Address);
                             mimeMessage.Headers.Add(HeaderId.DispositionNotificationTo, mailboxAddr.Address);
                             break;
                         case MailAddressType.ReturnReceiptTo:
@@ -595,26 +774,6 @@ namespace MailMergeLib
                 }
             }
         }
-
-        #endregion
-
-        #region *** Special attributes related properties and methods ***
-
-        /// <summary>
-        /// Gets or sets the user defined headers of a mail message.
-        /// </summary>
-        public HeaderList Headers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the delivery notification options, which will be used by DsnSmtpClient()
-        /// Bitwise-or whatever combination of flags you want to be notified about.
-        /// </summary>
-        /// <remarks>
-        /// The DsnSmtpClient will send RCPT TO commands like this (depending on options set):
-        /// RCPT TO:&lt;test@sample.com&gt; NOTIFY=SUCCESS,DELAY ORCPT=rfc822;test@sample.com
-        /// </remarks>
-        // Don't think this brings too much benefit
-        //public DeliveryStatusNotification? DeliveryStatusNotification { get; set; }
 
         /// <summary>
         /// Sets all attributes of a mail message.
@@ -648,8 +807,201 @@ namespace MailMergeLib
         }
 
         #endregion
-        
-        #region *** Helper methods ***
+
+        #region *** Serialization ***
+
+        /// <summary>
+        /// Get the message as a serialized xml string.
+        /// </summary>
+        /// <returns></returns>
+        public string Serialize()
+        {
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
+            return serializer.Serialize(this);
+        }
+
+        /// <summary>
+        /// Write a message to an xml stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        public void Serialize(Stream stream, System.Text.Encoding encoding)
+        {
+            Serialize(new StreamWriter(stream, encoding), true);
+        }
+
+        /// <summary>
+        /// Write message to a file.
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Serialize(string filename)
+        {
+            using (var fs = new FileStream(filename, FileMode.Create))
+            {
+                using (var sr = new StreamWriter(fs))
+                {
+                    Serialize(sr, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Write message with a StreamWriter.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
+        private void Serialize(TextWriter writer, bool isStream)
+        {
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
+            serializer.Serialize(this, writer);
+            writer.Flush();
+
+            if (isStream) return;
+
+#if NET40 || NET45
+            writer.Close();
+#endif
+            writer.Dispose();
+        }
+
+        /// <summary>
+        /// Reads a message from an xml string.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static MailMergeMessage Deserialize(string xml)
+        {
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
+            return (MailMergeMessage) serializer.Deserialize(xml);
+        }
+
+        /// <summary>
+        /// Reads a message from an xml stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        public static MailMergeMessage Deserialize(Stream stream, System.Text.Encoding encoding)
+        {
+            return Deserialize(new StreamReader(stream, encoding), true);
+        }
+
+        /// <summary>
+        /// Reads message from an xml file.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="encoding"></param>
+        public static MailMergeMessage Deserialize(string filename, System.Text.Encoding encoding)
+        {
+            using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                using (var sr = new StreamReader(fs, encoding))
+                {
+                    return Deserialize(sr, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads a message xml with a StreamReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns>Returns a <see cref="MailMergeMessage"/> instance.</returns>
+        /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
+        private static MailMergeMessage Deserialize(StreamReader reader, bool isStream)
+        {
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
+            reader.BaseStream.Position = 0;
+            var str = reader.ReadToEnd();
+            var s = (MailMergeMessage) serializer.Deserialize(str);
+
+            if (isStream) return s;
+#if NET40 || NET45
+            reader.Close();
+#endif
+            reader.Dispose();
+
+            return s;
+        }
+
+        #endregion
+
+        #region *** Equality ***
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MailMergeMessage)obj);
+        }
+
+        /// <summary>
+        /// Compares the MailMergeMessage with an other instance of MailMergeMessage for equality.
+        /// </summary>
+        /// <param name="mmm"></param>
+        /// <returns>Returns true, if both instances are equal, else false.</returns>
+        /// <remarks>
+        /// InlineAttachments are not compared because this property will be populated automatically from any HtmlText.
+        /// StreamAttachments are not included in the comparison.
+        /// </remarks>
+        public bool Equals(MailMergeMessage mmm)
+        {
+            return Info.Equals(mmm.Info) &&
+                   MailMergeAddresses.Equals(mmm.MailMergeAddresses) &&
+                   Equals(FileAttachments, mmm.FileAttachments) &&
+                   Equals(ExternalInlineAttachments, mmm.ExternalInlineAttachments) &&
+                   Equals(StringAttachments, mmm.StringAttachments) &&
+                   string.Equals(Subject, mmm.Subject) &&
+                   string.Equals(PlainText, mmm.PlainText) &&
+                   string.Equals(HtmlText, mmm.HtmlText) &&
+                   Equals(Headers, mmm.Headers) &&
+                   Config.Equals(mmm.Config);
+        }
+
+        protected bool Equals(HeaderList hl1, HeaderList hl2)
+        {
+            var hl1Dict = hl1.ToDictionary(header => header.Id, header => header.Value);
+            var h21Dict = hl2.ToDictionary(header => header.Id, header => header.Value);
+            
+            // not any enty missing in hl1Dict, nor in the other list
+            return !hl1Dict.Except(h21Dict).Union(h21Dict.Except(hl1Dict)).Any();
+        }
+
+        protected bool Equals(HashSet<FileAttachment> fl1, HashSet<FileAttachment> fl2)
+        {
+            // not any enty missing in fl1, nor in the other list
+            return !fl1.Except(fl2).Union(fl2.Except(fl1)).Any();
+        }
+
+        protected bool Equals(HashSet<StringAttachment> sa1, HashSet<StringAttachment> sa2)
+        {
+            // not any enty missing in sa11, nor in the other list
+            return !sa1.Except(sa2).Union(sa2.Except(sa1)).Any();
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (_mailMergeAddresses != null ? _mailMergeAddresses.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Info != null ? Info.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Headers != null ? Headers.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Subject != null ? Subject.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (PlainText != null ? PlainText.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (HtmlText != null ? HtmlText.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (SmartFormatter != null ? SmartFormatter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Config != null ? Config.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (FileAttachments != null ? FileAttachments.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ExternalInlineAttachments != null ? ExternalInlineAttachments.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (StringAttachments != null ? StringAttachments.GetHashCode() : 0);
+                
+                return hashCode;
+            }
+        }
+
+        #endregion
+
+        #region *** Public helper methods ***
 
         /// <summary>
         /// Dispose the streams of file attachments and HTML inline file attachments,

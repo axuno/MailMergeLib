@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+﻿using System.IO;
 using System.Text;
-using System.Xml.Serialization;
+using MailMergeLib.Serialization;
+using YAXLib;
 
 namespace MailMergeLib
 {
     /// <summary>
     /// MailMergeLib settings
     /// </summary>
-    [XmlRoot(Namespace = "http://www.axuno.net/MailMergeLib/XmlSchema/5.0", IsNullable = true, ElementName = "MailMergeLibSettings")]
+    [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly)]
+    [YAXSerializeAs("MailMergeLibSettings")]
     public class Settings
     {
         /// <summary>
@@ -25,13 +24,15 @@ namespace MailMergeLib
         /// <summary>
         /// Configuration for the MailMergeSender.
         /// </summary>
-        [XmlElement("Sender")]
+        [YAXSerializableField]
+        [YAXSerializeAs("Sender")]
         public SenderConfig SenderConfig { get; set; }
 
         /// <summary>
         /// Configuration for the MailMergeMessage.
         /// </summary>
-        [XmlElement("Message")]
+        [YAXSerializableField]
+        [YAXSerializeAs("Message")]
         public MessageConfig MessageConfig { get; set; }
 
         /// <summary>
@@ -43,8 +44,7 @@ namespace MailMergeLib
             get { return Crypto.CryptoKey; }
             set { Crypto.CryptoKey = value; }
         }
-
-
+        
         /// <summary>
         /// Write MailMergeLib settings to a stream.
         /// </summary>
@@ -71,16 +71,24 @@ namespace MailMergeLib
         }
 
         /// <summary>
+        /// Get MailMergeLib settings as an xml string.
+        /// </summary>
+        /// <returns>Returns the MailMergeLib settings as an xml string.</returns>
+        public string Serialize()
+        {
+            return SerializationFactory.GetStandardSerializer(typeof(Settings)).Serialize(this);
+        }
+
+        /// <summary>
         /// Write MailMergeLib settings with a StreamWriter.
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
         private void Serialize(TextWriter writer, bool isStream)
         {
-            var xmlNamespace = new XmlSerializerNamespaces();
-            xmlNamespace.Add(string.Empty, "http://www.axuno.net/MailMergeLib/XmlSchema/5.0");
-            var serializer = new XmlSerializer(typeof(Settings));
-            serializer.Serialize(writer, this, xmlNamespace);
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(Settings));
+            serializer.Serialize(this, writer);
+            writer.Flush();
 
             if (isStream) return;
 
@@ -89,7 +97,6 @@ namespace MailMergeLib
 #endif
             writer.Dispose();
         }
-
 
         /// <summary>
         /// Reads MailMergeLib settings from a stream.
@@ -105,15 +112,25 @@ namespace MailMergeLib
         /// Reads MailMergeLib settings from a file.
         /// </summary>
         /// <param name="filename"></param>
-        public static Settings Deserialize(string filename)
+        /// <param name="encoding"></param>
+        public static Settings Deserialize(string filename, Encoding encoding)
         {
             using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                using (var sr = new StreamReader(fs))
+                using (var sr = new StreamReader(fs, encoding))
                 {
                     return Deserialize(sr, false);
                 }
             }
+        }
+
+        /// <summary>
+        /// Read the MailMergeLib settings from an xml string.
+        /// </summary>
+        /// <returns>Returns the MailMergeLib settings as an xml string.</returns>
+        public static Settings Deserialize(string xml)
+        {
+            return (Settings) SerializationFactory.GetStandardSerializer(typeof(Settings)).Deserialize(xml);
         }
 
         /// <summary>
@@ -122,11 +139,13 @@ namespace MailMergeLib
         /// <param name="reader"></param>
         /// <returns>Returns a MailMergeLib Settings instance</returns>
         /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-        private static Settings Deserialize(TextReader reader, bool isStream)
+        private static Settings Deserialize(StreamReader reader, bool isStream)
         {
-            var serializer = new XmlSerializer(typeof(Settings));
-            var s = serializer.Deserialize(reader) as Settings;
-
+            var serializer = SerializationFactory.GetStandardSerializer(typeof(Settings));
+            reader.BaseStream.Position = 0;
+            var str = reader.ReadToEnd();
+            var s = (Settings)serializer.Deserialize(str);
+  
             if (isStream) return s;
 #if NET40 || NET45
             reader.Close();

@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
+    <Copyright>© 2007-2016 by axuno gGmbH</Copyright>
+    <AssemblyTitle>MailMergeLib 5</AssemblyTitle>
+    <VersionPrefix>5.2.0.0</VersionPrefix>
+    <Authors>axuno gGmbH</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <DefineConstants>TRACE;DEBUG;FXCORE</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>MailMergeLib</AssemblyName>
+    <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>MailMergeLib</PackageId>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\**\*;SmartFormatMail\Properties\**\*;packages.*.config;TextVariableManager.cs;HtmlAgilityPackHtmlConverter.cs" />
+    <None Remove="MailMergeLib.Net40.nuget.targets" />
+    <None Include="App.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.9.9" />
+    <PackageReference Include="MailKit" Version="1.16.1" />
+    <PackageReference Include="MimeKit" Version="1.16.1" />
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    <PackageReference Include="YAXLib" Version="2.15.0" />
+  </ItemGroup>
+
+</Project>

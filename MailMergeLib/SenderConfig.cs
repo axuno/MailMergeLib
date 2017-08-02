@@ -1,10 +1,12 @@
-﻿using System.Xml.Serialization;
+﻿using System.Linq;
+using YAXLib;
 
 namespace MailMergeLib
 {
     /// <summary>
     /// Configuration for MailMergeSender.
     /// </summary>
+    [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly)]
     public class SenderConfig
     {
         private int _maxNumOfSmtpClients = 5;
@@ -19,6 +21,7 @@ namespace MailMergeLib
         /// Gets or sets the maximum number of SmtpClient to send messages concurrently.
         /// Valid numbers are 1 to 50, defaults to 5.
         /// </summary>
+        [YAXSerializableField]
         public int MaxNumOfSmtpClients
         {
             get { return _maxNumOfSmtpClients; }
@@ -35,8 +38,36 @@ namespace MailMergeLib
         /// The first SmtpClientConfig is the "standard", any second is the "backup".
         /// Other instances of SmtpClientConfig in the array are used for parallel sending messages.
         /// </summary>
-        [XmlArray("SmtpClients")]
-        [XmlArrayItem(ElementName = "SmtpClient")]
+        [YAXSerializableField]
+        [YAXSerializeAs("SmtpClients")]
         public SmtpClientConfig[] SmtpClientConfig { get; set; } = {new SmtpClientConfig()};
+
+        #region *** Equality ***
+
+        protected bool Equals(SenderConfig other)
+        {
+            if (MaxNumOfSmtpClients != other.MaxNumOfSmtpClients || SmtpClientConfig.Length != other.SmtpClientConfig.Length)
+                return false;
+
+            return !SmtpClientConfig.Where((t, i) => !t.Equals(other.SmtpClientConfig[i])).Any();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SenderConfig) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (MaxNumOfSmtpClients * 397) ^ (SmtpClientConfig != null ? SmtpClientConfig.GetHashCode() : 0);
+            }
+        }
+
+        #endregion
     }
 }

@@ -17,12 +17,18 @@ namespace MailMergeLib.SmartFormatMail
     {
         #region: Constructor :
 
-        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore)
+        public SmartFormatter()
         {
-            Parser = new Parser(errorAction);
-            ErrorAction = errorAction;
+            Settings = new SmartSettings();
+            Parser = new Parser(Settings);
             SourceExtensions = new List<ISource>();
             FormatterExtensions = new List<IFormatter>();
+        }
+
+        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
+        public SmartFormatter(ErrorAction errorAction = ErrorAction.Ignore) : this()
+        {
+            Settings.FormatErrorAction = errorAction;
         }
 
         #endregion
@@ -105,16 +111,22 @@ namespace MailMergeLib.SmartFormatMail
         /// <summary>
         /// Gets or set the instance of the <see cref="Core.Parsing.Parser"/>
         /// </summary>
-        public Parser Parser { get; set; }
+        public Parser Parser { get; private set; }
+
         /// <summary>
         /// Gets or set the <see cref="Core.Settings.ErrorAction"/> for the formatter.
         /// </summary>
-        public ErrorAction ErrorAction { get; set; }
-        private SmartSettings _settings;
+        [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
+        public ErrorAction ErrorAction
+        {
+            get { return Settings.FormatErrorAction; }
+            set { Settings.FormatErrorAction = value; }
+        }
+
         /// <summary>
-        /// Get the <seealso cref="Core.Settings.SmartSettings"/> for the formatter.
+        /// Get the <see cref="Core.Settings.SmartSettings"/> for Smart.Format
         /// </summary>
-        public SmartSettings Settings => _settings ?? (_settings = new SmartSettings());
+        public SmartSettings Settings { get; }
 
         #endregion
 
@@ -209,10 +221,10 @@ namespace MailMergeLib.SmartFormatMail
                 var literalItem = item as LiteralText;
                 if (literalItem != null)
                 {
-                    formattingInfo.Write(literalItem.baseString, literalItem.startIndex, literalItem.endIndex - literalItem.startIndex);
+                    formattingInfo.Write(literalItem.ToString());
                     continue;
-                } 
-                
+                }
+
                 // Otherwise, the item must be a placeholder.
                 var placeholder = (Placeholder)item;
                 var childFormattingInfo = formattingInfo.CreateChild(placeholder);
@@ -240,11 +252,11 @@ namespace MailMergeLib.SmartFormatMail
                 }
             }
         }
-        
+
         private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
         {
-            OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, ErrorAction != ErrorAction.ThrowError));
-            switch (ErrorAction)
+            OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, Settings.FormatErrorAction != ErrorAction.ThrowError));
+            switch (Settings.FormatErrorAction)
             {
                 case ErrorAction.Ignore:
                     return;
@@ -282,8 +294,8 @@ namespace MailMergeLib.SmartFormatMail
                 formattingInfo.Selector = selector;
                 formattingInfo.Result = null;
                 var handled = InvokeSourceExtensions(formattingInfo);
-                if (handled) formattingInfo.CurrentValue = formattingInfo.Result;                
-                
+                if (handled) formattingInfo.CurrentValue = formattingInfo.Result;
+
                 if (firstSelector)
                 {
                     firstSelector = false;
@@ -298,7 +310,7 @@ namespace MailMergeLib.SmartFormatMail
                         if (handled) formattingInfo.CurrentValue = parentFormattingInfo.Result;
                     }
                 }
-                
+
                 if (!handled)
                 {
                     throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"", selector);
@@ -309,8 +321,27 @@ namespace MailMergeLib.SmartFormatMail
         {
             foreach (var sourceExtension in SourceExtensions)
             {
-                var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
-                if (handled) return true;
+                // if the current value is of type SmartObjects
+                // then try to find the right source extension for each of the objects in SmartObjects
+                // Note: SmartObjects cannot be nested, so this can be the case only once. 
+                var smartObjects = formattingInfo.CurrentValue as SmartObjects;
+                if (smartObjects != null)
+                {
+                    var savedCurrentValue = formattingInfo.CurrentValue;
+                    foreach (var obj in smartObjects)
+                    {
+                        formattingInfo.CurrentValue = obj;
+                        var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+                        if (handled) return true;
+                    }
+                    formattingInfo.CurrentValue = savedCurrentValue;
+                }
+                else
+                {
+                    // other object - default handling
+                    var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
+                    if (handled) return true;
+                }
             }
             return false;
         }
@@ -337,7 +368,7 @@ namespace MailMergeLib.SmartFormatMail
         private bool InvokeFormatterExtensions(FormattingInfo formattingInfo)
         {
             var formatterName = formattingInfo.Placeholder.FormatterName;
-            
+
             // Evaluate the named formatter (or, evaluate all "" formatters)
             foreach (var formatterExtension in FormatterExtensions)
             {

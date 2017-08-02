@@ -29,44 +29,90 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\net40\</OutputPath>
     <DefineConstants>TRACE;NET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\net40\MailMergeLib.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AngleSharp">
+      <HintPath>..\packages\AngleSharp.0.9.9\lib\net40\AngleSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MailKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\packages\MailKit.1.16.1\lib\net40\MailKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MimeKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\packages\MimeKit.1.16.1\lib\net40\MimeKit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO, Version=2.6.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.10\lib\net40\System.IO.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Runtime, Version=2.6.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.10\lib\net40\System.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.Threading.Tasks, Version=2.6.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.10\lib\net40\System.Threading.Tasks.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="YAXLib, Version=2.15.0.0, Culture=neutral, PublicKeyToken=15c43682c986900f, processorArchitecture=MSIL">
+      <HintPath>..\packages\YAXLib.2.15\lib\net4.0\YAXLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttachmentBuilder.cs" />
     <Compile Include="BodyBuilderBase.cs" />
     <Compile Include="AngleSharpHtmlConverter.cs" />
+    <Compile Include="Credential.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="EmailValidator.cs" />
     <Compile Include="HtmlBodyBuilder.cs" />
-    <Compile Include="HtmlTagHelper.cs" />
     <Compile Include="FileAttachment.cs" />
-    <Compile Include="HtmlBodyBuilderRegEx.cs" />
     <Compile Include="IHtmlConverter.cs" />
     <Compile Include="MailMergeAddress.cs" />
     <Compile Include="MailMergeAddressCollection.cs" />
     <Compile Include="MailMergeMessage_Exception.cs" />
     <Compile Include="MailMergeMessage.cs" />
-    <Compile Include="MailMergeSender_EventArgs.cs" />
+    <Compile Include="MailSender_EventArgs.cs" />
     <Compile Include="MessageConfig.cs" />
     <Compile Include="MessageOutput.cs" />
     <Compile Include="MailSmartFormatter.cs" />
+    <Compile Include="MessageStore\FileMessageInfo.cs" />
+    <Compile Include="MessageStore\FileMessageStore.cs" />
+    <Compile Include="MessageStore\IMessageInfo.cs" />
+    <Compile Include="MessageStore\IMessageStore.cs" />
+    <Compile Include="MessageStore\MessageInfo.cs" />
+    <Compile Include="MessageStore\MessageInfoBase.cs" />
     <Compile Include="PlainBodyBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\HeaderListSerializer.cs" />
+    <Compile Include="Serialization\IPEndPointSerializer.cs" />
+    <Compile Include="Serialization\MailMergeAddressesSerializer.cs" />
+    <Compile Include="Serialization\PartSerializer.cs" />
+    <Compile Include="Serialization\SerializationFactory.cs" />
+    <Compile Include="Serialization\StringAsCdataSerializer.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormatter.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\IFormattingInfo.cs" />
     <Compile Include="SmartFormatMail\Core\Extensions\ISelectorInfo.cs" />
@@ -105,22 +151,29 @@
     <Compile Include="SmartFormatMail\Smart.cs" />
     <Compile Include="SmartFormatMail\SmartExtensions.cs" />
     <Compile Include="SmartFormatMail\SmartFormatter.cs" />
+    <Compile Include="SmartFormatMail\SmartObjects.cs" />
     <Compile Include="SmartFormatMail\Utilities\FormatDelegate.cs" />
     <Compile Include="SmartFormatMail\Utilities\PluralRules.cs" />
     <Compile Include="SmartFormatMail\Utilities\PluralRules_Old.cs" />
     <Compile Include="SmartFormatMail\Utilities\TimeSpanUtility.cs" />
+    <Compile Include="SmartFormatterConfig.cs" />
+    <Compile Include="Templates\Part.cs" />
+    <Compile Include="Templates\Parts.cs" />
+    <Compile Include="Templates\PartType.cs" />
+    <Compile Include="Templates\Template.cs" />
+    <Compile Include="Templates\TemplateException.cs" />
+    <Compile Include="Templates\Templates.cs" />
     <Compile Include="UriScheme.cs" />
     <None Include="app.config" />
     <None Include="MailMergeLib.snk" />
     <Compile Include="MailMergeSender.cs" />
-    <Compile Include="RegExHtmlConverter.cs" />
     <Compile Include="SenderConfig.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SmtpClientConfig.cs" />
     <Compile Include="StreamAttachment.cs" />
     <Compile Include="StringAttachment.cs" />
-    <Compile Include="TextVariableManager.cs" />
     <Compile Include="Tools.cs" />
+    <None Include="packages.MailMergeLib.Net40.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SmartFormatMail\license.txt" />

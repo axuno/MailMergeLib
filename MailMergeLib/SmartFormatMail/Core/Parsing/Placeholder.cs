@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using MailMergeLib.SmartFormatMail.Core.Settings;
 
 namespace MailMergeLib.SmartFormatMail.Core.Parsing
 {
@@ -16,7 +17,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// </example>
     public class Placeholder : FormatItem
     {
-        public Placeholder(Format parent, int startIndex, int nestedDepth) : base(parent, startIndex)
+        public Placeholder(SmartSettings smartSettings, Format parent, int startIndex, int nestedDepth) : base(smartSettings, parent, startIndex)
         {
             this.parent = parent;
             this.Selectors = new List<Selector>();
