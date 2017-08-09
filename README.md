@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/axuno/MailMergeLib/master/MailMergeLlib.png" width="300" alt="Logo">
 
-```MailMergeLib``` version 5.0 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
+```MailMergeLib``` version 5 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
 
 ### 1. Mail message generation:
 * Email templates can be fully individualized in terms of recipients, subject, HTML and/or plain text, attachments and even headers. Placeholders are inserted as variable names from data source between curly braces like so: ```{MailboxAddress.Name}``` or with formatting arguments like ```{Date:yyyy-MM-dd}```.
@@ -20,15 +20,17 @@
 * Emails are sent using the SmtpClient from [MailKit](https://github.com/jstedfast/MailKit), the sister project to MimeKit. SmtpClient is highly flexible and can be configured for literally every scenario you can think of.
 * Instead of sending, emails can also be stored in MIME formatted text files, e.g. if a "pickup directory" from IIS or Microsoft Exchange shall be used. If needed, these files can be loaded back into a MimeMessage from MimeKit.
 
+### 3. Save and restore:
+* Messages and templates can be saved and loaded to/from XML files.
+* Configuration settings for messages and SMTP can be stored to and loaded from an XML file.
 
-### 3. Both:
+### 4. Both:
 * Fine grained control over the whole process of email message generation and distribution.
 * Clearly out-performs .NET ```System.Net.Mail```.
-* Configuration settings for messages and SMTP can be stored to and loaded from an XML file.
 * RFC standards compliant.
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
-### Supported Frameworks
+### 5. Supported Frameworks
 * .Net Framework 4.0
 * .Net Framework 4.5+
 * .Net Core
