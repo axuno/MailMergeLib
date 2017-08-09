@@ -53,8 +53,9 @@ namespace MailMergeLib.MessageStore
         /// Returns the <see cref="MailMergeMessage"/> for these metadata.
         /// Method must be overridden in a derived class.
         /// </summary>
-        /// <returns></returns>
-        public abstract MailMergeMessage LoadMessage();
+        /// <param name="encoding">The encoding to use for loading the message.</param>
+        /// <returns>Returns an instance of <see cref="MailMergeMessage"/></returns>
+        public abstract MailMergeMessage LoadMessage(Encoding encoding);
 
         #region *** Equality ***
 

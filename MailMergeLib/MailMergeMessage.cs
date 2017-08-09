@@ -556,13 +556,10 @@ namespace MailMergeLib
 
         /// <summary>
         /// Converts the HtmlText property into plain text (without tags or html entities)
-        /// If the converter is null, the ParsingHtmlConverter will be used. If this fails,
-        /// a simple RegExHtmlConverter will be used.
         /// </summary>
         /// <param name="converter">
         /// The IHtmlConverter to be used for converting. If the converter is null, the 
-        /// ParsingHtmlConverter will be used. If this fails,  RegExHtmlConverter will be 
-        /// used. Usage of a parsing converter is recommended.
+        /// ParsingHtmlConverter will be used.
         /// </param>
         /// <returns>Returns the plain text representation of the HTML string.</returns>
         public string ConvertHtmlToPlainText(IHtmlConverter converter = null)
@@ -811,57 +808,31 @@ namespace MailMergeLib
         #region *** Serialization ***
 
         /// <summary>
-        /// Get the message as a serialized xml string.
+        /// Get the message as a serialized XML string.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns a string with XML markup.</returns>
         public string Serialize()
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
-            return serializer.Serialize(this);
+            return SerializationFactory.Serialize(this);
         }
 
         /// <summary>
-        /// Write a message to an xml stream.
+        /// Write a message to an XML stream.
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="encoding"></param>
         public void Serialize(Stream stream, System.Text.Encoding encoding)
         {
-            Serialize(new StreamWriter(stream, encoding), true);
+            SerializationFactory.Serialize(this, stream, encoding);
         }
 
         /// <summary>
-        /// Write message to a file.
+        /// Write message to an XML file.
         /// </summary>
         /// <param name="filename"></param>
         public void Serialize(string filename)
         {
-            using (var fs = new FileStream(filename, FileMode.Create))
-            {
-                using (var sr = new StreamWriter(fs))
-                {
-                    Serialize(sr, false);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Write message with a StreamWriter.
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-        private void Serialize(TextWriter writer, bool isStream)
-        {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
-            serializer.Serialize(this, writer);
-            writer.Flush();
-
-            if (isStream) return;
-
-#if NET40 || NET45
-            writer.Close();
-#endif
-            writer.Dispose();
+            SerializationFactory.Serialize(this, filename);
         }
 
         /// <summary>
@@ -871,8 +842,7 @@ namespace MailMergeLib
         /// <returns></returns>
         public static MailMergeMessage Deserialize(string xml)
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
-            return (MailMergeMessage) serializer.Deserialize(xml);
+            return SerializationFactory.Deserialize<MailMergeMessage>(xml);
         }
 
         /// <summary>
@@ -892,13 +862,7 @@ namespace MailMergeLib
         /// <param name="encoding"></param>
         public static MailMergeMessage Deserialize(string filename, System.Text.Encoding encoding)
         {
-            using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                using (var sr = new StreamReader(fs, encoding))
-                {
-                    return Deserialize(sr, false);
-                }
-            }
+            return SerializationFactory.Deserialize<MailMergeMessage>(filename, encoding);
         }
 
         /// <summary>
@@ -909,18 +873,7 @@ namespace MailMergeLib
         /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
         private static MailMergeMessage Deserialize(StreamReader reader, bool isStream)
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
-            reader.BaseStream.Position = 0;
-            var str = reader.ReadToEnd();
-            var s = (MailMergeMessage) serializer.Deserialize(str);
-
-            if (isStream) return s;
-#if NET40 || NET45
-            reader.Close();
-#endif
-            reader.Dispose();
-
-            return s;
+            return SerializationFactory.Deserialize<MailMergeMessage>(reader, isStream);
         }
 
         #endregion

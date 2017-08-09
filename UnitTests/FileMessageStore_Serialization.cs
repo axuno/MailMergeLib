@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MailMergeLib.MessageStore;
 using NUnit.Framework;
 
@@ -27,7 +28,7 @@ namespace UnitTests
             foreach (var info in messageInfos)
             {
                 // messageInfos come from fast xml scan in MessageInfoBase, Info of the Messsage comes from YAXLib deserialization
-                Assert.AreEqual(info, info.LoadMessage().Info);
+                Assert.AreEqual(info, info.LoadMessage(Encoding.UTF8).Info);
             }
         }
 

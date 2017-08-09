@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using YAXLib;
 
@@ -9,6 +10,11 @@ namespace MailMergeLib.Serialization
         public void SerializeToAttribute(string objectToSerialize, XAttribute attrToFill)
         {
             throw new NotImplementedException();
+
+            var several = new Dictionary<string, object>()
+            {
+                {"Recipient", new Dictionary<string, string>() {{"Email", "sample@example.com"}, {"Name", "John Specimen"}}}
+            };
         }
 
         public void SerializeToElement(string objectToSerialize, XElement elemToFill)

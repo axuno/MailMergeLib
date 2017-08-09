@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using MailMergeLib.Serialization;
 using YAXLib;
 
 namespace MailMergeLib.Templates
@@ -96,14 +98,44 @@ namespace MailMergeLib.Templates
             }
         }
 
+        #region *** Serialization ***
+
         /// <summary>
-        /// Serialize this object to XML.
+        /// Serialize <see cref="Templates"/> to XML.
         /// </summary>
         /// <returns>Returns a string with XML markup.</returns>
         public string Serialize()
         {
-            var serializer = new YAXSerializer(typeof(Templates));
-            return serializer.Serialize(this);
+            return SerializationFactory.Serialize<Templates>(this);
+        }
+
+        /// <summary>
+        /// Write <see cref="Templates"/> to an XML stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        public void Serialize(Stream stream, System.Text.Encoding encoding)
+        {
+            Serialize(new StreamWriter(stream, encoding), true);
+        }
+
+        /// <summary>
+        /// Write <see cref="Templates"/> to a file.
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Serialize(string filename)
+        {
+            SerializationFactory.Serialize(this, filename);
+        }
+
+        /// <summary>
+        /// Write <see cref="Templates"/> with a StreamWriter.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
+        private void Serialize(TextWriter writer, bool isStream)
+        {
+            SerializationFactory.Serialize(this, writer, isStream);
         }
 
         /// <summary>
@@ -113,9 +145,30 @@ namespace MailMergeLib.Templates
         /// <returns>Returns an instance of <see cref="Templates"/>.</returns>
         public static Templates Deserialize(string xml)
         {
-            var serializer = new YAXSerializer(typeof(Templates));
-            return (Templates) serializer.Deserialize(xml);
+            return SerializationFactory.Deserialize<Templates>(xml);
         }
+
+        /// <summary>
+        /// Reads <see cref="Templates"/> from an XML stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        public static Templates Deserialize(Stream stream, System.Text.Encoding encoding)
+        {
+            return SerializationFactory.Deserialize<Templates>(new StreamReader(stream, encoding), true);
+        }
+
+        /// <summary>
+        /// Reads <see cref="Templates"/> from an XML file.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="encoding"></param>
+        public static Templates Deserialize(string filename, System.Text.Encoding encoding)
+        {
+            return SerializationFactory.Deserialize<Templates>(filename, encoding);
+        }
+        
+        #endregion
 
         /// <summary>
         /// Compares the Templates with an other instance of Templates for equality.

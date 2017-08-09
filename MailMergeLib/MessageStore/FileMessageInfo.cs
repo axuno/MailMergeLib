@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using MailMergeLib.Serialization;
 
 namespace MailMergeLib.MessageStore
@@ -18,10 +19,9 @@ namespace MailMergeLib.MessageStore
         /// Deserializes the <see cref="MailMergeMessage"/> and returns a new message object.
         /// </summary>
         /// <returns>Returns the deserialized object from the <see cref="MessageFile"/>.</returns>
-        public override MailMergeMessage LoadMessage()
+        public override MailMergeMessage LoadMessage(Encoding encoding)
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeMessage));
-            return (MailMergeMessage) serializer.DeserializeFromFile(MessageFile.FullName);
+            return SerializationFactory.Deserialize<MailMergeMessage>(MessageFile.FullName, encoding);
         }
     }
 }

@@ -143,7 +143,6 @@ namespace UnitTests
             };
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "{FromAddr}"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{ToAddr}"));
-
             variables = new Dictionary<string, string>() { { "FirstName", "Jane" }, { "FromAddr", "from@example.com" }, { "ToAddr", "to@example.com" } };
 
             return mmm;

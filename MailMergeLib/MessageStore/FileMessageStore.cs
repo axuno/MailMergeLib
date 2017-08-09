@@ -81,8 +81,7 @@ namespace MailMergeLib.MessageStore
         /// <returns></returns>
         public string Serialize()
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(FileMessageStore));
-            return serializer.Serialize(this);
+            return SerializationFactory.Serialize(this);
         }
 
         /// <summary>
@@ -101,13 +100,7 @@ namespace MailMergeLib.MessageStore
         /// <param name="filename"></param>
         public void Serialize(string filename)
         {
-            using (var fs = new FileStream(filename, FileMode.Create))
-            {
-                using (var sr = new StreamWriter(fs))
-                {
-                    Serialize(sr, false);
-                }
-            }
+            SerializationFactory.Serialize(this, filename);
         }
 
         /// <summary>
@@ -117,16 +110,7 @@ namespace MailMergeLib.MessageStore
         /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
         private void Serialize(TextWriter writer, bool isStream)
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(FileMessageStore));
-            serializer.Serialize(this, writer);
-            writer.Flush();
-
-            if (isStream) return;
-
-#if NET40 || NET45
-            writer.Close();
-#endif
-            writer.Dispose();
+            SerializationFactory.Serialize(this, writer, isStream);
         }
 
         /// <summary>
@@ -136,8 +120,7 @@ namespace MailMergeLib.MessageStore
         /// <returns></returns>
         public static FileMessageStore Deserialize(string xml)
         {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(FileMessageStore));
-            return (FileMessageStore)serializer.Deserialize(xml);
+            return SerializationFactory.Deserialize<FileMessageStore>(xml);
         }
 
         /// <summary>
@@ -147,7 +130,7 @@ namespace MailMergeLib.MessageStore
         /// <param name="encoding"></param>
         public static FileMessageStore Deserialize(Stream stream, System.Text.Encoding encoding)
         {
-            return Deserialize(new StreamReader(stream, encoding), true);
+            return SerializationFactory.Deserialize<FileMessageStore>(stream, encoding);
         }
 
         /// <summary>
@@ -157,34 +140,7 @@ namespace MailMergeLib.MessageStore
         /// <param name="encoding"></param>
         public static FileMessageStore Deserialize(string filename, System.Text.Encoding encoding)
         {
-            using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                using (var sr = new StreamReader(fs, encoding))
-                {
-                    return Deserialize(sr, false);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Reads a message store xml with a StreamReader.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <returns>Returns a message store instance</returns>
-        /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-        private static FileMessageStore Deserialize(StreamReader reader, bool isStream)
-        {
-            var serializer = SerializationFactory.GetStandardSerializer(typeof(FileMessageStore));
-            reader.BaseStream.Position = 0;
-            var str = reader.ReadToEnd();
-            var s = (FileMessageStore)serializer.Deserialize(str);
-
-            if (isStream) return s;
-#if NET40 || NET45
-            reader.Close();
-#endif
-            reader.Dispose();
-            return s;
+            return SerializationFactory.Deserialize<FileMessageStore>(filename, encoding);
         }
 
         #endregion
