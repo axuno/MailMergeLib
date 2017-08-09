@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MailMergeLib.Serialization;
 using YAXLib;
 
@@ -98,9 +99,9 @@ namespace MailMergeLib.MessageStore
         /// Write message store to a file.
         /// </summary>
         /// <param name="filename"></param>
-        public void Serialize(string filename)
+        public void Serialize(string filename, Encoding encoding)
         {
-            SerializationFactory.Serialize(this, filename);
+            SerializationFactory.Serialize(this, filename, encoding);
         }
 
         /// <summary>

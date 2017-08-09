@@ -47,7 +47,6 @@ namespace UnitTests
         [Test]
         public void SerializeNewMailMergeMessage()
         {
-            new MailMergeMessage().Serialize(@"C:\Temp\NewMMM.xml");
             Assert.DoesNotThrow(() => new MailMergeMessage().Serialize()); 
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MailMergeLib.MessageStore;
 using MailMergeLib.Serialization;
 using MailMergeLib.SmartFormatMail.Extensions;
@@ -830,9 +831,10 @@ namespace MailMergeLib
         /// Write message to an XML file.
         /// </summary>
         /// <param name="filename"></param>
-        public void Serialize(string filename)
+        /// <param name="encoding"></param>
+        public void Serialize(string filename, Encoding encoding)
         {
-            SerializationFactory.Serialize(this, filename);
+            SerializationFactory.Serialize(this, filename, encoding);
         }
 
         /// <summary>

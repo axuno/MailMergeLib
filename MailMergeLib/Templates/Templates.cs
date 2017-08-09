@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MailMergeLib.Serialization;
 using YAXLib;
 
@@ -123,9 +124,10 @@ namespace MailMergeLib.Templates
         /// Write <see cref="Templates"/> to a file.
         /// </summary>
         /// <param name="filename"></param>
-        public void Serialize(string filename)
+        /// <param name="encoding"></param>
+        public void Serialize(string filename, Encoding encoding)
         {
-            SerializationFactory.Serialize(this, filename);
+            SerializationFactory.Serialize(this, filename, encoding);
         }
 
         /// <summary>

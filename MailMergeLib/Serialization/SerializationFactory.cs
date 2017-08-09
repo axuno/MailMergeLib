@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using YAXLib;
 
 namespace MailMergeLib.Serialization
@@ -56,11 +57,12 @@ namespace MailMergeLib.Serialization
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="filename"></param>
-        internal static void Serialize<T>(T obj, string filename)
+        /// <param name="encoding"></param>
+        internal static void Serialize<T>(T obj, string filename, Encoding encoding)
         {
             using (var fs = new FileStream(filename, FileMode.Create))
             {
-                using (var sr = new StreamWriter(fs))
+                using (var sr = new StreamWriter(fs, encoding))
                 {
                     Serialize<T>(obj, sr, false);
                 }
@@ -103,7 +105,7 @@ namespace MailMergeLib.Serialization
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="encoding"></param>
-        internal static T Deserialize<T>(Stream stream, System.Text.Encoding encoding)
+        internal static T Deserialize<T>(Stream stream, Encoding encoding)
         {
             return Deserialize<T>(new StreamReader(stream, encoding), true);
         }
