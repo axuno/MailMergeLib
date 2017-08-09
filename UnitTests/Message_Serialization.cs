@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 using MailMergeLib;
+using MailMergeLib.Templates;
 
 namespace UnitTests
 {
@@ -48,6 +49,29 @@ namespace UnitTests
         public void SerializeNewMailMergeMessage()
         {
             Assert.DoesNotThrow(() => new MailMergeMessage().Serialize()); 
+        }
+
+        [Test]
+        public void SerializeTemplates()
+        {
+            var templates = new Templates
+            {
+                new Template()
+                {
+                    Name = "TestTemplate",
+                    Text = new Parts
+                    {
+                        new Part(PartType.Plain, "key1", "some text"),
+                        new Part(PartType.Plain, "key2", "other text")
+                    }
+                }
+            };
+            var result = templates.Serialize();
+            var back = new MailMergeMessage();
+            back.Templates.AddRange(Templates.Deserialize(result));
+
+            Assert.True(templates.Equals(back.Templates));
+            Assert.AreEqual(templates.Serialize(), back.Templates.Serialize());
         }
     }
 }
