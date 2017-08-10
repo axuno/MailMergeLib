@@ -13,14 +13,14 @@ namespace UnitTests
         [Test]
         public void SerializeDeserialize()
         {
-            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { "Msg*.xml" });
+            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { "Msg*.xml" }, Encoding.UTF8);
             Assert.AreEqual(fms, FileMessageStore.Deserialize(fms.Serialize()));
         }
 
         [Test]
         public void GetMessageInfosFromFiles()
         {
-            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] {"Msg*.xml"});
+            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] {"Msg*.xml"}, Encoding.UTF8);
             var messageInfos = fms.ScanForMessages().ToList();
 
             Assert.AreEqual(2, messageInfos.Count);
@@ -28,14 +28,14 @@ namespace UnitTests
             foreach (var info in messageInfos)
             {
                 // messageInfos come from fast xml scan in MessageInfoBase, Info of the Messsage comes from YAXLib deserialization
-                Assert.AreEqual(info, info.LoadMessage(Encoding.UTF8).Info);
+                Assert.AreEqual(info, info.LoadMessage().Info);
             }
         }
 
         [Test]
         public void NoMessageFilesFound()
         {
-            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { Guid.NewGuid().ToString("N") });
+            var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { Guid.NewGuid().ToString("N")}, Encoding.UTF8);
             var messageInfos = fms.ScanForMessages().ToList();
             Assert.AreEqual(0, messageInfos.Count);
 

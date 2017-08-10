@@ -822,7 +822,7 @@ namespace MailMergeLib
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="encoding"></param>
-        public void Serialize(Stream stream, System.Text.Encoding encoding)
+        public void Serialize(Stream stream, Encoding encoding)
         {
             SerializationFactory.Serialize(this, stream, encoding);
         }
@@ -852,7 +852,7 @@ namespace MailMergeLib
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="encoding"></param>
-        public static MailMergeMessage Deserialize(Stream stream, System.Text.Encoding encoding)
+        public static MailMergeMessage Deserialize(Stream stream, Encoding encoding)
         {
             return Deserialize(new StreamReader(stream, encoding), true);
         }
@@ -862,7 +862,7 @@ namespace MailMergeLib
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="encoding"></param>
-        public static MailMergeMessage Deserialize(string filename, System.Text.Encoding encoding)
+        public static MailMergeMessage Deserialize(string filename, Encoding encoding)
         {
             return SerializationFactory.Deserialize<MailMergeMessage>(filename, encoding);
         }

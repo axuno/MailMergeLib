@@ -17,18 +17,38 @@ namespace MailMergeLib.MessageStore
         /// Constructor of the <see cref="FileMessageStore"/> class.
         /// </summary>
         public FileMessageStore()
+        {}
+
+        /// <summary>
+        /// The <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s.
+        /// Used for serialization. It is the string representation of <see cref="MessageEncoding"/>.
+        /// </summary>
+        [YAXSerializableField]
+        [YAXSerializeAs("MessageEncoding")]
+        private string MessageEncodingName
         {
+            get => MessageEncoding.WebName;
+            set => MessageEncoding = Encoding.GetEncoding(value);
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s from the file system.
+        /// </summary>
+        /// <remarks><see cref="MessageEncoding"/> will also be used by <see cref="FileMessageInfo"/></remarks>
+        [YAXDontSerialize]
+        public Encoding MessageEncoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         /// Constructor of the <see cref="FileMessageStore"/> class.
         /// </summary>
         /// <param name="searchFolders"></param>
         /// <param name="searchPatterns"></param>
-        public FileMessageStore(string[] searchFolders, string[] searchPatterns)
+        /// <param name="encoding">The <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s.</param>
+        public FileMessageStore(string[] searchFolders, string[] searchPatterns, Encoding encoding) : this()
         {
             SearchFolders = searchFolders;
             SearchPatterns = searchPatterns;
+            MessageEncoding = encoding;
         }
 
         /// <summary>
@@ -60,7 +80,8 @@ namespace MailMergeLib.MessageStore
                     Description = info.Description,
                     Comments = info.Comments,
                     Data = info.Data,
-                    MessageFile = fileInfo
+                    MessageFile = fileInfo,
+                    MessageEncoding = MessageEncoding
                 };
                 yield return mi;
             }
