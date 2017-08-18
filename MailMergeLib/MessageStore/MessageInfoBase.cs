@@ -126,6 +126,7 @@ namespace MailMergeLib.MessageStore
 
         private static IMessageInfo ReadInfo(XmlReader xmlReader)
         {
+            // ReSharper disable once InconsistentNaming
             MessageInfo Info = null;
             while (xmlReader.ReadToFollowing(nameof(Info)) && xmlReader.Depth == 1)
             {

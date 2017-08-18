@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using NUnit.Framework;
 using MailMergeLib;
-using MailMergeLib.Templates;
+using MailMergeLib.SmartFormatMail;
 
 namespace UnitTests
 {
@@ -101,6 +102,92 @@ namespace UnitTests
                 Assert.IsFalse(exceptions.InnerExceptions.Any(e => e is MailMergeMessage.AttachmentException));
 
                 Console.WriteLine("Exceptions for missing attachment files suppressed.");
+            }
+        }
+
+        [Test]
+        public void MessagesFromDataRows()
+        {
+            var tbl = new DataTable();
+            tbl.Columns.Add("Email", typeof(string));
+            tbl.Columns.Add("Continent", typeof(string));
+            tbl.Rows.Add("test@example.com", "Europe");
+            tbl.Rows.Add("2ndRow@axample.com", "Asia");
+            tbl.Rows.Add("3ndRow@axample.com", "America");
+            var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+
+            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
+
+            var i = 0;
+            foreach (var mimeMessage in mmm.GetMimeMessages<DataRow>(tbl.Rows.OfType<DataRow>()))
+            {
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(tbl.Rows[i]["Email"].ToString()));
+                Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", tbl.Rows[i]["Email"].ToString()).Replace("{Continent}", tbl.Rows[i]["Continent"].ToString())));
+                MailMergeMessage.DisposeFileStreams(mimeMessage);
+                i++;
+            }
+        }
+
+        [Test]
+        public void MessagesFromListOfSmartObjects()
+        {
+            var dataList = new List<SmartObjects>();
+            var so1 = new SmartObjects(new []{new Dictionary<string, string>(){{"Email", "test@example.com"}}, new Dictionary<string, string>() { { "Continent", "Europe" } } });
+            var so2 = new SmartObjects(new[] { new Dictionary<string, string>() { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string>() { { "Continent", "Asia" } } });
+            var so3 = new SmartObjects(new[] { new Dictionary<string, string>() { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string>() { { "Continent", "America" } } });
+
+            dataList.AddRange(new []{so1, so2, so3});
+
+            var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+
+            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
+
+            var i = 0;
+            foreach (var mimeMessage in mmm.GetMimeMessages<SmartObjects>(dataList))
+            {
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(((Dictionary<string, string>)dataList[i][0])["Email"]));
+                Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", ((Dictionary<string, string>)dataList[i][0])["Email"]).Replace("{Continent}", ((Dictionary<string, string>)dataList[i][1])["Continent"])));
+                MailMergeMessage.DisposeFileStreams(mimeMessage);
+                i++;
+            }
+        }
+
+        private class Recipient
+        {
+            public string Name { get; set; }
+            public string Email { get; set; }
+
+        }
+
+        [Test]
+        public void MessagesFromList()
+        {
+            var recipients = new List<Recipient>();
+            for (var i = 0; i < 10; i++)
+            {
+                recipients.Add(new Recipient() { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
+            }
+
+            var mmm = new MailMergeMessage("Get MimeMessages Test", string.Empty, "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
+            mmm.ConvertHtmlToPlainText();
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+
+            var cnt = 0;
+            foreach (var mimeMessage in mmm.GetMimeMessages<Recipient>(recipients))
+            {
+                Assert.IsTrue(mimeMessage.TextBody == string.Format($"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})"));
+                Assert.IsTrue(mimeMessage.HtmlBody.Contains(string.Format($"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})")));
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(recipients[cnt].Name) && mimeMessage.To.ToString().Contains(recipients[cnt].Email));
+                MailMergeMessage.DisposeFileStreams(mimeMessage);
+                cnt++;
+
+                // The message could be sent using the low-level API using a configured SmtpClient:
+                // new SmtpClient().Send(FormatOptions.Default, mimeMessage);
             }
         }
     }

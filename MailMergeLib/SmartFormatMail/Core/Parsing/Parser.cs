@@ -216,7 +216,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         currentPlaceholder = new Placeholder(Settings, current, i, nestedDepth);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
-                        operatorIndex = i+1;
+                        operatorIndex = i + 1;
                         selectorIndex = 0;
                         namedFormatterStartIndex = -1;
                     }
@@ -242,7 +242,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         if (current.parent == null)
                         {
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i, i + 1);
-                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i+1, ParsingError.TooManyClosingBraces, Settings.ParseErrorAction != ErrorAction.ThrowError));
+                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i + 1, ParsingError.TooManyClosingBraces, Settings.ParseErrorAction != ErrorAction.ThrowError));
                             continue;
                         }
                         // End of the placeholder's Format:
@@ -252,17 +252,16 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         current = current.parent.parent;
                         namedFormatterStartIndex = -1;
                     }
-                    else if (c == CharLiteralEscapeChar || c ==_alternativeEscapeChar)
+                    else if ((c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals) || (_alternativeEscaping && c == _alternativeEscapeChar))
                     {
+                        namedFormatterStartIndex = -1;
+
                         // See that is the next character
                         var nextI = i + 1;
 
                         // **** Alternative brace escaping with { or } following the escape character ****
-                        if (_alternativeEscaping && nextI < length &&
-                            (format[nextI] == openingBrace || format[nextI] == closingBrace))
+                        if (nextI < length && (format[nextI] == openingBrace || format[nextI] == closingBrace))
                         {
-                            namedFormatterStartIndex = -1;
-
                             // Finish the last text item:
                             if (i != lastI)
                             {
@@ -328,7 +327,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                                 }
 
                             }
-                            
+
                             var nameIsEmpty = (namedFormatterStartIndex == i);
                             var missingClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1);
                             if (nameIsEmpty || missingClosingParenthesis)
@@ -345,7 +344,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                             if (namedFormatterOptionsStartIndex == -1)
                             {
                                 var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
-                                
+
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
                                 {
                                     parentPlaceholder.FormatterName = formatterName;
@@ -384,7 +383,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                        {   
+                        {
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
                             selectorIndex++;
                             operatorIndex = i;
@@ -514,14 +513,16 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             /// CTOR.
             /// </summary>
             internal ParsingErrorText()
-            {}
+            { }
 
             /// <summary>
             /// Gets the string representation of the ParsingError enum.
             /// </summary>
             /// <param name="parsingErrorKey"></param>
             /// <returns>The string representation of the ParsingError enum</returns>
-            public string this[ParsingError parsingErrorKey] { get { return _errors[parsingErrorKey]; }
+            public string this[ParsingError parsingErrorKey]
+            {
+                get { return _errors[parsingErrorKey]; }
             }
         }
 

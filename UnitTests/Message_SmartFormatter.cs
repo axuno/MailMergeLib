@@ -126,7 +126,7 @@ namespace UnitTests
             tbl.Columns.Add("Email", typeof(string));
             tbl.Columns.Add("Continent", typeof(string));
             tbl.Rows.Add("test@example.com", "Europe");
-            var row = tbl.Rows[0];
+            dataItem = tbl.Rows[0];
             text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
             // this is part of MailMergeMessage.GetMimeMessage() because MailSmartFormatter does not support TableRows on its own
             // dataItem = row.Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c]);
@@ -147,6 +147,7 @@ namespace UnitTests
 
             Assert.AreEqual(expected, result);
             Console.WriteLine("DataRow: passed");
+
 
             // ******** Parser error ********
             var parsingErrors = new List<string>();

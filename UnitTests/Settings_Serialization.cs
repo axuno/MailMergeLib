@@ -91,7 +91,6 @@ namespace UnitTests
             var inSettings = Settings.Deserialize(outMs, Encoding.UTF8);
 
             Assert.IsTrue(inSettings.SenderConfig.Equals(_outSettings.SenderConfig));
-
             outMs.Dispose();
         }
     }

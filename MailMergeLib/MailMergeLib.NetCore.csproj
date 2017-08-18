@@ -21,14 +21,16 @@
 
   <ItemGroup>
     <Compile Remove="Properties\**\*;SmartFormatMail\Properties\**\*;packages.*.config;" />
+    <None Remove="app.config" />
     <None Remove="MailMergeLib.Net40.nuget.targets" />
-    <None Include="App.config" />
+    <None Remove="packages.MailMergeLib.Net40.config" />
+    <None Remove="packages.MailMergeLib.Net45.config" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.9" />
-    <PackageReference Include="MailKit" Version="1.16.1" />
-    <PackageReference Include="MimeKit" Version="1.16.1" />
+    <PackageReference Include="MailKit" Version="1.18.0" />
+    <PackageReference Include="MimeKit" Version="1.18.0" />
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />

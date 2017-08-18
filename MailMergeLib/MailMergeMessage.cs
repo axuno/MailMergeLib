@@ -556,18 +556,33 @@ namespace MailMergeLib
         #region *** Public methods ***
 
         /// <summary>
-        /// Converts the HtmlText property into plain text (without tags or html entities)
+        /// Converts the <see cref="HtmlText"/> into plain text (without tags or html entities)
+        /// and writes it to the <see cref="PlainText"/> property.
         /// </summary>
         /// <param name="converter">
         /// The IHtmlConverter to be used for converting. If the converter is null, the 
-        /// ParsingHtmlConverter will be used.
+        /// <see cref="AngleSharpHtmlConverter"/> will be used.
         /// </param>
-        /// <returns>Returns the plain text representation of the HTML string.</returns>
-        public string ConvertHtmlToPlainText(IHtmlConverter converter = null)
+        public void ConvertHtmlToPlainText(IHtmlConverter converter = null)
         {
-            return converter == null
-                ? (new AngleSharpHtmlConverter()).ToPlainText(HtmlText)
+            PlainText = converter == null
+                ? new AngleSharpHtmlConverter().ToPlainText(HtmlText)
                 : converter.ToPlainText(HtmlText);
+        }
+
+        /// <summary>
+        /// Gets a list of MimeMessage representations of the MailMergeMessage for all items of the <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="dataSource"></param>
+        /// <returns>Returns all MailMessages ready to be sent by an SmtpClient.</returns>
+        /// <exception cref="MailMergeMessageException">Throws a general <see cref="MailMergeMessageException"/>, which contains a list of exceptions giving more details.</exception>
+        public IEnumerable<MimeMessage> GetMimeMessages<T>(IEnumerable<T> dataSource)
+        {
+            var dataSourceList = dataSource.ToList();
+            foreach (var dataItem in dataSourceList)
+            {
+                yield return GetMimeMessage(dataItem);
+            }
         }
 
         /// <summary>
@@ -579,7 +594,7 @@ namespace MailMergeLib
         /// For class instances it's allowed to use the name of parameterless methods; use method names WITHOUT parentheses.
         /// </param>
         /// <returns>Returns a MailMessage ready to be sent by an SmtpClient.</returns>
-        /// <exception cref="MailMergeMessageException">Throws a general MailMergeMessageException, which contains a list of exceptions giving more details.</exception>
+        /// <exception cref="MailMergeMessageException">Throws a general <see cref="MailMergeMessageException"/>, which contains a list of exceptions giving more details.</exception>
         public MimeMessage GetMimeMessage(object dataItem = default(object))
         {
             lock (SyncRoot)

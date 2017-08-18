@@ -40,11 +40,13 @@
     <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.9.9\lib\net45\AngleSharp.dll</HintPath>
     </Reference>
-    <Reference Include="MailKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>..\packages\MailKit.1.16.1\lib\net45\MailKit.dll</HintPath>
+    <Reference Include="MailKit">
+      <HintPath>..\packages\MailKit.1.18.0\lib\net45\MailKit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="MimeKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\packages\MimeKit.1.16.1\lib\net45\MimeKit.dll</HintPath>
+    <Reference Include="MimeKit">
+      <HintPath>..\packages\MimeKit.1.18.0\lib\net45\MimeKit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -139,6 +141,7 @@
     <Compile Include="Templates\TemplateException.cs" />
     <Compile Include="Templates\Templates.cs" />
     <Compile Include="UriScheme.cs" />
+    <None Include="app.config" />
     <None Include="MailMergeLib.snk" />
     <Compile Include="MailMergeSender.cs" />
     <Compile Include="SenderConfig.cs" />

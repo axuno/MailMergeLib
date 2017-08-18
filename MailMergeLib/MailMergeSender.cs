@@ -146,15 +146,6 @@ namespace MailMergeLib
 #endif
                         }
 
-                        try
-                        {
-                            smtpClient.Disconnect(true);
-                        }
-                        catch (Exception)
-                        {
-                            // don't care for exception when disconnecting,
-                            // because smptClient will be disposed immediately anyway
-                        }
                         smtpClient.ProtocolLogger?.Dispose();
                     }
                 }, _cancellationTokenSource.Token);
@@ -716,12 +707,12 @@ namespace MailMergeLib
             }
         }
 
-#endregion
+        #endregion
 
-        # region *** Events ***
+        #region *** Events ***
 
         /// <summary>
-        /// Event raising before sending a mail message.
+        /// Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
         /// </summary>
         public event EventHandler<MailMessageFailureEventArgs> OnMessageFailure;
 

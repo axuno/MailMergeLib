@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailMergeLib.Net45", "MailMergeLib\MailMergeLib.Net45.csproj", "{F6ABBAC7-F7B8-4010-BA9D-75495E35AA15}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailMergeLib.NetCore", "MailMergeLib\MailMergeLib.NetCore.csproj", "{B0333A74-843F-4E09-B0DD-F48B9A45E430}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailMergeLib.Net40", "MailMergeLib\MailMergeLib.Net40.csproj", "{5B3439A8-28ED-4D31-9DF4-84728E1176A1}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{F6ABBAC7-F7B8-4010-BA9D-75495E35AA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6ABBAC7-F7B8-4010-BA9D-75495E35AA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6ABBAC7-F7B8-4010-BA9D-75495E35AA15}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0333A74-843F-4E09-B0DD-F48B9A45E430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0333A74-843F-4E09-B0DD-F48B9A45E430}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0333A74-843F-4E09-B0DD-F48B9A45E430}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0333A74-843F-4E09-B0DD-F48B9A45E430}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5B3439A8-28ED-4D31-9DF4-84728E1176A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5B3439A8-28ED-4D31-9DF4-84728E1176A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B3439A8-28ED-4D31-9DF4-84728E1176A1}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
@@ -90,7 +92,92 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task SendSyncAndAsync()
+        public async Task AllSenderEvents()
+        {
+            var actualEvents = new ConcurrentStack<string>();
+            var expectedEvents = new ConcurrentStack<string>();
+
+            var mms = new MailMergeSender { Config = _settings.SenderConfig };
+            mms.Config.MaxNumOfSmtpClients = 1;
+
+            // Event raising before merging starts
+            mms.OnMergeBegin += (mailMergeSender, mergeBeginArgs) => { actualEvents.Push(nameof(mms.OnMergeBegin)); };
+            // Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
+            mms.OnMessageFailure += (mailMergeSender, messageFailureArgs) => { actualEvents.Push(nameof(mms.OnMessageFailure)); };
+
+            // Event raising before sending a single mail message starts
+            mms.OnBeforeSend += (smtpClient, beforeSendArgs) => { };
+
+            // Event raising right after the SmtpClient's connection to the server is up (but not yet authenticated).
+            mms.OnSmtpConnected += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpConnected)); };
+            // Event raising after the SmtpClient has authenticated on the server.
+            mms.OnSmtpAuthenticated += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpAuthenticated)); }; 
+            // Event raising after the SmtpClient has disconnected from the SMTP mail server.
+            mms.OnSmtpDisconnected += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpDisconnected)); };
+
+            // Event raising if sending a single mail message fails
+            mms.OnSendFailure += (smtpClient, sendFailureArgs) => { actualEvents.Push(nameof(mms.OnSendFailure)); };
+            // Event raising before sending a single mail message is finished
+            mms.OnAfterSend += (smtpClient, afterSendArgs) => { actualEvents.Push(nameof(mms.OnAfterSend)); };
+
+            // Event raising each time before and after a single message was sent
+            mms.OnMergeProgress += (mailMergeSender, progressArgs) => { actualEvents.Push(nameof(mms.OnMergeProgress)); };
+            // Event raising after merging is completed
+            mms.OnMergeComplete += (mailMergeSender, completedArgs) => { actualEvents.Push(nameof(mms.OnMergeComplete)); };
+
+            var recipients = new List<Recipient>();
+            for (var i = 0; i < 1; i++)
+            {
+                recipients.Add(new Recipient() { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
+            }
+
+            var mmm = new MailMergeMessage("Event tests", "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+
+            var sequenceOfExpectedEvents = new[] { nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnSmtpConnected), nameof(mms.OnAfterSend), nameof(mms.OnMergeProgress), nameof(mms.OnMergeComplete), nameof(mms.OnSmtpDisconnected) };
+
+            #region * Synchronous send method *
+
+            mms.Send(mmm, recipients);
+
+            expectedEvents.Clear();
+            expectedEvents.PushRange(sequenceOfExpectedEvents);
+
+            Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
+            // sequence of sync sending is predefined
+            for (var i = 0; i < actualEvents.Count; i++)
+            {
+                expectedEvents.TryPop(out string expected);
+                actualEvents.TryPop(out string actual);
+                Assert.AreEqual(expected, actual);
+            }
+
+            #endregion
+
+            #region * Async send method *
+
+            actualEvents.Clear();
+            expectedEvents.Clear();
+            expectedEvents.PushRange(sequenceOfExpectedEvents);
+
+            await mms.SendAsync(mmm, recipients);
+            Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
+
+            // sequence of async sending may be different from sync, but all events must exists
+            var sortedActual = actualEvents.OrderBy(e => e).ToArray();
+            var sortedExpected = expectedEvents.OrderBy(e => e).ToArray();
+
+            for (var i = 0; i < sortedActual.Length; i++)
+            {
+                Assert.AreEqual(sortedExpected[i], sortedActual[i]);
+            }
+
+            #endregion
+        }
+
+
+        [Test]
+        public async Task SendSyncAndAsyncPerformance()
         {
             // In this sample:
             // With 100,000 messages and 10 MaxNumOfSmtpClients async is about twice as fast as sync.
