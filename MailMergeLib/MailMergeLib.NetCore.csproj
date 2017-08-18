@@ -17,6 +17,13 @@
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <Version>5.3.0.0</Version>
+    <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
+    <PackageReleaseNotes />
+    <PackageTags>smtp mime mail email merge template net40 net45 netcore c#</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
