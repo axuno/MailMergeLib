@@ -9,7 +9,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
     /// <summary>
     /// Template Formatter allows for registering reusable templates, and use them by name.
     /// </summary>
-    internal class TemplateFormatter : IFormatter
+    public class TemplateFormatter : IFormatter
     {
         private readonly SmartFormatter _formatter;
         private readonly IDictionary<string, Format> _templates;
