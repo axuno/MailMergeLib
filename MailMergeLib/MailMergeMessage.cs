@@ -622,7 +622,7 @@ namespace MailMergeLib
                     exceptions.Add(new AddressException("No recipients.", _badMailAddr, null));
                 if (string.IsNullOrWhiteSpace(mimeMessage.From.ToString()))
                     exceptions.Add(new AddressException("No from address.", _badMailAddr, null));
-                if (HtmlText.Length == 0 && PlainText.Length == 0 && Subject.Length == 0 && !FileAttachments.Any() &&
+                if (string.IsNullOrEmpty(HtmlText) && string.IsNullOrEmpty(PlainText) && string.IsNullOrEmpty(Subject) && !FileAttachments.Any() &&
                     !InlineAttachments.Any() && !StringAttachments.Any() && !StreamAttachments.Any())
                     exceptions.Add(new EmtpyContentException("Message is empty.", null));
                 if (_badMailAddr.Count > 0)
