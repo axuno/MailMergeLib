@@ -60,6 +60,7 @@ namespace MailMergeLib
         {
             Config.IgnoreIllegalRecipientAddresses = true;
             Config.Priority = MessagePriority.Normal;
+            Subject = PlainText = HtmlText = string.Empty;
 
             if (Config.SmartFormatterConfig == null) Config.SmartFormatterConfig = new SmartFormatterConfig();
 
@@ -91,7 +92,6 @@ namespace MailMergeLib
             : this(subject)
         {
             PlainText = plainText;
-            HtmlText = string.Empty;
         }
 
         /// <summary>
