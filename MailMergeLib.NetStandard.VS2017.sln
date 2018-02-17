@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailMergeLib.NetCore", "MailMergeLib\MailMergeLib.NetCore.csproj", "{B0333A74-843F-4E09-B0DD-F48B9A45E430}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailMergeLib.NetStandard", "MailMergeLib\MailMergeLib.NetStandard.csproj", "{B0333A74-843F-4E09-B0DD-F48B9A45E430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08CE7487-B55B-4CD2-9F89-48283EDC3994}
 	EndGlobalSection
 EndGlobal

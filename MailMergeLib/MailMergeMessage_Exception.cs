@@ -90,7 +90,21 @@ namespace MailMergeLib
                 MissingVariable = missingVariable;
             }
 
-            public HashSet<string> MissingVariable { get; } = new HashSet<string>();
+            public HashSet<string> MissingVariable { get; }
+        }
+
+        #endregion
+
+        #region Nested type: ParseException
+
+        /// <summary>
+        /// Mail merge exception for not properly formatted templates (e.g. missing closing brace).
+        /// </summary>
+        public class ParseException : Exception
+        {
+            public ParseException(string message, Exception innerException)
+                : base(message, innerException)
+            { }
         }
 
         #endregion

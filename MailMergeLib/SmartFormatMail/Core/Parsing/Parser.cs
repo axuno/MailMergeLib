@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
+
 
 namespace MailMergeLib.SmartFormatMail.Core.Parsing
 {
@@ -28,7 +30,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
         #region: Settings :
 
         /// <summary>
-        /// Gets or sets the <seealso cref="Core.Settings.SmartSettings"/> for Smart.Format
+        /// Gets or sets the <seealso cref="SmartSettings"/> for Smart.Format
         /// </summary>
         public SmartSettings Settings { get; internal set; } = new SmartSettings();
 
@@ -216,7 +218,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         currentPlaceholder = new Placeholder(Settings, current, i, nestedDepth);
                         current.Items.Add(currentPlaceholder);
                         current.HasNested = true;
-                        operatorIndex = i + 1;
+                        operatorIndex = i+1;
                         selectorIndex = 0;
                         namedFormatterStartIndex = -1;
                     }
@@ -242,7 +244,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         if (current.parent == null)
                         {
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TooManyClosingBraces], i, i + 1);
-                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i + 1, ParsingError.TooManyClosingBraces, Settings.ParseErrorAction != ErrorAction.ThrowError));
                             continue;
                         }
                         // End of the placeholder's Format:
@@ -252,7 +253,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         current = current.parent.parent;
                         namedFormatterStartIndex = -1;
                     }
-                    else if ((c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals) || (_alternativeEscaping && c == _alternativeEscapeChar))
+                    else if ((c == CharLiteralEscapeChar && Settings.ConvertCharacterStringLiterals) || (_alternativeEscaping && c ==_alternativeEscapeChar))
                     {
                         namedFormatterStartIndex = -1;
 
@@ -327,7 +328,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                                 }
 
                             }
-
+                            
                             var nameIsEmpty = (namedFormatterStartIndex == i);
                             var missingClosingParenthesis = (namedFormatterOptionsStartIndex != -1 && namedFormatterOptionsEndIndex == -1);
                             if (nameIsEmpty || missingClosingParenthesis)
@@ -344,7 +345,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                             if (namedFormatterOptionsStartIndex == -1)
                             {
                                 var formatterName = format.Substring(namedFormatterStartIndex, i - namedFormatterStartIndex);
-
+                                
                                 if (FormatterNameExists(formatterName, formatterExtensionNames))
                                 {
                                     parentPlaceholder.FormatterName = formatterName;
@@ -383,7 +384,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                     {
                         // Add the selector:
                         if (i != lastI)
-                        {
+                        {   
                             currentPlaceholder.Selectors.Add(new Selector(Settings, format, lastI, i, operatorIndex, selectorIndex));
                             selectorIndex++;
                             operatorIndex = i;
@@ -402,7 +403,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         {
                             // There are trailing operators. For now, this is an error.
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
-                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, operatorIndex, i + 1, ParsingError.TrailingOperatorsInSelector, Settings.ParseErrorAction != ErrorAction.ThrowError));
                         }
                         lastI = i + 1;
 
@@ -423,7 +423,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         {
                             // There are trailing operators.  For now, this is an error.
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.TrailingOperatorsInSelector], operatorIndex, i);
-                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, operatorIndex, i, ParsingError.TrailingOperatorsInSelector, Settings.ParseErrorAction != ErrorAction.ThrowError));
                         }
                         lastI = i + 1;
 
@@ -445,7 +444,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                         {
                             // Invalid character in the selector.
                             parsingErrors.AddIssue(current, parsingErrorText[ParsingError.InvalidCharactersInSelector], i, i + 1);
-                            OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, i, i + 1, ParsingError.InvalidCharactersInSelector, Settings.ParseErrorAction != ErrorAction.ThrowError));
                         }
                     }
                 }
@@ -459,7 +457,6 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             if (current.parent != null || currentPlaceholder != null)
             {
                 parsingErrors.AddIssue(current, parsingErrorText[ParsingError.MissingClosingBrace], format.Length, format.Length);
-                OnParsingFailure?.Invoke(this, new ParsingErrorEventArgs(current.RawText, format.Length, format.Length, ParsingError.MissingClosingBrace, Settings.ParseErrorAction != ErrorAction.ThrowError));
                 current.endIndex = format.Length;
                 while (current.parent != null)
                 {
@@ -468,8 +465,15 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
                 }
             }
 
-            // Check if there were any parsing errors:
-            if (parsingErrors.HasIssues && Settings.ParseErrorAction == ErrorAction.ThrowError) throw parsingErrors;
+            // Check for any parsing errors:
+            if (parsingErrors.HasIssues)
+            {
+                OnParsingFailure?.Invoke(this,
+                    new ParsingErrorEventArgs(parsingErrors, Settings.ParseErrorAction == ErrorAction.ThrowError));
+
+                if (Settings.ParseErrorAction == ErrorAction.ThrowError)
+                    throw parsingErrors;
+            }
 
             return result;
         }
@@ -513,16 +517,14 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             /// CTOR.
             /// </summary>
             internal ParsingErrorText()
-            { }
+            {}
 
             /// <summary>
             /// Gets the string representation of the ParsingError enum.
             /// </summary>
             /// <param name="parsingErrorKey"></param>
             /// <returns>The string representation of the ParsingError enum</returns>
-            public string this[ParsingError parsingErrorKey]
-            {
-                get { return _errors[parsingErrorKey]; }
+            public string this[ParsingError parsingErrorKey] { get { return _errors[parsingErrorKey]; }
             }
         }
 

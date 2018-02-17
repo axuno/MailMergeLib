@@ -20,11 +20,14 @@ namespace MailMergeLib
     public partial class MailMergeMessage : IDisposable
     {
         #region *** Private fields ***
-        
+
         private MimeEntity _textMessagePart;  // plain text and/or html text, maybe with inline attachments
         private List<MimePart> _attachmentParts;
 
         // backing fields for properties are necessary for private setters used in deserialization!
+        private string _subject = string.Empty;
+        private string _plainText = string.Empty;
+        private string _htmlText = string.Empty;
         private MailMergeAddressCollection _mailMergeAddresses;
         private HashSet<FileAttachment> _fileAttachments = new HashSet<FileAttachment>();
         private List<StreamAttachment> _streamAttachments = new List<StreamAttachment>();
@@ -48,7 +51,8 @@ namespace MailMergeLib
         private readonly HashSet<string> _badMailAddr = new HashSet<string>();
         private readonly HashSet<string> _badInlineFiles = new HashSet<string>();
         private readonly HashSet<string> _badVariableNames = new HashSet<string>();
-        
+        private readonly List<ParseException> _parseExceptions = new List<ParseException>();
+
         #endregion
 
         #region *** Constructor ***
@@ -60,16 +64,8 @@ namespace MailMergeLib
         {
             Config.IgnoreIllegalRecipientAddresses = true;
             Config.Priority = MessagePriority.Normal;
-            Subject = PlainText = HtmlText = string.Empty;
-
-            if (Config.SmartFormatterConfig == null) Config.SmartFormatterConfig = new SmartFormatterConfig();
-
-            SmartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig);
+            SmartFormatter = GetConfiguredMailSmartFormatter();
             Config.SmartFormatterConfig.OnConfigChanged += SmartFormatter.SetConfig;
-            // Smart.Format("{Name:choose(null|):N/A|empty|{Name}}", variable), where abc.Name NULL, string.Emtpy or a string
-
-            SmartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
-
             _mailMergeAddresses = new MailMergeAddressCollection(this);
         }
 
@@ -184,7 +180,7 @@ namespace MailMergeLib
         /// </summary>
         [YAXSerializableField]
         [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-        public string Subject { get; set; }
+        public string Subject { get => _subject; set => _subject = value ?? string.Empty; }
 
         /// <summary>
         /// Gets or sets the mail message plain text content.
@@ -192,7 +188,7 @@ namespace MailMergeLib
         [YAXSerializableField]
         [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
         [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-        public string PlainText { get; set; }
+        public string PlainText { get => _plainText; set => _plainText = value ?? string.Empty; }
 
         /// <summary>
         /// Gets or sets the mail message HTML content.
@@ -200,7 +196,7 @@ namespace MailMergeLib
         [YAXSerializableField]
         [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
         [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-        public string HtmlText { get; set; }
+        public string HtmlText { get => _htmlText; set => _htmlText = value ?? string.Empty; }
 
         /// <summary>
         /// Gets a collection of type <see cref="MailMergeLib.Templates.Templates"/>.
@@ -297,46 +293,6 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        /// Replaces all variables in the text with their corresponding values.
-        /// Used for subject, body and attachment.
-        /// </summary>
-        /// <param name="text">Text to search and replace.</param>
-        /// <param name="dataItem"></param>
-        /// <returns>Returns the text with all variables replaced.</returns>
-        internal string SearchAndReplaceVars(string text, object dataItem)
-        {
-            if (text == null) return null;
-            SmartFormatter.SetConfig(Config?.SmartFormatterConfig); // make sure we use the latest settings
-            return SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
-        }
-
-        /// <summary>
-        /// Replaces all variables in the text with their corresponding values.
-        /// Filenames may contain backslashes which may not be interpreted as literals.
-        /// That's why "ConvertCharacterStringLiterals" must be false in this method.
-        /// </summary>
-        /// <param name="text">Text to search and replace.</param>
-        /// <param name="dataItem"></param>
-        /// <returns>Returns the text with all variables replaced.</returns>
-        internal string SearchAndReplaceVarsInFilename(string text, object dataItem)
-        {
-            if (text == null) return null;
-            var currentConfig = Config.SmartFormatterConfig;
-            var fileConfig = new SmartFormatterConfig
-            {
-                ConvertCharacterStringLiterals = false,
-                FormatErrorAction = SmartFormatter.Settings.FormatErrorAction,
-                ParseErrorAction = SmartFormatter.Settings.ParseErrorAction,
-                CaseSensitivity = SmartFormatter.Settings.CaseSensitivity
-            };
-
-            SmartFormatter.SetConfig(fileConfig);
-            var result = SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
-            SmartFormatter.SetConfig(currentConfig);
-            return result;
-        }
-
-        /// <summary>
         /// Adds external inline attachments (linked resources of the HTML body) of a mail message.
         /// They are normally generated automatically with all image sources pointing to local files,
         /// but with this method such files can be added as well.
@@ -359,8 +315,88 @@ namespace MailMergeLib
 
         #endregion
 
+        #region *** SmartFormat ***
+        private MailSmartFormatter GetConfiguredMailSmartFormatter()
+        {
+            if (Config.SmartFormatterConfig == null) Config.SmartFormatterConfig = new SmartFormatterConfig();
+
+            var smartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig);
+            // Smart.Format("{Name:choose(null|):N/A|empty|{Name}}", variable), where abc.Name NULL, string.Emtpy or a string
+
+            smartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
+            smartFormatter.Parser.OnParsingFailure += (sender, args) => { _parseExceptions.Add(new ParseException(args.Errors.MessageShort, args.Errors)); };
+            return smartFormatter;
+        }
+
+        /// <summary>
+        /// Replaces all variables in the text with their corresponding values.
+        /// Used for subject, body and attachment.
+        /// </summary>
+        /// <param name="text">Text to search and replace.</param>
+        /// <param name="dataItem"></param>
+        /// <returns>Returns the text with all variables replaced.</returns>
+        /// <remarks>
+        /// In case <see cref="SmartFormatMail.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
+        /// or <see cref="SmartFormatMail.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
+        /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
+        /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
+        /// </remarks>
+        internal string SearchAndReplaceVars(string text, object dataItem)
+        {
+            if (text == null) return null;
+            SmartFormatter.SetConfig(Config?.SmartFormatterConfig); // make sure we use the latest settings
+            try
+            {
+                return SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
+            }
+            catch (SmartFormatMail.Core.Parsing.ParsingErrors ex)
+            {
+                return text;
+            }
+            catch (SmartFormatMail.Core.Formatting.FormattingException)
+            {
+                return text;
+            }
+        }
+
+        /// <summary>
+        /// Replaces all variables in the text with their corresponding values.
+        /// Filenames may contain backslashes which may not be interpreted as literals.
+        /// That's why "ConvertCharacterStringLiterals" must be false in this method.
+        /// Uses new instances of <see cref="MailSmartFormatter"/> and <see cref="SmartFormatterConfig"/>.
+        /// </summary>
+        /// <param name="text">Text to search and replace.</param>
+        /// <param name="dataItem"></param>
+        /// <returns>Returns the text with all variables replaced.</returns>
+        /// <remarks>
+        /// In case <see cref="SmartFormatMail.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
+        /// or <see cref="SmartFormatMail.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
+        /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
+        /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
+        /// </remarks>
+        internal string SearchAndReplaceVarsInFilename(string text, object dataItem)
+        {
+            if (text == null) return null;
+            try
+            {
+                var filenameSmartFormatter = GetConfiguredMailSmartFormatter();
+                filenameSmartFormatter.Settings.ConvertCharacterStringLiterals = false;
+                return filenameSmartFormatter.Format(Config?.CultureInfo, text, dataItem);
+            }
+            catch (SmartFormatMail.Core.Parsing.ParsingErrors)
+            {
+                return text;
+            }
+            catch (SmartFormatMail.Core.Formatting.FormattingException)
+            {
+                return text;
+            }
+        }
+
+        #endregion
+
         #region *** Private Methods ***
-        
+
         /// <summary>
         /// Prepares the mail message subject:
         /// Replacing placeholders with their values and setting correct encoding.
@@ -448,7 +484,7 @@ namespace MailMergeLib
                 _badInlineFiles.Clear();
             }
         }
-        
+
         /// <summary>
         /// Registers html parts if they exist, otherwise the plain text parts
         /// </summary>
@@ -600,11 +636,11 @@ namespace MailMergeLib
             lock (SyncRoot)
             {
                 _badVariableNames.Clear();
-#if !FXCORE
+                _parseExceptions.Clear();
+#if !NETSTANDARD1_6
                 // convert DataRow to Dictionary<string, object>
-                if (dataItem is DataRow)
+                if (dataItem is DataRow row)
                 {
-                    var row = (DataRow) dataItem;
                     dataItem = row.Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c]);
                 }
 #endif
@@ -639,6 +675,8 @@ namespace MailMergeLib
                         new AttachmentException(
                             $"File attachment(s) missing or not readable: {string.Join(", ", _badAttachmentFiles.ToArray())}",
                             _badAttachmentFiles, null));
+                if (_parseExceptions.Count > 0)
+                    exceptions.AddRange(_parseExceptions);
                 if (_badVariableNames.Count > 0)
                     exceptions.Add(
                         new VariableException(
@@ -647,7 +685,7 @@ namespace MailMergeLib
 
                 // Finally throw general exception
                 if (exceptions.Count > 0)
-                    throw new MailMergeMessageException("Building of message failed with one or more exceptions.", exceptions, mimeMessage);
+                    throw new MailMergeMessageException("Building of message failed with one or more exceptions. See inner exceptions for details.", exceptions, mimeMessage);
 
                 if (_attachmentParts.Any())
                 {
@@ -666,7 +704,7 @@ namespace MailMergeLib
 
                 if (mimeMessage.Body == null)
                 {
-                    mimeMessage.Body = _textMessagePart ?? new TextPart("plain") {Text = string.Empty};
+                    mimeMessage.Body = _textMessagePart ?? new TextPart("plain") { Text = string.Empty };
                 }
 
                 return mimeMessage;
@@ -711,7 +749,7 @@ namespace MailMergeLib
         #endregion
 
         #region *** Private methods ***
-        
+
         /// <summary>
         /// Prepares all recipient address and the corresponding header fields of a mail message.
         /// </summary>
@@ -747,10 +785,10 @@ namespace MailMergeLib
                     {
                         mailboxAddr = mmAddr.GetMailAddress(this, dataItem);
                     }
-                    
+
                     if (Config.IgnoreIllegalRecipientAddresses && mailboxAddr == null)
                         continue;
-                    
+
                     switch (mmAddr.AddrType)
                     {
                         case MailAddressType.To:
@@ -932,7 +970,7 @@ namespace MailMergeLib
         {
             var hl1Dict = hl1.ToDictionary(header => header.Id, header => header.Value);
             var h21Dict = hl2.ToDictionary(header => header.Id, header => header.Value);
-            
+
             // not any enty missing in hl1Dict, nor in the other list
             return !hl1Dict.Except(h21Dict).Union(h21Dict.Except(hl1Dict)).Any();
         }
@@ -964,7 +1002,7 @@ namespace MailMergeLib
                 hashCode = (hashCode * 397) ^ (FileAttachments != null ? FileAttachments.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ExternalInlineAttachments != null ? ExternalInlineAttachments.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (StringAttachments != null ? StringAttachments.GetHashCode() : 0);
-                
+
                 return hashCode;
             }
         }

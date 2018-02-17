@@ -7,6 +7,7 @@ using MailMergeLib.SmartFormatMail.Core.Output;
 using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
 
+
 namespace MailMergeLib.SmartFormatMail
 {
     /// <summary>
@@ -109,7 +110,7 @@ namespace MailMergeLib.SmartFormatMail
         #region: Properties :
 
         /// <summary>
-        /// Gets or set the instance of the <see cref="Core.Parsing.Parser"/>
+        /// Gets or set the instance of the <see cref="SmartFormat.Core.Parsing.Parser"/>
         /// </summary>
         public Parser Parser { get; private set; }
 
@@ -222,8 +223,7 @@ namespace MailMergeLib.SmartFormatMail
             CheckForExtensions();
             foreach (var item in formattingInfo.Format.Items)
             {
-                var literalItem = item as LiteralText;
-                if (literalItem != null)
+                if (item is LiteralText literalItem)
                 {
                     formattingInfo.Write(literalItem.ToString());
                     continue;
@@ -328,8 +328,7 @@ namespace MailMergeLib.SmartFormatMail
                 // if the current value is of type SmartObjects
                 // then try to find the right source extension for each of the objects in SmartObjects
                 // Note: SmartObjects cannot be nested, so this can be the case only once. 
-                var smartObjects = formattingInfo.CurrentValue as SmartObjects;
-                if (smartObjects != null)
+                if (formattingInfo.CurrentValue is SmartObjects smartObjects)
                 {
                     var savedCurrentValue = formattingInfo.CurrentValue;
                     foreach (var obj in smartObjects)

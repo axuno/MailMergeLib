@@ -55,6 +55,7 @@ namespace MailMergeLib
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
         /// <exception cref="NullReferenceException"></exception>
         /// <exception cref="Exception">The first exception found in one of the async tasks.</exception>
+        /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public async Task SendAsync<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
         {
             if (mailMergeMessage == null || dataSource == null)
@@ -69,14 +70,14 @@ namespace MailMergeLib
 
             var tasksUsed = new HashSet<int>();
 
-            EventHandler<MailSenderAfterSendEventArgs> afterSend = (obj, args) =>
-                                                                    {
-                                                                           if (args.Error == null)
-                                                                               Interlocked.Increment(ref sentMsgCount);
-                                                                           else
-                                                                            Interlocked.Increment(ref errorMsgCount);
-                                                                    };
-            OnAfterSend += afterSend;
+            void AfterSend(object obj, MailSenderAfterSendEventArgs args)
+            {
+                if (args.Error == null)
+                    Interlocked.Increment(ref sentMsgCount);
+                else
+                    Interlocked.Increment(ref errorMsgCount);
+            }
+            OnAfterSend += AfterSend;
 
             var startTime = DateTime.Now;
             
@@ -105,8 +106,7 @@ namespace MailMergeLib
                 {
                     using (var smtpClient = GetInitializedSmtpClient(smtpConfigForTask[taskNo]))
                     {
-                        T dataItem;
-                        while (queue.TryDequeue(out dataItem))
+                        while (queue.TryDequeue(out var dataItem))
                         {
                             lock (tasksUsed)
                             {
@@ -125,7 +125,16 @@ namespace MailMergeLib
                             }
                             catch (Exception ex)
                             {
+                                OnMergeProgress?.Invoke(this,
+                                    new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+
                                 OnMessageFailure?.Invoke(this, new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem));
+                                Interlocked.Increment(ref errorMsgCount);
+                                
+                                // Fire promised events
+                                OnMergeProgress?.Invoke(this,
+                                    new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+
                                 return;
                             }
 
@@ -167,7 +176,7 @@ namespace MailMergeLib
             {
                 OnMergeComplete?.Invoke(this, new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, errorMsgCount, tasksUsed.Count));
 
-                OnAfterSend -= afterSend;
+                OnAfterSend -= AfterSend;
 
                 IsBusy = false;
             }
@@ -189,6 +198,7 @@ namespace MailMergeLib
         /// </exception>
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
         /// <exception cref="AggregateException"></exception>
+        /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public async Task SendAsync(MailMergeMessage mailMergeMessage, object dataItem)
         {
             if (IsBusy)
@@ -207,7 +217,18 @@ namespace MailMergeLib
                     var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
                     using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
                     {
-                        await SendMimeMessageAsync(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig).ConfigureAwait(false);
+                        MimeMessage mimeMessage;
+                        try
+                        {
+                            mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
+                        }
+                        catch (Exception ex)
+                        {
+                            OnMessageFailure?.Invoke(this, new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem));
+                            throw;
+                        }
+
+                        await SendMimeMessageAsync(smtpClient, mimeMessage, smtpClientConfig).ConfigureAwait(false);
                         smtpClient.ProtocolLogger?.Dispose();
                     }
 
@@ -416,7 +437,7 @@ namespace MailMergeLib
             else _cancellationTokenSource.CancelAfter(new TimeSpan(0, 0, 0, 0, waitTime));
         }
 
-#endregion
+        #endregion
 
         #region *** Sync Methods ***
 
@@ -442,6 +463,7 @@ namespace MailMergeLib
         /// <exception cref="SmtpCommandException"></exception>
         /// <exception cref="SmtpProtocolException"></exception>
         /// <exception cref="AuthenticationException"></exception>
+        /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public void Send<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
         {
             if (IsBusy)
@@ -468,7 +490,24 @@ namespace MailMergeLib
                         OnMergeProgress?.Invoke(this,
                             new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
 
-                        var mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
+                        MimeMessage mimeMessage;
+                        try
+                        {
+                            mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
+                        }
+                        catch (Exception ex)
+                        {
+                            OnMessageFailure?.Invoke(this, new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem));
+                            // Invoke promised events
+                            OnMergeProgress?.Invoke(this,
+                                new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 1));
+                            smtpClient.Dispose();
+                            OnMergeComplete?.Invoke(this,
+                                new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 1, 1));
+
+                            throw;
+                        }
+
                         if (_cancellationTokenSource.IsCancellationRequested) break;
                         SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
                         sentMsgCount++;
@@ -480,10 +519,11 @@ namespace MailMergeLib
                         Thread.Sleep(smtpClientConfig.DelayBetweenMessages);
                         if (_cancellationTokenSource.IsCancellationRequested) break;
                     }
-
+                    
+                    smtpClient.ProtocolLogger?.Dispose();
+                    smtpClient.Dispose(); // fire OnSmtpDisconnected before OnMergeComplete
                     OnMergeComplete?.Invoke(this,
                         new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 0, 1));
-                    smtpClient.ProtocolLogger?.Dispose();
                 }
             }
             finally
@@ -509,19 +549,31 @@ namespace MailMergeLib
         /// <exception cref="SmtpCommandException"></exception>
         /// <exception cref="SmtpProtocolException"></exception>
         /// <exception cref="AuthenticationException"></exception>
+        /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public void Send(MailMergeMessage mailMergeMessage, object dataItem)
         {
             if (IsBusy)
                 throw new InvalidOperationException($"{nameof(Send)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
 
             IsBusy = true;
-
+            
             try
             {
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
                 using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
                 {
-                    SendMimeMessage(smtpClient, mailMergeMessage.GetMimeMessage(dataItem), smtpClientConfig);
+                    MimeMessage mimeMessage;
+                    try
+                    {
+                        mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
+                    }
+                    catch (Exception ex)
+                    {
+                        OnMessageFailure?.Invoke(this, new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem));
+                        throw;
+                    }
+
+                    SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
                     smtpClient.ProtocolLogger?.Dispose();
                 }
             }
@@ -584,12 +636,12 @@ namespace MailMergeLib
                 }
                 catch (Exception ex)
                 {
+                    sendException = ex;
                     // exceptions which are thrown by SmtpClient:
                     if (ex is SmtpCommandException || ex is SmtpProtocolException ||
                         ex is AuthenticationException || ex is System.Net.Sockets.SocketException)
                     {
                         failureCounter++;
-                        sendException = ex;
                         OnSendFailure?.Invoke(smtpClient,
                             new MailSenderSendFailureEventArgs(sendException, failureCounter, config, mimeMsg));
 
@@ -609,7 +661,6 @@ namespace MailMergeLib
                     else
                     {
                         failureCounter = config.MaxFailures;
-                        sendException = ex;
                         OnSendFailure?.Invoke(smtpClient, new MailSenderSendFailureEventArgs(sendException, 1, config, mimeMsg));
                     }
                 }
@@ -786,7 +837,6 @@ namespace MailMergeLib
             smtpClient.Connected += (sender, args) => { OnSmtpConnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
             smtpClient.Authenticated += (sender, args) => { OnSmtpAuthenticated?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
             smtpClient.Disconnected += (sender, args) => { OnSmtpDisconnected?.Invoke(smtpClient, new MailSenderSmtpClientEventArgs(config)); };
-
             return smtpClient;
         }
 

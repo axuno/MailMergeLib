@@ -153,7 +153,7 @@ namespace UnitTests
             var parsingErrors = new List<string>();
             try
             {
-                smf.Parser.OnParsingFailure += (sender, args) => { parsingErrors.Add(args.RawText); };
+                smf.Parser.OnParsingFailure += (sender, args) => { parsingErrors.Add(args.Errors.MessageShort); };
                 result = smf.Format(culture, "{lorem", dataItem);
                 Assert.Fail("No parsing error.");
             }

@@ -54,11 +54,23 @@ namespace UnitTests
             var connCounter = 0;
             var disconnCounter = 0;
             SmtpClientConfig usedClientConfig = null;
-            EventHandler<MailSenderAfterSendEventArgs> onAfterSend = (sender, args) => { usedClientConfig = args.SmtpClientConfig; };
-            EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = (sender, args) => { connCounter++;};
-            EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = (sender, args) => { disconnCounter++; };
 
-            SendMail(onAfterSend, onSmtpConnected, onSmtpDisconnected);
+            void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
+            {
+                usedClientConfig = args.SmtpClientConfig;
+            }
+
+            void OnSmtpConnected(object sender, MailSenderSmtpClientEventArgs args)
+            {
+                connCounter++;
+            }
+
+            void OnSmtpDisconnected(object sender, MailSenderSmtpClientEventArgs args)
+            {
+                disconnCounter++;
+            }
+
+            SendMail(OnAfterSend, OnSmtpConnected, OnSmtpDisconnected);
 
             Assert.AreEqual(connCounter, 1);
             Assert.AreEqual(disconnCounter, 1);
@@ -73,10 +85,14 @@ namespace UnitTests
         public void SendMailWithBackupConfig()
         {
             SmtpClientConfig usedClientConfig = null;
-            EventHandler<MailSenderAfterSendEventArgs> onAfterSend = (sender, args) => { usedClientConfig = args.SmtpClientConfig; };
+
+            void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
+            {
+                usedClientConfig = args.SmtpClientConfig;
+            }
 
             _settings.SenderConfig.SmtpClientConfig[0].SmtpPort++; // set wrong server port, so that backup config should be taken
-            SendMail(onAfterSend);
+            SendMail(OnAfterSend);
             Assert.AreEqual(1, _server.ReceivedEmailCount);
             Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig.Name);
 
@@ -92,8 +108,127 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task AllSenderEvents()
+        [TestCase("", false)]
+        [TestCase("{CauseParseFailure", true)]
+        [TestCase("{CauseMissingVariableFailure}", true)]
+        public async Task AllSenderEventsSingleMail(string somePlaceholder, bool withParseFailure)
         {
+            #region * Sync and Async preparation *
+
+            var actualEvents = new ConcurrentStack<string>();
+            var expectedEvents = new ConcurrentStack<string>();
+
+            var mms = new MailMergeSender { Config = _settings.SenderConfig };
+            mms.Config.MaxNumOfSmtpClients = 1;
+
+            // Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
+            mms.OnMessageFailure += (mailMergeSender, messageFailureArgs) => { actualEvents.Push(nameof(mms.OnMessageFailure)); };
+
+            // Event raising before sending a single mail message starts
+            mms.OnBeforeSend += (smtpClient, beforeSendArgs) => { actualEvents.Push(nameof(mms.OnBeforeSend)); };
+
+            // Event raising right after the SmtpClient's connection to the server is up (but not yet authenticated).
+            mms.OnSmtpConnected += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpConnected)); };
+            // Event raising after the SmtpClient has authenticated on the server.
+            mms.OnSmtpAuthenticated += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpAuthenticated)); };
+            // Event raising after the SmtpClient has disconnected from the SMTP mail server.
+            mms.OnSmtpDisconnected += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpDisconnected)); };
+
+            // Event raising if sending a single mail message fails
+            mms.OnSendFailure += (smtpClient, sendFailureArgs) => { actualEvents.Push(nameof(mms.OnSendFailure)); };
+            // Event raising before sending a single mail message is finished
+            mms.OnAfterSend += (smtpClient, afterSendArgs) => { actualEvents.Push(nameof(mms.OnAfterSend)); };
+
+            var recipient = new Recipient { Email = $"recipient@example.com", Name = $"Name of recipient" };
+
+            var mmm = new MailMergeMessage("Event tests" + somePlaceholder, "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
+
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+
+            var sequenceOfExpectedEvents = new List<string>();
+            if (withParseFailure)
+            {
+                sequenceOfExpectedEvents.Clear();
+                sequenceOfExpectedEvents.AddRange(new[]
+                {
+                    nameof(mms.OnMessageFailure),
+                    nameof(mms.OnSmtpDisconnected)
+                });
+            }
+            else
+            {
+                sequenceOfExpectedEvents.Clear();
+                sequenceOfExpectedEvents.AddRange(new[]
+                {
+                    nameof(mms.OnBeforeSend), nameof(mms.OnSmtpConnected),
+                    nameof(mms.OnAfterSend), nameof(mms.OnSmtpDisconnected)
+                });
+            }
+
+            #endregion
+
+            #region * Synchronous send method *
+
+            try
+            {
+                mms.Send(mmm, recipient);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            expectedEvents.Clear();
+            expectedEvents.PushRange(sequenceOfExpectedEvents.ToArray());
+
+            Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
+            // sequence of sync sending is predefined
+            while (actualEvents.Count > 0)
+            {
+                expectedEvents.TryPop(out string expected);
+                actualEvents.TryPop(out string actual);
+                Assert.AreEqual(expected, actual);
+            }
+
+            #endregion
+
+            #region * Async send method *
+
+            actualEvents.Clear();
+            expectedEvents.Clear();
+            expectedEvents.PushRange(sequenceOfExpectedEvents.ToArray());
+
+            try
+            {
+                await mms.SendAsync(mmm, recipient);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
+
+            // sequence of async sending may be different from sync, but all events must exists
+            var sortedActual = actualEvents.OrderBy(e => e).ToArray();
+            var sortedExpected = expectedEvents.OrderBy(e => e).ToArray();
+
+            for (var i = 0; i < sortedActual.Length; i++)
+            {
+                Assert.AreEqual(sortedExpected[i], sortedActual[i]);
+            }
+
+            #endregion
+        }
+
+        [Test]
+        [TestCase("", false)]
+        [TestCase("{CauseParseFailure", true)]
+        [TestCase("{CauseMissingVariableFailure}", true)]
+        public async Task AllSenderEventsMailMerge(string somePlaceholder, bool withParseFailure)
+        {
+            #region * Sync and Async preparation *
+
             var actualEvents = new ConcurrentStack<string>();
             var expectedEvents = new ConcurrentStack<string>();
 
@@ -106,7 +241,7 @@ namespace UnitTests
             mms.OnMessageFailure += (mailMergeSender, messageFailureArgs) => { actualEvents.Push(nameof(mms.OnMessageFailure)); };
 
             // Event raising before sending a single mail message starts
-            mms.OnBeforeSend += (smtpClient, beforeSendArgs) => { };
+            mms.OnBeforeSend += (smtpClient, beforeSendArgs) => { actualEvents.Push(nameof(mms.OnBeforeSend)); };
 
             // Event raising right after the SmtpClient's connection to the server is up (but not yet authenticated).
             mms.OnSmtpConnected += (smtpClient, smtpClientArgs) => { actualEvents.Push(nameof(mms.OnSmtpConnected)); };
@@ -131,21 +266,50 @@ namespace UnitTests
                 recipients.Add(new Recipient() { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
             }
 
-            var mmm = new MailMergeMessage("Event tests", "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
+            var mmm = new MailMergeMessage("Event tests" + somePlaceholder, "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
+
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
 
-            var sequenceOfExpectedEvents = new[] { nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnSmtpConnected), nameof(mms.OnAfterSend), nameof(mms.OnMergeProgress), nameof(mms.OnMergeComplete), nameof(mms.OnSmtpDisconnected) };
+            var sequenceOfExpectedEvents = new List<string>();
+            if (withParseFailure)
+            {
+                sequenceOfExpectedEvents.Clear();
+                sequenceOfExpectedEvents.AddRange(new[]
+                {
+                    nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnMessageFailure),
+                    nameof(mms.OnMergeProgress), nameof(mms.OnSmtpDisconnected), nameof(mms.OnMergeComplete)
+                });
+            }
+            else
+            {
+                sequenceOfExpectedEvents.Clear();
+                sequenceOfExpectedEvents.AddRange(new[]
+                {
+                    nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnBeforeSend), nameof(mms.OnSmtpConnected),
+                    nameof(mms.OnAfterSend), nameof(mms.OnMergeProgress), nameof(mms.OnSmtpDisconnected),
+                    nameof(mms.OnMergeComplete)
+                });
+            }
+
+            #endregion
 
             #region * Synchronous send method *
 
-            mms.Send(mmm, recipients);
-
+            try
+            {
+                mms.Send(mmm, recipients);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
             expectedEvents.Clear();
-            expectedEvents.PushRange(sequenceOfExpectedEvents);
+            expectedEvents.PushRange(sequenceOfExpectedEvents.ToArray());
 
             Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
             // sequence of sync sending is predefined
-            for (var i = 0; i < actualEvents.Count; i++)
+            while (actualEvents.Count > 0)
             {
                 expectedEvents.TryPop(out string expected);
                 actualEvents.TryPop(out string actual);
@@ -158,9 +322,17 @@ namespace UnitTests
 
             actualEvents.Clear();
             expectedEvents.Clear();
-            expectedEvents.PushRange(sequenceOfExpectedEvents);
+            expectedEvents.PushRange(sequenceOfExpectedEvents.ToArray());
 
-            await mms.SendAsync(mmm, recipients);
+            try
+            {
+                await mms.SendAsync(mmm, recipients);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             Assert.AreEqual(expectedEvents.Count, actualEvents.Count);
 
             // sequence of async sending may be different from sync, but all events must exists
@@ -174,7 +346,6 @@ namespace UnitTests
 
             #endregion
         }
-
 
         [Test]
         public async Task SendSyncAndAsyncPerformance()
@@ -194,7 +365,7 @@ namespace UnitTests
 
             mms.Config.MaxNumOfSmtpClients = 10;
             var sw = new Stopwatch();
-
+            
             sw.Start();
             mms.Send(mmm, recipients);
             sw.Stop();
@@ -205,7 +376,7 @@ namespace UnitTests
 
             sw.Reset();
             _server.ClearReceivedEmail();
-
+            
             sw.Start();
 
             int numOfSmtpClientsUsed = 0;
