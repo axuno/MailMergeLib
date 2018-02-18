@@ -39,6 +39,7 @@
 
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/) Install the NuGet package
+
 Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
 
 ### History
