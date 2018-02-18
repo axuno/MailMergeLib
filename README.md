@@ -1,5 +1,7 @@
 <img src="https://raw.githubusercontent.com/axuno/MailMergeLib/master/MailMergeLlib.png" width="300" alt="Logo">
 
+[![GitHub release](https://img.shields.io/github/release/axuno/mailmergelib.svg)](https://github.com/axuno/MailMergeLib/releases/latest)
+
 ```MailMergeLib``` version 5 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
 
 ### 1. Mail message generation:
@@ -36,8 +38,8 @@
 * .Net Core
 
 ### Get started
-* Install the [Nuget Package](https://www.nuget.org/packages/MailMergeLib/)
-* Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
+[![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/) Install the NuGet package
+Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
 
 ### History
 MailMergeLib was introduced back in 2007 on [CodeProject](http://www.codeproject.com/Articles/19546/MailMergeLib-A-NET-Mail-Client-Library). The last version published there is 4.03. It is based on ```System.Net.Mail```. For anyone still using ```System.Net.Mail```, Jeffrey Stedfast's [Code Review] (http://jeffreystedfast.blogspot.de/2015/03/code-review-microsofts-systemnetmail.html) might be interesting, although he describes issues more polite than they actually are (especially in terms of RFC violations).
