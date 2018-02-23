@@ -28,7 +28,7 @@ namespace UnitTests
             // netDumbster.smtp.Logging.LogManager.GetLogger = type => new netDumbster.smtp.Logging.ConsoleLogger(type);
         }
 
-        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = null)
+        private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = null, EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = null, EventHandler<MailSenderSendFailureEventArgs> onSendFailure = null)
         {
             var data = new Dictionary<string, object>
             {
@@ -44,6 +44,7 @@ namespace UnitTests
             mms.OnAfterSend += onAfterSend;
             mms.OnSmtpConnected += onSmtpConnected;
             mms.OnSmtpDisconnected += onSmtpDisconnected;
+            mms.OnSendFailure += onSendFailure;
            
             mms.Send(mmm, (object) data);
         }
@@ -98,6 +99,25 @@ namespace UnitTests
 
             Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig.Name}' passed.\n\n");
             Console.WriteLine(_server.ReceivedEmail[0].Data);
+        }
+
+        [Test]
+        public void SendMailWithSendFailure()
+        {
+            SmtpClientConfig usedClientConfig = null;
+            Exception sendFailure = null;
+
+            void OnSendFailure(object sender, MailSenderSendFailureEventArgs args)
+            {
+                sendFailure = args.Error;
+                usedClientConfig = args.SmtpClientConfig;
+            }
+
+            _settings.SenderConfig.SmtpClientConfig[0].SmtpPort++; // set wrong server port, so that backup config should be taken
+            _settings.SenderConfig.SmtpClientConfig[1].SmtpPort++; // set wrong server port, so that send will fail
+            Assert.Catch(() => SendMail(onSendFailure: OnSendFailure));
+            Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig.Name);
+            Assert.AreEqual(0, _server.ReceivedEmailCount);
         }
 
         private class Recipient
