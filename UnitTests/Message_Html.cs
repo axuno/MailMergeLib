@@ -12,6 +12,15 @@ namespace UnitTests
     [TestFixture]
     public class Message_Html
     {
+        private class DummyHtmlConverter : IHtmlConverter
+        {
+            public const string ConstantText = "Plain text for test";
+            public string ToPlainText(string html)
+            {
+                return ConstantText;
+            }
+        }
+
         [Test]
         public void HtmlMailMergeWithInlineAndAtt()
         {
@@ -164,6 +173,9 @@ namespace UnitTests
             Assert.IsTrue(string.IsNullOrEmpty(mmm.PlainText));
             mmm.ConvertHtmlToPlainText();
             Assert.IsTrue(mmm.PlainText.Length > 0);
+
+            mmm.ConvertHtmlToPlainText(new DummyHtmlConverter());
+            Assert.AreEqual(DummyHtmlConverter.ConstantText, mmm.PlainText);
         }
     }
 }
