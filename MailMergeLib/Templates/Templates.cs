@@ -61,6 +61,9 @@ namespace MailMergeLib.Templates
             set
             {
                 var tp = Find(k => k.Name == name);
+                if (tp == null)
+                    throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
+
                 tp.Name = value.Name;
                 tp.Text = value.Text;
                 tp.DefaultKey = value.DefaultKey;
