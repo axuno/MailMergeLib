@@ -197,7 +197,14 @@ namespace MailMergeLib.MessageStore
         {
             unchecked
             {
-                return ((SearchFolders != null ? SearchFolders.GetHashCode() : 0) * 397) ^ (SearchPatterns != null ? SearchPatterns.GetHashCode() : 0);
+                return (SearchFolders != null
+                           ? ((System.Collections.IStructuralEquatable) SearchFolders).GetHashCode(
+                               EqualityComparer<string>.Default)
+                           : 0) * 397
+                       ^ (SearchPatterns != null
+                           ? ((System.Collections.IStructuralEquatable) SearchPatterns).GetHashCode(
+                               EqualityComparer<string>.Default)
+                           : 0);
             }
         }
 

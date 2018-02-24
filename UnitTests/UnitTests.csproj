@@ -70,11 +70,13 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmailValidator.cs" />
     <Compile Include="FileMessageStore_Serialization.cs" />
-    <Compile Include="MessageInfoBase.cs" />
+    <Compile Include="FileMessageInfo.cs" />
+    <Compile Include="MessageInfo.cs" />
     <Compile Include="Message_Variables.cs" />
     <Compile Include="Message_Templates.cs" />
     <Compile Include="Settings_Serialization.cs" />

@@ -27,7 +27,7 @@ namespace UnitTests
         {
             var mmm = new MailMergeMessage
             {
-                Info = new MessageInfo { Id = 1, Category = "Orders", Description = "Message description", Comments = "Comments to the message", Data = "Data hint" },
+                Info = new MailMergeLib.MessageStore.MessageInfo { Id = 1, Category = "Orders", Description = "Message description", Comments = "Comments to the message", Data = "Data hint" },
                 // File.ReadAllText will include \r besides \n, while the internal C# representation is only \n
                 HtmlText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, HtmlTextFile))), // contains image (<img src="..." />) which must be "inline-attached"
                 PlainText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, PlainTextFile))),
@@ -46,7 +46,7 @@ namespace UnitTests
         {
             var mmm = new MailMergeMessage
             {
-                Info = new MessageInfo { Id = 1, Category = "Orders", Description = "Message description", Comments = "Comments to the message", Data = "Data hint"},
+                Info = new MailMergeLib.MessageStore.MessageInfo { Id = 1, Category = "Orders", Description = "Message description", Comments = "Comments to the message", Data = "Data hint"},
                 // File.ReadAllText will include \r besides \n, while the internal C# representation is only \n
                 HtmlText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, HtmlTextThreeInlineAtt))),
                 Subject = "Three inline attachments",
@@ -77,7 +77,7 @@ namespace UnitTests
         public static MailMergeMessage GetMessageWithAllPropertiesSet()
         {
             var mmm = GetHtmlMailWithInlineAndOtherAttachments();
-            mmm.Info = new MessageInfo
+            mmm.Info = new MailMergeLib.MessageStore.MessageInfo
             {
                 Id = 1,
                 Description = "Message description {Date:yyyy-MM-dd}",
@@ -112,7 +112,7 @@ namespace UnitTests
         {
             var mmm = new MailMergeMessage
             {
-                Info = new MessageInfo
+                Info = new MailMergeLib.MessageStore.MessageInfo
                 {
                     Id = 1,
                     Description = "Message description",
