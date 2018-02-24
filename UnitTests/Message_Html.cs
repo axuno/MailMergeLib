@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.IO;
 using System.Linq;
 using AngleSharp.Dom.Html;
@@ -52,6 +53,40 @@ namespace UnitTests
             Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")));
 
             MailMergeMessage.DisposeFileStreams(msg);
+        }
+
+        [Test]
+        public void HtmlMailMergeWithStreamAttachment()
+        {
+            var dataItem = new
+            {
+                Name = "John",
+                MailboxAddr = "john@example.com",
+                Success = true,
+                Date = DateTime.Now,
+                SenderAddr = "test@specimen.com"
+            };
+
+            var text = "Some test for stream attachment";
+            var streamAttFilename = $"StreamFilename_{dataItem.Date:yyyy-MM-dd}.txt";
+
+            var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            mmm.FileAttachments.Clear();
+            mmm.InlineAttachments.Clear();
+            mmm.StreamAttachments.Clear();
+            mmm.StringAttachments.Clear();
+
+            using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text ?? string.Empty)))
+            {
+                mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
+
+                var msg = mmm.GetMimeMessage(dataItem);
+                var att = msg.Attachments.FirstOrDefault() as MimePart;
+                Assert.IsTrue(att?.FileName == streamAttFilename && att.IsAttachment);
+                Assert.IsTrue(msg.ToString().Contains(text));
+
+                MailMergeMessage.DisposeFileStreams(msg);
+            }
         }
 
         [Test]
