@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestFiles\error.jpg" />
+    <Content Include="TestFiles\TextForHtmlConverter.html" />
     <Content Include="TestFiles\SameImageSeveralTimes.html" />
     <Content Include="TestFiles\Mailtext.html" />
     <Content Include="TestFiles\Mailtext.txt" />

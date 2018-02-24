@@ -12,6 +12,7 @@ namespace UnitTests
     public class MessageFactory
     {
         public const string HtmlTextFile = "Mailtext.html";
+        public const string HtmlConverterTestFile = "TextForHtmlConverter.html";
         public const string HtmlTextThreeInlineAtt = "SameImageSeveralTimes.html";
         public const string PlainTextFile = "Mailtext.txt";
         public const string LogFileName = "LogFile.log";
@@ -144,6 +145,24 @@ namespace UnitTests
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "{FromAddr}"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{ToAddr}"));
             variables = new Dictionary<string, string>() { { "FirstName", "Jane" }, { "FromAddr", "from@example.com" }, { "ToAddr", "to@example.com" } };
+
+            return mmm;
+        }
+
+        public static MailMergeMessage GetHtmlMessageForHtmlConverter()
+        {
+            var mmm = new MailMergeMessage
+            {
+                HtmlText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, HtmlConverterTestFile))),
+                Subject = "HTML Converter Test",
+                Config =
+                {
+                    Organization = "MailMergeLib Inc.",
+                    CharacterEncoding = Encoding.UTF8,
+                }
+            };
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@test.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@test.com"));
 
             return mmm;
         }

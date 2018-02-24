@@ -156,5 +156,14 @@ namespace UnitTests
             Assert.IsTrue(msg.ToString().Contains(httpImage));
             MailMergeMessage.DisposeFileStreams(msg);
         }
+
+        [Test]
+        public void ConvertHtmlToPlainText()
+        {
+            var mmm = MessageFactory.GetHtmlMessageForHtmlConverter();
+            Assert.IsTrue(string.IsNullOrEmpty(mmm.PlainText));
+            mmm.ConvertHtmlToPlainText();
+            Assert.IsTrue(mmm.PlainText.Length > 0);
+        }
     }
 }

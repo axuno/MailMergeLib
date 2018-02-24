@@ -58,15 +58,9 @@ namespace MailMergeLib
 
             switch (node.NodeType)
             {
-                case NodeType.Comment:
-                    // don't output comments
+                case NodeType.Comment: // don't output comments
+                case NodeType.Document: // child node cannot be a document
                     break;
-
-
-                case NodeType.Document:
-                    ConvertContentToText(node.ChildNodes, outText);
-                    break;
-
 
                 case NodeType.Text:
                     var parentName = node.ParentElement.NodeName.ToLower();
