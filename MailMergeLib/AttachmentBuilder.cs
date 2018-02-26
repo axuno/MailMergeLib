@@ -91,9 +91,7 @@ namespace MailMergeLib
             if (_attachment.ContentType.MimeType.ToLower().StartsWith("text/"))
             {
                 _attachment.ContentType.Charset = Tools.GetMimeCharset(characterEncoding);
-                _attachment.ContentTransferEncoding = Tools.IsSevenBit(_attachment.ContentObject.Stream, characterEncoding)
-                                                   ? ContentEncoding.SevenBit
-                                                   : textTransferEncoding;
+                _attachment.ContentTransferEncoding = textTransferEncoding;
             }
             else
             {
