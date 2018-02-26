@@ -95,12 +95,7 @@ namespace MailMergeLib
 
             var htmlTextPart = new TextPart("html")
             {
-                ContentTransferEncoding = Tools.IsSevenBit(DocHtml)
-                    ? ContentEncoding.SevenBit
-                    : TextTransferEncoding != ContentEncoding.SevenBit
-                        ? TextTransferEncoding
-                        : ContentEncoding.QuotedPrintable,
-
+                ContentTransferEncoding = TextTransferEncoding
             };
             htmlTextPart.SetText(CharacterEncoding, DocHtml);  // MimeKit.ContentType.Charset is set using CharacterEncoding
             htmlTextPart.ContentId = MimeUtils.GenerateMessageId();

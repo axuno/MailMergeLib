@@ -20,11 +20,7 @@ namespace MailMergeLib
         {
             var plainTextPart = new TextPart("plain");
             plainTextPart.SetText(CharacterEncoding, _plainText);
-            plainTextPart.ContentTransferEncoding = Tools.IsSevenBit(_plainText)
-                                 ? ContentEncoding.SevenBit
-                                 : TextTransferEncoding != ContentEncoding.SevenBit
-                                       ? TextTransferEncoding
-                                       : ContentEncoding.QuotedPrintable;
+            plainTextPart.ContentTransferEncoding = TextTransferEncoding;
 
             plainTextPart.ContentType.Charset = Tools.GetMimeCharset(CharacterEncoding); // RFC 2045 Section 5.1 - http://www.ietf.org;
             plainTextPart.ContentId = MimeUtils.GenerateMessageId();
