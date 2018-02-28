@@ -683,10 +683,6 @@ namespace MailMergeLib
                             $"Variable(s) for placeholder(s) not found: {string.Join(", ", _badVariableNames.ToArray())}",
                             _badVariableNames, null));
 
-                // Finally throw general exception
-                if (exceptions.Count > 0)
-                    throw new MailMergeMessageException("Building of message failed with one or more exceptions. See inner exceptions for details.", exceptions, mimeMessage);
-
                 if (_attachmentParts.Any())
                 {
                     var mixed = new Multipart("mixed");
@@ -706,6 +702,11 @@ namespace MailMergeLib
                 {
                     mimeMessage.Body = _textMessagePart ?? new TextPart("plain") { Text = string.Empty };
                 }
+
+                // Throw a general exception in case of any exceptions
+                // Note: The MimeMessage, as far as it could completed, is one of the parameters of the exception
+                if (exceptions.Count > 0)
+                    throw new MailMergeMessageException("Building of message failed with one or more exceptions. See inner exceptions for details.", exceptions, mimeMessage);
 
                 return mimeMessage;
             }

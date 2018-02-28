@@ -21,6 +21,7 @@ namespace UnitTests
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{to.address}"));
             mmm.AddExternalInlineAttachment(new FileAttachment("{inlineAtt.filename}.jpg", string.Empty));
             mmm.FileAttachments.Add(new FileAttachment("{fileAtt.filename}.xml", "{fileAtt.displayname}"));
+            mmm.FileAttachments.Add(new FileAttachment("{throwParingError.xml", "DisplayName"));
 
             // **************** Part 1:
             mmm.Config.IgnoreMissingInlineAttachments = false;
@@ -42,8 +43,9 @@ namespace UnitTests
                  * 3) No FROM address
                  * 4) Missing file attachment {fileAtt.filename}.xml
                  * 5) Missing inline attachment {inlineAtt.filename}.jpg
+                 * 6) Parsing error in file attachment "{throwParingError.xml"
                  */
-                Assert.AreEqual(5, exceptions.InnerExceptions.Count);
+                Assert.AreEqual(6, exceptions.InnerExceptions.Count);
 
                 foreach (var ex in exceptions.InnerExceptions.Where(ex => !(ex is MailMergeMessage
                     .AttachmentException)))
@@ -71,14 +73,20 @@ namespace UnitTests
                 var attExceptions = exceptions.InnerExceptions.Where(ex => ex is MailMergeMessage.AttachmentException)
                     .ToList();
                 Assert.AreEqual(2, attExceptions.Count);
-                foreach (var ex in attExceptions)
-                {
-                    Console.WriteLine($"{nameof(MailMergeMessage.AttachmentException)} thrown successfully:");
-                    Console.WriteLine("Missing files: " +
-                                      string.Join(", ", (ex as MailMergeMessage.AttachmentException).BadAttachment));
-                    Console.WriteLine();
-                    Assert.AreEqual(1, (ex as MailMergeMessage.AttachmentException).BadAttachment.Count);
-                }
+
+                // Inline file missing
+                Console.WriteLine($"{nameof(MailMergeMessage.AttachmentException)} thrown successfully:");
+                Console.WriteLine("Missing inline attachment files: " +
+                                  string.Join(", ", (attExceptions[0] as MailMergeMessage.AttachmentException).BadAttachment));
+                Console.WriteLine();
+                Assert.AreEqual(1, (attExceptions[0] as MailMergeMessage.AttachmentException).BadAttachment.Count);
+
+                // 2 file attachments missing
+                Console.WriteLine($"{nameof(MailMergeMessage.AttachmentException)} thrown successfully:");
+                Console.WriteLine("Missing attachment files: " +
+                                  string.Join(", ", (attExceptions[1] as MailMergeMessage.AttachmentException).BadAttachment));
+                Console.WriteLine();
+                Assert.AreEqual(2, (attExceptions[1] as MailMergeMessage.AttachmentException).BadAttachment.Count);
             }
 
             // **************** Part 2:
@@ -97,8 +105,9 @@ namespace UnitTests
                  * 1) 9 missing variables for {placeholders} and {:templates(...)}
                  * 2) No recipients
                  * 3) No FROM address
+                 * 4) 1 parsing error
                  */
-                Assert.AreEqual(3, exceptions.InnerExceptions.Count);
+                Assert.AreEqual(4, exceptions.InnerExceptions.Count);
                 Assert.IsFalse(exceptions.InnerExceptions.Any(e => e is MailMergeMessage.AttachmentException));
 
                 Console.WriteLine("Exceptions for missing attachment files suppressed.");
