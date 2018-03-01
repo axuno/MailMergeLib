@@ -128,18 +128,43 @@ namespace MailMergeLib
 
     /// <summary>
     /// Argument used by the event when getting the merged MimeMessage of the MailMergeMessage has failed.
+    /// With the arguments supplied the event delegate is able to either resolve what caused the error and
+    /// set a correctly built <see cref="MimeMessage"/> to be sent, or finally give up and let throw a
+    /// <see cref="MailMergeLib.MailMergeMessage.MailMergeMessageException"/>,
     /// </summary>
     public class MailMessageFailureEventArgs : EventArgs
     {
+        /// <summary>
+        /// Contains the exceptions caught will trying to build the <see cref="MimeMessage"/>.
+        /// </summary>
         public readonly Exception Error;
+        /// <summary>
+        /// The <see cref="MailMergeMessage"/> which tried to build the <see cref="MimeMessage"/>.
+        /// </summary>
         public readonly MailMergeMessage MailMergeMessage;
+        /// <summary>
+        /// The data item which was used to build the <see cref="MimeMessage"/>.
+        /// </summary>
         public readonly object DataSource;
+        /// <summary>
+        /// The <see cref="MimeMessage"/> which could be built until any errors occurred.
+        /// The delegate may modify the mime message by resolving any errors and return the new <see cref="MimeMessage"/>.
+        /// </summary>
+        public MimeMessage MimeMessage;
+        /// <summary>
+        /// The value returned to the <see cref="MailMergeMessage"/> build process to determine
+        /// whether a <see cref="MailMergeLib.MailMergeMessage.MailMergeMessageException"/> should be thrown.
+        /// Default to true.
+        /// </summary>
+        public bool ThrowException;
 
-        internal MailMessageFailureEventArgs(Exception error, MailMergeMessage mailMergeMessage, object dataSource)
+        internal MailMessageFailureEventArgs(Exception error, MailMergeMessage mailMergeMessage, object dataSource, MimeMessage mimeMessage = null, bool throwException = true)
         {
             Error = error;
             MailMergeMessage = mailMergeMessage;
             DataSource = dataSource;
+            MimeMessage = mimeMessage;
+            ThrowException = throwException;
         }
     }
 }

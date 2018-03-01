@@ -1019,14 +1019,16 @@ namespace MailMergeLib
         /// <param name="mimeMessage"></param>
         public static void DisposeFileStreams(MimeMessage mimeMessage)
         {
+            if (mimeMessage == null) return;
+
             // Dispose the streams of file attachments
-            foreach (var mimePart in mimeMessage.Attachments.Where(mp => mp is MimePart).Cast<MimePart>())
+            foreach (var mimePart in mimeMessage.Attachments?.Where(mp => mp is MimePart).Cast<MimePart>())
             {
                 mimePart?.ContentObject?.Stream?.Dispose();
             }
 
             // Dispose the streams of HTML inline file attachments
-            foreach (var mimePart in mimeMessage.BodyParts.Where(mp => mp is MimePart).Cast<MimePart>())
+            foreach (var mimePart in mimeMessage.BodyParts?.Where(mp => mp is MimePart).Cast<MimePart>())
             {
                 mimePart?.ContentObject?.Stream?.Dispose();
             }

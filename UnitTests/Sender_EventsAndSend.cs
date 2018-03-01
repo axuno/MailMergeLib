@@ -18,6 +18,7 @@ namespace UnitTests
     [TestFixture]
     public class Sender_EventsAndSend
     {
+        private static object _locker = new object();
         private static SimpleSmtpServer _server;
         private Random _rnd = new Random();
         private Settings _settings = new Settings();
@@ -58,17 +59,17 @@ namespace UnitTests
 
             void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
             {
-                usedClientConfig = args.SmtpClientConfig;
+                lock(_locker) { usedClientConfig = args.SmtpClientConfig;}
             }
 
             void OnSmtpConnected(object sender, MailSenderSmtpClientEventArgs args)
             {
-                connCounter++;
+                lock (_locker) {connCounter++;}
             }
 
             void OnSmtpDisconnected(object sender, MailSenderSmtpClientEventArgs args)
             {
-                disconnCounter++;
+                lock (_locker) {disconnCounter++;}
             }
 
             SendMail(OnAfterSend, OnSmtpConnected, OnSmtpDisconnected);
@@ -109,8 +110,11 @@ namespace UnitTests
 
             void OnSendFailure(object sender, MailSenderSendFailureEventArgs args)
             {
-                sendFailure = args.Error;
-                usedClientConfig = args.SmtpClientConfig;
+                lock (_locker)
+                {
+                    sendFailure = args.Error;
+                    usedClientConfig = args.SmtpClientConfig;
+                }
             }
 
             _settings.SenderConfig.SmtpClientConfig[0].SmtpPort++; // set wrong server port, so that backup config should be taken
@@ -283,7 +287,7 @@ namespace UnitTests
             var recipients = new List<Recipient>();
             for (var i = 0; i < 1; i++)
             {
-                recipients.Add(new Recipient() { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
+                recipients.Add(new Recipient { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
             }
 
             var mmm = new MailMergeMessage("Event tests" + somePlaceholder, "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
@@ -368,15 +372,183 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task SendSyncAndAsyncPerformance()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Send_With_And_Without_MailMergeMessageException(bool throwException, bool returnNullMimeMessage)
+        {
+            #region * Sync and Async preparation *
+
+            const string theFormatError = "{causeFormatError}";
+            const string plainText = theFormatError + "This is the plain text part for {Name} ({Email})";
+
+            var mms = new MailMergeSender { Config = _settings.SenderConfig };
+            mms.Config.MaxNumOfSmtpClients = 1;
+
+            // Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
+            mms.OnMessageFailure += (mailMergeSender, messageFailureArgs) =>
+            {
+                lock (_locker)
+                {
+                    if (throwException)
+                    {
+                        return;
+                    }
+
+                    // Remove the cause of the exception and return corrected values
+                    // Note: changes of MailMergeMessage will affect als messages to be sent
+                    messageFailureArgs.MailMergeMessage.PlainText = plainText.Replace(theFormatError, string.Empty);
+                    // in production a try...catch... must be implemented
+                    messageFailureArgs.MimeMessage = messageFailureArgs.MailMergeMessage.GetMimeMessage(messageFailureArgs.DataSource);
+                    messageFailureArgs.ThrowException = throwException;
+                }
+            };
+
+            var recipients = new List<Recipient>();
+            for (var i = 0; i < 2; i++)
+            {
+                recipients.Add(new Recipient { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
+            }
+
+            var mmm = new MailMergeMessage("Message failure", plainText) { Config = _settings.MessageConfig };
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+
+            #endregion
+
+            #region * Synchronous send methods *
+
+            // send enumerable data
+            mmm.PlainText = plainText; // set text from constant
+            try
+            {
+                if (throwException)
+                {
+                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(() => mms.Send(mmm, recipients));
+                }
+                else
+                {
+                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (throwException)
+            {
+                Assert.AreEqual(0, _server.ReceivedEmailCount);
+            }
+            else
+            {
+                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+            }
+
+            _server.ClearReceivedEmail();
+
+            // send single data item
+            mmm.PlainText = plainText; // set text from constant
+            try
+            {
+                if (throwException)
+                {
+                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(() => mms.Send(mmm, recipients[0]));
+                }
+                else
+                {
+                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (throwException)
+            {
+                Assert.AreEqual(0, _server.ReceivedEmailCount);
+            }
+            else
+            {
+                Assert.AreEqual(1, _server.ReceivedEmailCount);
+            }
+
+            _server.ClearReceivedEmail();
+
+            #endregion
+
+            #region * Async send methods *
+
+            // send enumerable data
+            mmm.PlainText = plainText; // set text from constant
+            try
+            {
+                if (throwException)
+                {
+                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
+                }
+                else
+                {
+                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (throwException)
+            {
+                Assert.AreEqual(0, _server.ReceivedEmailCount);
+            }
+            else
+            {
+                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+            }
+
+            _server.ClearReceivedEmail();
+
+            // send single data item
+            mmm.PlainText = plainText; // set text from constant
+            try
+            {
+                if (throwException)
+                {
+                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
+                }
+                else
+                {
+                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            if (throwException)
+            {
+                Assert.AreEqual(0, _server.ReceivedEmailCount);
+            }
+            else
+            {
+                Assert.AreEqual(1, _server.ReceivedEmailCount);
+            }
+
+            #endregion
+        }
+
+        [Test]
+        [TestCase(10)]
+        [TestCase(1000, Ignore = "Only for performance tests")]
+        public async Task SendSyncAndAsyncPerformance(int numOfRecipients)
         {
             // In this sample:
             // With 100,000 messages and 10 MaxNumOfSmtpClients async is about twice as fast as sync.
 
             var recipients = new List<Recipient>();
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < numOfRecipients; i++)
             {
-                recipients.Add(new Recipient() {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
+                recipients.Add(new Recipient {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
             }
             
             var mmm = new MailMergeMessage("Async/Sync email test", "This is the plain text part for {Name} ({Email})") { Config = _settings.MessageConfig };
