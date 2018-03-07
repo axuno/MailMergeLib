@@ -374,7 +374,7 @@ namespace UnitTests
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task Send_With_And_Without_MailMergeMessageException(bool throwException, bool returnNullMimeMessage)
+        public void Send_With_And_Without_MailMergeMessageException(bool throwException)
         {
             #region * Sync and Async preparation *
 
