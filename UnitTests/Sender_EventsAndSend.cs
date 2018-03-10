@@ -372,9 +372,10 @@ namespace UnitTests
         }
 
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void Send_With_And_Without_MailMergeMessageException(bool throwException)
+        [TestCase(true, true)]   // setting for setMimeMessageToNull is irrelevant
+        [TestCase(false, false)] // no exception is fine ONLY if MimeMessage is not null
+        [TestCase(false, true)]  // no exception with null for MimeMessage must throw exception
+        public void Send_With_And_Without_MailMergeMessageException(bool throwException, bool setMimeMessageToNull)
         {
             #region * Sync and Async preparation *
 
@@ -398,7 +399,14 @@ namespace UnitTests
                     // Note: changes of MailMergeMessage will affect als messages to be sent
                     messageFailureArgs.MailMergeMessage.PlainText = plainText.Replace(theFormatError, string.Empty);
                     // in production a try...catch... must be implemented
-                    messageFailureArgs.MimeMessage = messageFailureArgs.MailMergeMessage.GetMimeMessage(messageFailureArgs.DataSource);
+                    if (setMimeMessageToNull)
+                    {
+                        messageFailureArgs.MimeMessage = null;
+                    }
+                    else
+                    {
+                        messageFailureArgs.MimeMessage = messageFailureArgs.MailMergeMessage.GetMimeMessage(messageFailureArgs.DataSource);
+                    }
                     messageFailureArgs.ThrowException = throwException;
                 }
             };
@@ -426,7 +434,14 @@ namespace UnitTests
                 }
                 else
                 {
-                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                    if (setMimeMessageToNull)
+                    {
+                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(() => mms.Send(mmm, recipients));
+                    }
+                    else
+                    {
+                        Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                    }
                 }
             }
             catch (Exception e)
@@ -440,7 +455,14 @@ namespace UnitTests
             }
             else
             {
-                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                if (setMimeMessageToNull)
+                {
+                    Assert.AreEqual(0, _server.ReceivedEmailCount);
+                }
+                else
+                {
+                    Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                }
             }
 
             _server.ClearReceivedEmail();
@@ -455,7 +477,14 @@ namespace UnitTests
                 }
                 else
                 {
-                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                    if (setMimeMessageToNull)
+                    {
+                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(() => mms.Send(mmm, recipients[0]));
+                    }
+                    else
+                    {
+                        Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                    }
                 }
             }
             catch (Exception e)
@@ -469,7 +498,14 @@ namespace UnitTests
             }
             else
             {
-                Assert.AreEqual(1, _server.ReceivedEmailCount);
+                if (setMimeMessageToNull)
+                {
+                    Assert.AreEqual(0, _server.ReceivedEmailCount);
+                }
+                else
+                {
+                    Assert.AreEqual(1, _server.ReceivedEmailCount);
+                }
             }
 
             _server.ClearReceivedEmail();
@@ -488,7 +524,14 @@ namespace UnitTests
                 }
                 else
                 {
-                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                    if (setMimeMessageToNull)
+                    {
+                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
+                    }
+                    else
+                    {
+                        Assert.DoesNotThrow(() => mms.Send(mmm, recipients));
+                    }
                 }
             }
             catch (Exception e)
@@ -502,7 +545,14 @@ namespace UnitTests
             }
             else
             {
-                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                if (setMimeMessageToNull)
+                {
+                    Assert.AreEqual(0, _server.ReceivedEmailCount);
+                }
+                else
+                {
+                    Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                }
             }
 
             _server.ClearReceivedEmail();
@@ -517,7 +567,14 @@ namespace UnitTests
                 }
                 else
                 {
-                    Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                    if (setMimeMessageToNull)
+                    {
+                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
+                    }
+                    else
+                    {
+                        Assert.DoesNotThrow(() => mms.Send(mmm, recipients[0]));
+                    }
                 }
             }
             catch (Exception e)
@@ -531,7 +588,14 @@ namespace UnitTests
             }
             else
             {
-                Assert.AreEqual(1, _server.ReceivedEmailCount);
+                if (setMimeMessageToNull)
+                {
+                    Assert.AreEqual(0, _server.ReceivedEmailCount);
+                }
+                else
+                {
+                    Assert.AreEqual(1, _server.ReceivedEmailCount);
+                }
             }
 
             #endregion

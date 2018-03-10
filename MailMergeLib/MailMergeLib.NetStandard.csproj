@@ -16,12 +16,12 @@
     <PackageId>MailMergeLib</PackageId>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <Version>5.4.0.0</Version>
+    <Version>5.4.1.0</Version>
     <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
     <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
-    <PackageReleaseNotes />
+    <PackageReleaseNotes>New feature: Within an OnMessageFailure delegate the cause of the failure can be removed, so that the message can still be sent successfully. See details in https://github.com/axuno/MailMergeLib/wiki/Message-Error-Handling</PackageReleaseNotes>
     <PackageTags>smtp mime mail email merge template net40 net45 netcore c#</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
