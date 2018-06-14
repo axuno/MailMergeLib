@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using MailMergeLib;
 using MailMergeLib.SmartFormatMail;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTests
 {
@@ -197,6 +198,41 @@ namespace UnitTests
 
                 // The message could be sent using the low-level API using a configured SmtpClient:
                 // new SmtpClient().Send(FormatOptions.Default, mimeMessage);
+            }
+        }
+
+        [Test]
+        public void MessagesFromJsonArray()
+        {
+            var recipients = JArray.Parse(@"
+[
+    {
+      'Email': 'email.1@example.com',
+      'Name': 'John'
+    },
+    {
+      'Email': 'email.2@example.com',
+      'Name': 'Mary'
+    },
+    {
+      'Email': 'email.3@example.com',
+      'Name': 'Steve'
+    }
+]
+");
+            var mmm = new MailMergeMessage("Get MimeMessages JSON Test", string.Empty, "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
+            mmm.ConvertHtmlToPlainText();
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
+
+            var cnt = 0;
+            foreach (var mimeMessage in mmm.GetMimeMessages(recipients))
+            {
+                Assert.IsTrue(mimeMessage.TextBody == string.Format($"This is the plain text part for {recipients[cnt]["Name"]} ({recipients[cnt]["Email"]})"));
+                Assert.IsTrue(mimeMessage.HtmlBody.Contains(string.Format($"This is the plain text part for {recipients[cnt]["Name"]} ({recipients[cnt]["Email"]})")));
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(recipients[cnt]["Name"].ToString()) && mimeMessage.To.ToString().Contains(recipients[cnt]["Email"].ToString()));
+                MailMergeMessage.DisposeFileStreams(mimeMessage);
+                cnt++;
             }
         }
     }

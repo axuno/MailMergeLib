@@ -5,7 +5,7 @@ using MailMergeLib.SmartFormatMail.Core.Parsing;
 namespace MailMergeLib.SmartFormatMail.Core.Settings
 {
     /// <summary>
-    /// <see cref="MailMergeLib.SmartFormatMail"/> settings to be applied for parsing and formatting.
+    /// <see cref="MailMergeLib.SmartFormatMail" /> settings to be applied for parsing and formatting.
     /// </summary>
     public class SmartSettings
     {
@@ -18,12 +18,12 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction"/> to apply for the <see cref="SmartFormatter"/>.
+        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="SmartFormatter" />.
         /// </summary>
         public ErrorAction FormatErrorAction { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ErrorAction"/> to apply for the <see cref="Parser"/>.
+        /// Gets or sets the <see cref="ErrorAction" /> to apply for the <see cref="Parser" />.
         /// </summary>
         public ErrorAction ParseErrorAction { get; set; }
 
@@ -33,11 +33,11 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
         public CaseSensitivityType CaseSensitivity { get; set; }
 
         /// <summary>
-        /// This setting is relevant for the <see cref="Parsing.LiteralText"/>.
+        /// This setting is relevant for the <see cref="Parsing.LiteralText" />.
         /// If true (the default), character string literals are treated like in "normal" string.Format:
-        ///    string.Format("\t")   will return a "TAB" character
+        /// string.Format("\t")   will return a "TAB" character
         /// If false, character string literals are not converted, just like with this string.Format:
-        ///    string.Format(@"\t")  will return the 2 characters "\" and "t"
+        /// string.Format(@"\t")  will return the 2 characters "\" and "t"
         /// </summary>
         public bool ConvertCharacterStringLiterals { get; set; }
 
@@ -51,7 +51,8 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
                     case CaseSensitivityType.CaseInsensitive:
                         return StringComparer.CurrentCultureIgnoreCase;
                     default:
-                        throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
+                        throw new InvalidOperationException(
+                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
                 }
             }
         }
@@ -66,7 +67,8 @@ namespace MailMergeLib.SmartFormatMail.Core.Settings
                     case CaseSensitivityType.CaseInsensitive:
                         return StringComparison.CurrentCultureIgnoreCase;
                     default:
-                        throw new InvalidOperationException($"The case sensitivity type [{CaseSensitivity}] is unknown.");
+                        throw new InvalidOperationException(
+                            $"The case sensitivity type [{CaseSensitivity}] is unknown.");
                 }
             }
         }

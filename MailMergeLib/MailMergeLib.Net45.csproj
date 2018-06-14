@@ -38,13 +38,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.0.9.9.1\lib\net45\AngleSharp.dll</HintPath>
+      <HintPath>..\packages\AngleSharp.0.9.9.2\lib\net45\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="MailKit, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>..\packages\MailKit.2.0.1\lib\net45\MailKit.dll</HintPath>
+      <HintPath>..\packages\MailKit.2.0.4\lib\net45\MailKit.dll</HintPath>
     </Reference>
     <Reference Include="MimeKit, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\packages\MimeKit.2.0.1\lib\net45\MimeKit.dll</HintPath>
+      <HintPath>..\packages\MimeKit.2.0.4\lib\net45\MimeKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -116,6 +122,8 @@
     <Compile Include="SmartFormatMail\Extensions\DefaultFormatter.cs" />
     <Compile Include="SmartFormatMail\Extensions\DefaultSource.cs" />
     <Compile Include="SmartFormatMail\Extensions\DictionarySource.cs" />
+    <Compile Include="SmartFormatMail\Extensions\IsMatchFormatter.cs" />
+    <Compile Include="SmartFormatMail\Extensions\JsonSource.cs" />
     <Compile Include="SmartFormatMail\Extensions\ListFormatter.cs" />
     <Compile Include="SmartFormatMail\Extensions\PluralLocalizationFormatter.cs" />
     <Compile Include="SmartFormatMail\Extensions\ReflectionSource.cs" />

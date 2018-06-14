@@ -1,9 +1,11 @@
-﻿namespace MailMergeLib.SmartFormatMail.Core.Parsing
+﻿using System;
+
+namespace MailMergeLib.SmartFormatMail.Core.Parsing
 {
     /// <summary>
     /// Supplies information about parsing errors.
     /// </summary>
-    public class ParsingErrorEventArgs : System.EventArgs
+    public class ParsingErrorEventArgs : EventArgs
     {
         internal ParsingErrorEventArgs(ParsingErrors errors, bool throwsException)
         {

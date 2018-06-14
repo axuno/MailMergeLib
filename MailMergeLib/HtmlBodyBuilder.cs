@@ -110,7 +110,7 @@ namespace MailMergeLib
                 image/png
                 image/gif...
             */
-            var mpr = new MultipartRelated {htmlTextPart};
+            var mpr = new MultipartRelated(htmlTextPart);
 
             // Produce attachments as part of the multipart/related MIME part,
             // as described in RFC2387

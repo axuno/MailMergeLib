@@ -7,7 +7,6 @@ using MailMergeLib.SmartFormatMail.Core.Output;
 using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
 
-
 namespace MailMergeLib.SmartFormatMail
 {
     /// <summary>
@@ -16,6 +15,15 @@ namespace MailMergeLib.SmartFormatMail
     /// </summary>
     public class SmartFormatter
     {
+        #region : EventHandlers :
+
+        /// <summary>
+        /// Event raising, if an error occurs during formatting.
+        /// </summary>
+        public event EventHandler<FormattingErrorEventArgs> OnFormattingFailure;
+
+        #endregion
+
         #region: Constructor :
 
         public SmartFormatter()
@@ -37,12 +45,12 @@ namespace MailMergeLib.SmartFormatMail
         #region: Extension Registry :
 
         /// <summary>
-        /// Gets the list of <see cref="ISource"/> source extensions.
+        /// Gets the list of <see cref="ISource" /> source extensions.
         /// </summary>
         public List<ISource> SourceExtensions { get; }
 
         /// <summary>
-        /// Gets the list of <see cref="IFormatter"/> formatter extensions.
+        /// Gets the list of <see cref="IFormatter" /> formatter extensions.
         /// </summary>
         public List<IFormatter> FormatterExtensions { get; }
 
@@ -54,9 +62,7 @@ namespace MailMergeLib.SmartFormatMail
         {
             var names = new List<string>();
             foreach (var extension in FormatterExtensions)
-            {
                 names.AddRange(extension.Names.Where(n => n != string.Empty).ToArray());
-            }
             return names.ToArray();
         }
 
@@ -110,22 +116,22 @@ namespace MailMergeLib.SmartFormatMail
         #region: Properties :
 
         /// <summary>
-        /// Gets or set the instance of the <see cref="SmartFormat.Core.Parsing.Parser"/>
+        /// Gets or set the instance of the <see cref="Core.Parsing.Parser" />
         /// </summary>
-        public Parser Parser { get; private set; }
+        public Parser Parser { get; }
 
         /// <summary>
-        /// Gets or set the <see cref="Core.Settings.ErrorAction"/> for the formatter.
+        /// Gets or set the <see cref="Core.Settings.ErrorAction" /> for the formatter.
         /// </summary>
         [Obsolete("Depreciated. Use the FormatterErrorAction property in Settings instead.", false)]
         public ErrorAction ErrorAction
         {
-            get { return Settings.FormatErrorAction; }
-            set { Settings.FormatErrorAction = value; }
+            get => Settings.FormatErrorAction;
+            set => Settings.FormatErrorAction = value;
         }
 
         /// <summary>
-        /// Get the <see cref="Core.Settings.SmartSettings"/> for Smart.Format
+        /// Get the <see cref="Core.Settings.SmartSettings" /> for Smart.Format
         /// </summary>
         public SmartSettings Settings { get; }
 
@@ -141,22 +147,22 @@ namespace MailMergeLib.SmartFormatMail
         /// <returns>Returns the formated input with items replaced with their string representation.</returns>
         public string Format(string format, params object[] args)
         {
-            return Format(null, format, args ?? new object[] { null });
+            return Format(null, format, args ?? new object[] {null});
         }
 
         /// <summary>
         /// Replaces one or more format items in as specified string with the string representation of a specific object.
         /// </summary>
-        /// <param name="provider">The <see cref="IFormatProvider"/> to use.</param>
+        /// <param name="provider">The <see cref="IFormatProvider" /> to use.</param>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">The object to format.</param>
         /// <returns>Returns the formated input with items replaced with their string representation.</returns>
         public string Format(IFormatProvider provider, string format, params object[] args)
         {
-            args = args ?? new object[] { null };
+            args = args ?? new object[] {null};
             var output = new StringOutput(format.Length + args.Length * 8);
             var formatParsed = Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames());
-            var current = (args.Length > 0) ? args[0] : args; // The first item is the default.
+            var current = args.Length > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, formatParsed, args, null, provider, output);
             Format(formatDetails, formatParsed, current);
 
@@ -165,7 +171,7 @@ namespace MailMergeLib.SmartFormatMail
 
         public void FormatInto(IOutput output, string format, params object[] args)
         {
-            args = args ?? new object[] { null };
+            args = args ?? new object[] {null};
             var formatParsed = Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames());
             var current = args.Length > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, formatParsed, args, null, null, output);
@@ -174,10 +180,11 @@ namespace MailMergeLib.SmartFormatMail
 
         public string FormatWithCache(ref FormatCache cache, string format, params object[] args)
         {
-            args = args ?? new object[] { null };
+            args = args ?? new object[] {null};
             var output = new StringOutput(format.Length + args.Length * 8);
 
-            if (cache == null) cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
+            if (cache == null)
+                cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
             var current = args.Length > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
             Format(formatDetails, cache.Format, current);
@@ -187,8 +194,9 @@ namespace MailMergeLib.SmartFormatMail
 
         public void FormatWithCacheInto(ref FormatCache cache, IOutput output, string format, params object[] args)
         {
-            args = args ?? new object[] { null };
-            if (cache == null) cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
+            args = args ?? new object[] {null};
+            if (cache == null)
+                cache = new FormatCache(Parser.ParseFormat(format, GetNotEmptyFormatterExtensionNames()));
             var current = args.Length > 0 ? args[0] : args; // The first item is the default.
             var formatDetails = new FormatDetails(this, cache.Format, args, cache, null, output);
             Format(formatDetails, cache.Format, current);
@@ -202,19 +210,10 @@ namespace MailMergeLib.SmartFormatMail
 
         #endregion
 
-        #region : EventHandlers :
-
-        /// <summary>
-        /// Event raising, if an error occurs during formatting.
-        /// </summary>
-        public event EventHandler<FormattingErrorEventArgs> OnFormattingFailure;
-
-        #endregion
-
         #region: Format :
 
         /// <summary>
-        /// Format the input given in parameter <see cref="FormattingInfo"/>.
+        /// Format the input given in parameter <see cref="FormattingInfo" />.
         /// </summary>
         /// <param name="formattingInfo"></param>
         public void Format(FormattingInfo formattingInfo)
@@ -223,14 +222,15 @@ namespace MailMergeLib.SmartFormatMail
             CheckForExtensions();
             foreach (var item in formattingInfo.Format.Items)
             {
-                if (item is LiteralText literalItem)
+                var literalItem = item as LiteralText;
+                if (literalItem != null)
                 {
                     formattingInfo.Write(literalItem.ToString());
                     continue;
                 }
 
                 // Otherwise, the item must be a placeholder.
-                var placeholder = (Placeholder)item;
+                var placeholder = (Placeholder) item;
                 var childFormattingInfo = formattingInfo.CreateChild(placeholder);
                 try
                 {
@@ -257,17 +257,23 @@ namespace MailMergeLib.SmartFormatMail
             }
         }
 
-        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex, FormattingInfo formattingInfo)
+        private void FormatError(FormatItem errorItem, Exception innerException, int startIndex,
+            FormattingInfo formattingInfo)
         {
-            OnFormattingFailure?.Invoke(this, new FormattingErrorEventArgs(errorItem.RawText, startIndex, Settings.FormatErrorAction != ErrorAction.ThrowError));
+            OnFormattingFailure?.Invoke(this,
+                new FormattingErrorEventArgs(errorItem.RawText, startIndex,
+                    Settings.FormatErrorAction != ErrorAction.ThrowError));
             switch (Settings.FormatErrorAction)
             {
                 case ErrorAction.Ignore:
                     return;
                 case ErrorAction.ThrowError:
-                    throw (innerException as FormattingException) ?? new FormattingException(errorItem, innerException, startIndex);
+                    throw innerException as FormattingException ??
+                          new FormattingException(errorItem, innerException, startIndex);
                 case ErrorAction.OutputErrorInResult:
-                    formattingInfo.FormatDetails.FormattingException = (innerException as FormattingException) ?? new FormattingException(errorItem, innerException, startIndex);
+                    formattingInfo.FormatDetails.FormattingException =
+                        innerException as FormattingException ??
+                        new FormattingException(errorItem, innerException, startIndex);
                     formattingInfo.Write(innerException.Message);
                     formattingInfo.FormatDetails.FormattingException = null;
                     break;
@@ -280,13 +286,11 @@ namespace MailMergeLib.SmartFormatMail
         private void CheckForExtensions()
         {
             if (SourceExtensions.Count == 0)
-            {
-                throw new InvalidOperationException("No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
-            }
+                throw new InvalidOperationException(
+                    "No source extensions are available. Please add at least one source extension, such as the DefaultSource.");
             if (FormatterExtensions.Count == 0)
-            {
-                throw new InvalidOperationException("No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
-            }
+                throw new InvalidOperationException(
+                    "No formatter extensions are available. Please add at least one formatter extension, such as the DefaultFormatter.");
         }
 
         private void EvaluateSelectors(FormattingInfo formattingInfo)
@@ -316,11 +320,11 @@ namespace MailMergeLib.SmartFormatMail
                 }
 
                 if (!handled)
-                {
-                    throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"", selector);
-                }
+                    throw formattingInfo.FormattingException($"Could not evaluate the selector \"{selector.RawText}\"",
+                        selector);
             }
         }
+
         private bool InvokeSourceExtensions(FormattingInfo formattingInfo)
         {
             foreach (var sourceExtension in SourceExtensions)
@@ -328,7 +332,8 @@ namespace MailMergeLib.SmartFormatMail
                 // if the current value is of type SmartObjects
                 // then try to find the right source extension for each of the objects in SmartObjects
                 // Note: SmartObjects cannot be nested, so this can be the case only once. 
-                if (formattingInfo.CurrentValue is SmartObjects smartObjects)
+                var smartObjects = formattingInfo.CurrentValue as SmartObjects;
+                if (smartObjects != null)
                 {
                     var savedCurrentValue = formattingInfo.CurrentValue;
                     foreach (var obj in smartObjects)
@@ -337,6 +342,7 @@ namespace MailMergeLib.SmartFormatMail
                         var handled = sourceExtension.TryEvaluateSelector(formattingInfo);
                         if (handled) return true;
                     }
+
                     formattingInfo.CurrentValue = savedCurrentValue;
                 }
                 else
@@ -346,6 +352,7 @@ namespace MailMergeLib.SmartFormatMail
                     if (handled) return true;
                 }
             }
+
             return false;
         }
 
@@ -358,12 +365,11 @@ namespace MailMergeLib.SmartFormatMail
         {
             var handled = InvokeFormatterExtensions(formattingInfo);
             if (!handled)
-            {
                 throw formattingInfo.FormattingException("No suitable Formatter could be found", formattingInfo.Format);
-            }
         }
+
         /// <summary>
-        /// First check whether the named formatter name exist in of the <see cref="FormatterExtensions"/>,
+        /// First check whether the named formatter name exist in of the <see cref="FormatterExtensions" />,
         /// next check whether the named formatter is able to process the format.
         /// </summary>
         /// <param name="formattingInfo"></param>
@@ -379,6 +385,7 @@ namespace MailMergeLib.SmartFormatMail
                 var handled = formatterExtension.TryEvaluateFormat(formattingInfo);
                 if (handled) return true;
             }
+
             return false;
         }
 

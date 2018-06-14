@@ -6,6 +6,7 @@ using System.Globalization;
 using MailMergeLib;
 using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -109,6 +110,34 @@ namespace UnitTests
             Assert.AreEqual(expected,result);
             Console.WriteLine("Dictionary: passed");
 
+            // ******** JSON ********
+            // JObject
+            dataItem = JObject.Parse("{ 'Email':'test@example.com', 'Continent':'Europe' }");
+            expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
+            result = smf.Format(culture, text, dataItem);
+            Assert.AreEqual(expected, result);
+            Console.WriteLine("JSON Object: passed");
+            // JArray
+            dataItem = JObject.Parse(@"
+{
+  'Manufacturers': [
+    {
+      'Name': 'Acme Corp'
+    },
+    {
+      'Name': 'Contoso'
+    },
+    {
+      'Name': 'Jumbo'
+    }
+  ]
+}
+");
+            expected = "Acme Corp, Contoso, and Jumbo";
+            result = smf.Format(culture, "{Manufacturers:list:{Name}|, |, and }", dataItem);
+            Assert.AreEqual(expected, result);
+            Console.WriteLine("JSON Array: passed");
+
             // ******** ExpandoObject ********
             dynamic em = new ExpandoObject();
             em.Email = "test@example.com";
@@ -173,7 +202,7 @@ namespace UnitTests
             Console.WriteLine("Format error (missing variable): passed");
 
             // ******** Culture ********
-            result = smf.Format(culture, "{Date:MMMM}", new DateTime(2016,01,01));
+            result = smf.Format(culture, "{Date:MMMM}", new DateTime(2018,01,01));
             
             Assert.AreEqual("January", result);
             Console.WriteLine("Culture: passed");

@@ -28,11 +28,12 @@ namespace MailMergeLib
             var listFormatter = new ListFormatter(this);
 
             AddExtensions(
-                (ISource)listFormatter,
-                new ReflectionSource(this),
+                (ISource)listFormatter, // ListFormatter MUST be first
                 new DictionarySource(this),
-                // new XmlSource(this),
-                // These default extensions reproduce the String.Format behavior:
+                new JsonSource(this),
+                //new XmlSource(this),
+                new ReflectionSource(this),
+                // The DefaultSource reproduces the string.Format behavior:
                 new DefaultSource(this)
                 );
             AddExtensions(

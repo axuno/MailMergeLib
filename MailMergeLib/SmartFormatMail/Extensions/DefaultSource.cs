@@ -43,7 +43,6 @@ namespace MailMergeLib.SmartFormatMail.Extensions
                     selectorInfo.Result = current; // (don't change the current item)
                     return true;
                 }
-
             }
 
             return false;
