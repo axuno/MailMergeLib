@@ -98,11 +98,7 @@ namespace MailMergeLib
             for (var i = 0; i < sendTasks.Length; i++)
             {
                 var taskNo = i;
-#if NET40
-                sendTasks[taskNo] = TaskEx.Run(async () =>
-#else
                 sendTasks[taskNo] = Task.Run(async () =>
-#endif
                 {
                     using (var smtpClient = GetInitializedSmtpClient(smtpConfigForTask[taskNo]))
                     {
@@ -117,11 +113,7 @@ namespace MailMergeLib
                             MimeMessage mimeMessage = null;
                             try
                             {
-#if NET40
-                                mimeMessage = await TaskEx.Run(() => mailMergeMessage.GetMimeMessage(localDataItem)).ConfigureAwait(false);
-#else
                                 mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem)).ConfigureAwait(false);
-#endif
                             }
                             catch (Exception exception)
                             {
@@ -164,11 +156,8 @@ namespace MailMergeLib
 
                             OnMergeProgress?.Invoke(this,
                                 new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-#if NET40
-                            await TaskEx.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
-#else
+
                             await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
-#endif
                         }
 
                         smtpClient.ProtocolLogger?.Dispose();
@@ -181,12 +170,7 @@ namespace MailMergeLib
                 OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
 
                 // Note await Task.WhenAll will only throw the FIRST exception of the aggregate exception!
-#if NET40
-                await TaskEx.WhenAll(sendTasks.AsEnumerable()).ConfigureAwait(false);
-#else
                 await Task.WhenAll(sendTasks.AsEnumerable()).ConfigureAwait(false);
-#endif
-
             }
             finally
             {
@@ -224,11 +208,7 @@ namespace MailMergeLib
 
             try
             {
-#if NET40
-                await TaskEx.Run(async () =>
-#else
                 await Task.Run(async () =>
-#endif
                 {
                     var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
                     using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
@@ -308,7 +288,7 @@ namespace MailMergeLib
                         case MessageOutput.Directory:
                             mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                             break;
-#if NET40 || NET45
+#if NET45
                         case MessageOutput.PickupDirectoryFromIis:
                             // for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
                             // and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
@@ -333,11 +313,9 @@ namespace MailMergeLib
                         sendException = ex;
                         OnSendFailure?.Invoke(smtpClient,
                             new MailSenderSendFailureEventArgs(sendException, failureCounter, config, mimeMsg));
-#if NET40
-                        await TaskEx.Delay(config.RetryDelayTime, _cancellationTokenSource.Token).ConfigureAwait(false);
-#else
+
                         await Task.Delay(config.RetryDelayTime, _cancellationTokenSource.Token).ConfigureAwait(false);
-#endif
+
                         // on first SMTP failure switch to the backup configuration, if one exists
                         if (failureCounter == 1 && config.MaxFailures > 1)
                         {
@@ -680,7 +658,7 @@ namespace MailMergeLib
                         case MessageOutput.Directory:
                             mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                             break;
-#if NET40 || NET45
+#if NET45
                         case MessageOutput.PickupDirectoryFromIis:
                             // for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
                             // and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/

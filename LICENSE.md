@@ -1,6 +1,6 @@
 ## MIT License Information
 
-MailMergeLib is Copyright (C) 2007-2017 by axuno gGmbH and is licensed under the MIT license:
+MailMergeLib is Copyright (C) 2007-2018 by axuno gGmbH and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

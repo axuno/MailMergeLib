@@ -83,7 +83,7 @@ namespace MailMergeLib.Serialization
 
             if (isStream) return;
 
-#if NET40 || NET45
+#if NET45
             writer.Close();
 #endif
             writer.Dispose();
@@ -140,7 +140,7 @@ namespace MailMergeLib.Serialization
             var s = (T)serializer.Deserialize(str);
 
             if (isStream) return s;
-#if NET40 || NET45
+#if NET45
             reader.Close();
 #endif
             reader.Dispose();

@@ -637,7 +637,7 @@ namespace MailMergeLib
             {
                 _badVariableNames.Clear();
                 _parseExceptions.Clear();
-#if NET40 || NET45 || NETSTANDARD2_0
+#if NET45 || NETSTANDARD2_0
                 // convert DataRow to Dictionary<string, object>
                 if (dataItem is DataRow row)
                 {

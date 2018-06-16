@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
+        <Copyright>© 2007-2018 by axuno gGmbH</Copyright>
+        <AssemblyTitle>MailMergeLib 5</AssemblyTitle>
+        <Version>5.5.0.0</Version>
+        <VersionPrefix>5.5.0.0</VersionPrefix>
+        <Authors>axuno gGmbH</Authors>
+        <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
+        <DefineConstants>DEBUG;TRACE;RELEASE;NETSTANDARD</DefineConstants>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>MailMergeLib</AssemblyName>
+        <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <PackageId>MailMergeLib</PackageId>
+        <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
+        <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
+        <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
+        <PackageReleaseNotes>New features:
+* Support for JSON (JObject, JArray)
+* IsMatchFormatter for evaluation of regular expressions
+        </PackageReleaseNotes>
+        <PackageTags>smtp mime mail email merge template net40 net45 netstandard c#</PackageTags>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <RootNamespace>MailMergeLib</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="nuget\**" />
+        <Compile Remove="Properties\**\*;SmartFormatMail\Properties\**\*;packages.*.config;" />
+        <EmbeddedResource Remove="nuget\**" />
+        <None Remove="nuget\**" />
+        <None Remove="packages.MailMergeLib.Net45.config" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AngleSharp" Version="0.9.9.2" />
+        <PackageReference Include="MailKit" Version="2.0.4" />
+        <PackageReference Include="MimeKit" Version="2.0.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+        <PackageReference Include="YAXLib" Version="2.15.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+        <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+        <PackageReference Include="System.Data.Common" Version="4.3.0" />
+        <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+        <PackageReference Include="System.Runtime" Version="4.3.0" />
+        <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    </ItemGroup>
+
+</Project>

@@ -5,7 +5,7 @@ using System.Threading;
 using MailMergeLib.SmartFormatMail.Core.Extensions;
 using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
-#if !NETSTANDARD1_6
+#if !NETSTANDARD
 // Not supported by .Net Core
 using System.Runtime.Remoting.Messaging;
 #endif
@@ -98,7 +98,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD
         /// <summary>
         /// The key for CallContext.Logical[Get|Set]Data().
         /// </summary>

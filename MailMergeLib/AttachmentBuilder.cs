@@ -20,8 +20,8 @@ namespace MailMergeLib
             var mimeTypeAndSubtype = fileAtt.MimeType.Split(new[] { '/' }, 2);
             _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
             {
-                ContentObject = new ContentObject(File.OpenRead(fileAtt.Filename), ContentEncoding.Default),
-                ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Attachment),
+                Content = new MimeContent(File.OpenRead(fileAtt.Filename), ContentEncoding.Default),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                 FileName = fileAtt.Filename
             };
 
@@ -42,8 +42,8 @@ namespace MailMergeLib
             var mimeTypeAndSubtype = stringAtt.MimeType.Split(new[] { '/' }, 2);
             _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
             {
-                ContentObject = new ContentObject(new MemoryStream(characterEncoding.GetBytes(stringAtt.Content ?? string.Empty)), ContentEncoding.Default),
-                ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Attachment),
+                Content = new MimeContent(new MemoryStream(characterEncoding.GetBytes(stringAtt.Content ?? string.Empty)), ContentEncoding.Default),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                 FileName = displayName
             };
 
@@ -65,8 +65,8 @@ namespace MailMergeLib
             var mimeTypeAndSubtype = streamAtt.MimeType.Split(new[] { '/' }, 2);
             _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
             {
-                ContentObject = new ContentObject(streamAtt.Stream, ContentEncoding.Default),
-                ContentDisposition = new MimeKit.ContentDisposition(MimeKit.ContentDisposition.Attachment),
+                Content = new MimeContent(streamAtt.Stream, ContentEncoding.Default),
+                ContentDisposition = new ContentDisposition(MimeKit.ContentDisposition.Attachment),
             };
 
             _attachment.ContentType.Name = displayName;

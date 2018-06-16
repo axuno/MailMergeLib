@@ -148,7 +148,6 @@
     <Compile Include="Templates\TemplateException.cs" />
     <Compile Include="Templates\Templates.cs" />
     <Compile Include="UriScheme.cs" />
-    <None Include="app.config" />
     <None Include="MailMergeLib.snk" />
     <Compile Include="MailMergeSender.cs" />
     <Compile Include="SenderConfig.cs" />
