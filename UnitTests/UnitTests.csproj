@@ -56,8 +56,7 @@
       <HintPath>..\packages\MimeKit.2.0.4\lib\net45\MimeKit.dll</HintPath>
     </Reference>
     <Reference Include="netDumbster">
-      <HintPath>D:\Documents\Visual Studio 2017\Projects\MailMergeLib-5\packages\netDumbster.1.4.0.0-beta1\lib\net40\netDumbster.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\netDumbster.1.4.0.0-beta1\lib\net40\netDumbster.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -94,7 +93,6 @@
     <Compile Include="Tools.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="TestFiles\LogFile.log" />
     <None Include="TestFiles\Sample.pdf" />
