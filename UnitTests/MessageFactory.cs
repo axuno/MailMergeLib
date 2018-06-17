@@ -15,7 +15,7 @@ namespace UnitTests
         public const string HtmlConverterTestFile = "TextForHtmlConverter.html";
         public const string HtmlTextThreeInlineAtt = "SameImageSeveralTimes.html";
         public const string PlainTextFile = "Mailtext.txt";
-        public const string LogFileName = "LogFile.log";
+        public const string LogFileName = "LogFile.txt";
         public const string ImgSuccess = "success.jpg";
         public const string ImgError = "error.jpg";
         public const string PdfFile = "Sample.pdf";
