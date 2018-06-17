@@ -343,7 +343,7 @@ namespace MailMergeLib
             foreach (var mimeEntity in mimeMsg.Attachments)
             {
                 var att = mimeEntity as MimePart;
-                att?.ContentObject.Stream.Dispose();
+                att?.Content.Stream.Dispose();
             }
 
             if (sendException != null)

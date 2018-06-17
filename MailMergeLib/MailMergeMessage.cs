@@ -1024,13 +1024,13 @@ namespace MailMergeLib
             // Dispose the streams of file attachments
             foreach (var mimePart in mimeMessage.Attachments?.Where(mp => mp is MimePart).Cast<MimePart>())
             {
-                mimePart?.ContentObject?.Stream?.Dispose();
+                mimePart?.Content?.Stream?.Dispose();
             }
 
             // Dispose the streams of HTML inline file attachments
             foreach (var mimePart in mimeMessage.BodyParts?.Where(mp => mp is MimePart).Cast<MimePart>())
             {
-                mimePart?.ContentObject?.Stream?.Dispose();
+                mimePart?.Content?.Stream?.Dispose();
             }
         }
 
