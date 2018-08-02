@@ -50,4 +50,4 @@ Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wik
 ### History
 MailMergeLib was introduced back in 2007 on [CodeProject](http://www.codeproject.com/Articles/19546/MailMergeLib-A-NET-Mail-Client-Library). The last version published there is 4.03. It is based on ```System.Net.Mail```. For anyone still using ```System.Net.Mail```, Jeffrey Stedfast's [Code Review](http://jeffreystedfast.blogspot.de/2015/03/code-review-microsofts-systemnetmail.html) might be interesting, although he describes issues more polite than they actually are (especially in terms of RFC violations).
 
-MailMergeLib 5 published on GitHub is a major rewrite, and it is not backwards compatible to prior releases. There is, however, a migration guide included in the ```MailMergeLib``` Wiki.
+MailMergeLib 5 published on GitHub is a major rewrite, and it is not backwards compatible to prior releases. There is, however, a migration guide included in the ```MailMergeLib``` Wiki. 
