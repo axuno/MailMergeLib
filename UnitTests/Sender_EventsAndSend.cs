@@ -520,13 +520,13 @@ namespace UnitTests
             {
                 if (throwException)
                 {
-                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
+                    Assert.ThrowsAsync<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
                 }
                 else
                 {
                     if (setMimeMessageToNull)
                     {
-                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
+                        Assert.ThrowsAsync<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients));
                     }
                     else
                     {
@@ -563,13 +563,13 @@ namespace UnitTests
             {
                 if (throwException)
                 {
-                    Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
+                    Assert.ThrowsAsync<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
                 }
                 else
                 {
                     if (setMimeMessageToNull)
                     {
-                        Assert.Throws<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
+                        Assert.ThrowsAsync<MailMergeMessage.MailMergeMessageException>(async () => await mms.SendAsync(mmm, recipients[0]));
                     }
                     else
                     {
