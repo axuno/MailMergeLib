@@ -138,8 +138,7 @@ namespace MailMergeLib
                                     OnMergeProgress?.Invoke(this,
                                         new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount,
                                             errorMsgCount));
-
-                                    return;
+                                    throw;
                                 }
 
                                 // set MimeMessage from OnMessageFailure delegate
