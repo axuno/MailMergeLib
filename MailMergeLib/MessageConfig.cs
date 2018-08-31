@@ -65,6 +65,7 @@ namespace MailMergeLib
 
         /// <summary>
         /// Gets or sets the local base directory of HTML linked resources and other attachments.
+        /// The <see cref="FileBaseDirectory"/> must be a an absolute path, while *file paths are relative* to the <see cref="FileBaseDirectory"/>.
         /// It is useful for retrieval of inline attachments (linked resources of the HTML body).
         /// </summary>
         [YAXSerializableField]
