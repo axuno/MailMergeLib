@@ -89,7 +89,7 @@ namespace UnitTests
             mmm.FileAttachments.Add(new FileAttachment(Path.GetFullPath(Path.Combine(TestFileFolders.FilesAbsPath, PdfFile)), "information.pdf"));
             mmm.StringAttachments.Add(new StringAttachment("some content", "content.txt"));
             mmm.Headers.Add(HeaderId.Comments, "some comments for header");
-            mmm.Config = new MessageConfig()
+            mmm.Config = new MailMergeLib.MessageConfig()
             {
                 FileBaseDirectory = TestFileFolders.FilesAbsPath,
                 CharacterEncoding = Encoding.UTF32,

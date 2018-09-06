@@ -42,7 +42,7 @@ namespace UnitTests
                         ConvertCharacterStringLiterals = true
                     },
                     Xmailer = "MailMergeLib 5",
-                    FileBaseDirectory = "Path-to-Base-Dir",
+                    FileBaseDirectory = "C:\\Path-to-Base-Dir", // must be a full path, not necessarily existing
                     TextTransferEncoding = ContentEncoding.QuotedPrintable,
                     BinaryTransferEncoding = ContentEncoding.UUEncode
                 },

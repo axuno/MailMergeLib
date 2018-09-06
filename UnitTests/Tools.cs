@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using MailMergeLib;
-using MimeKit;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -10,6 +8,44 @@ namespace UnitTests
     [TestFixture]
     public class Tools
     {
+        [Test]
+        [TestCase(@"C:\dir\file.ext", true)]
+        [TestCase(@"C:\dir\", true)]
+        [TestCase(@"C:\dir", true)]
+        [TestCase(@"C:\", true)]
+        [TestCase(@"\\unc\share\dir\file.ext", true)]
+        [TestCase(@"\\unc\share", true)]
+        [TestCase(@"file.ext", false)]
+        [TestCase(@"dir\file.ext", false)]
+        [TestCase(@"\dir\file.ext", false)]
+        [TestCase(@"C:", false)]
+        [TestCase(@"C:dir\file.ext", false)]
+        [TestCase(@"\dir", false)] // An "absolute", but not "full" path
+        [TestCase(null, false, false)]
+        [TestCase("", false, false)]
+        [TestCase("   ", false, false)]
+        [TestCase(@"C:\inval|d", false, false)]
+        [TestCase(@"\\is_this_a_dir_or_a_hostname", false, false)]
+        public static void IsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
+        {
+            Assert.AreEqual(expectedIsFull, MailMergeLib.Tools.IsFullPath(path), "IsFullPath('" + path + "')");
+
+            if (expectedIsFull)
+            {
+                Assert.AreEqual(path, Path.GetFullPath(path));
+            }
+            else if (expectedIsValid)
+            {
+                Assert.AreNotEqual(path, Path.GetFullPath(path));
+            }
+            else
+            {
+                Assert.That(() => Path.GetFullPath(path), Throws.Exception);
+            }
+        }
+
+
+
         [Test]
         [TestCase(null, null, "")]
         [TestCase(null, "", null)]

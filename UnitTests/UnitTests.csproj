@@ -77,6 +77,7 @@
     <Compile Include="EmailValidator.cs" />
     <Compile Include="FileMessageStore_Serialization.cs" />
     <Compile Include="FileMessageInfo.cs" />
+    <Compile Include="Message_Config.cs" />
     <Compile Include="MessageInfo.cs" />
     <Compile Include="Message_Variables.cs" />
     <Compile Include="Message_Templates.cs" />
@@ -94,7 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="TestFiles\LogFile.log" />
     <None Include="TestFiles\Sample.pdf" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestFiles\error.jpg" />
+    <Content Include="TestFiles\LogFile.txt" />
+    <Content Include="TestFiles\Msg01.xml" />
+    <Content Include="TestFiles\Msg02.xml" />
     <Content Include="TestFiles\TextForHtmlConverter.html" />
     <Content Include="TestFiles\SameImageSeveralTimes.html" />
     <Content Include="TestFiles\Mailtext.html" />

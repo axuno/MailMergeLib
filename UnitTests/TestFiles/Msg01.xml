@@ -54,7 +54,7 @@
     <BinaryTransferEncoding>Base64</BinaryTransferEncoding>
     <CharacterEncoding>utf-32</CharacterEncoding>
     <CultureInfo>de-DE</CultureInfo>
-    <FileBaseDirectory>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\</FileBaseDirectory>
+    <FileBaseDirectory>C:\</FileBaseDirectory>
     <IgnoreIllegalRecipientAddresses>False</IgnoreIllegalRecipientAddresses>
     <IgnoreMissingInlineAttachments>True</IgnoreMissingInlineAttachments>
     <IgnoreMissingFileAttachments>True</IgnoreMissingFileAttachments>
@@ -71,12 +71,12 @@
   </Config>
   <FileAttachments>
     <FileAttachment>
-      <Filename>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\LogFile.log</Filename>
+      <Filename>..\..\TestFiles\LogFile.log</Filename>
       <DisplayName>Log file from {Date:yyyy-MM-dd}.log</DisplayName>
       <MimeType>text/plain</MimeType>
     </FileAttachment>
     <FileAttachment>
-      <Filename>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\Sample.pdf</Filename>
+      <Filename>..\..\TestFiles\Sample.pdf</Filename>
       <DisplayName>information.pdf</DisplayName>
       <MimeType>application/pdf</MimeType>
     </FileAttachment>
@@ -90,7 +90,7 @@
   </StringAttachments>
   <ExternalInlineAttachments>
     <FileAttachment>
-      <Filename>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\error.jpg</Filename>
+      <Filename>..\..\TestFiles\error.jpg</Filename>
       <DisplayName>error-image.jpg</DisplayName>
       <MimeType>image/jpeg</MimeType>
     </FileAttachment>

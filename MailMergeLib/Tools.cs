@@ -13,6 +13,26 @@ namespace MailMergeLib
     public static class Tools
     {
         /// <summary>
+        /// Checks whether the given path is a full path
+        /// </summary>
+        /// <remarks>
+        /// Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
+        /// </remarks>
+        /// <param name="path"></param>
+        /// <returns>Returns true if the path is absolute, else false.</returns>
+        public static bool IsFullPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
+                return false;
+
+            var pathRoot = Path.GetPathRoot(path);
+            if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
+                return false;
+
+            return !(pathRoot == path && pathRoot.StartsWith("\\\\") && pathRoot.IndexOf('\\', 2) == -1); // A UNC server name without a share name (e.g "\\NAME") is invalid
+        }
+
+        /// <summary>
         /// Combines the specified filename with the basename of 
         /// to form a full path to file or directory.
         /// </summary>

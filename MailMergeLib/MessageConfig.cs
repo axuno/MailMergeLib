@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using MimeKit;
@@ -12,11 +13,13 @@ namespace MailMergeLib
     [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly, Options = YAXSerializationOptions.DontSerializeNullObjects)]
     public class MessageConfig
     {
+        private string _fileBaseDirectory = Path.GetTempPath();
+
         /// <summary>
         /// CTOR for MailMergeMessage configuration.
         /// </summary>
         public MessageConfig()
-        {}
+        { }
 
         /// <summary>
         /// Content transfer encoding for text like HTML.
@@ -69,7 +72,25 @@ namespace MailMergeLib
         /// It is useful for retrieval of inline attachments (linked resources of the HTML body).
         /// </summary>
         [YAXSerializableField]
-        public string FileBaseDirectory { get; set; } = Path.GetTempPath();
+        public string FileBaseDirectory
+        {
+            get => _fileBaseDirectory;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    _fileBaseDirectory = Path.GetTempPath();
+                    return;
+                }
+
+                if (!Tools.IsFullPath(value))
+                {
+                    throw new ArgumentException($"{value} is not a full path for property {nameof(FileBaseDirectory)}.");
+                }
+
+                _fileBaseDirectory = value;
+            }
+        }
 
         /// <summary>
         /// If true, empty or illegal recipient addresses will be discarded.
@@ -136,18 +157,18 @@ namespace MailMergeLib
         #region *** Equality ***
         protected bool Equals(MessageConfig other)
         {
-            return TextTransferEncoding == other.TextTransferEncoding && 
-                BinaryTransferEncoding == other.BinaryTransferEncoding && 
-                Equals(CharacterEncoding, other.CharacterEncoding) && 
-                Equals(CultureInfo, other.CultureInfo) && 
-                string.Equals(FileBaseDirectory, other.FileBaseDirectory) && 
-                IgnoreIllegalRecipientAddresses == other.IgnoreIllegalRecipientAddresses && 
+            return TextTransferEncoding == other.TextTransferEncoding &&
+                BinaryTransferEncoding == other.BinaryTransferEncoding &&
+                Equals(CharacterEncoding, other.CharacterEncoding) &&
+                Equals(CultureInfo, other.CultureInfo) &&
+                string.Equals(FileBaseDirectory, other.FileBaseDirectory) &&
+                IgnoreIllegalRecipientAddresses == other.IgnoreIllegalRecipientAddresses &&
                 IgnoreMissingInlineAttachments == other.IgnoreMissingInlineAttachments &&
                 IgnoreMissingFileAttachments == other.IgnoreMissingFileAttachments &&
                 Priority == other.Priority &&
-                Equals(StandardFromAddress, other.StandardFromAddress) && 
-                string.Equals(Organization, other.Organization) && 
-                string.Equals(Xmailer, other.Xmailer) && 
+                Equals(StandardFromAddress, other.StandardFromAddress) &&
+                string.Equals(Organization, other.Organization) &&
+                string.Equals(Xmailer, other.Xmailer) &&
                 SmartFormatterConfig.Equals(other.SmartFormatterConfig);
         }
 
@@ -164,22 +185,22 @@ namespace MailMergeLib
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((MessageConfig) obj);
+            return Equals((MessageConfig)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = (int) TextTransferEncoding;
-                hashCode = (hashCode * 397) ^ (int) BinaryTransferEncoding;
+                var hashCode = (int)TextTransferEncoding;
+                hashCode = (hashCode * 397) ^ (int)BinaryTransferEncoding;
                 hashCode = (hashCode * 397) ^ (CharacterEncoding != null ? CharacterEncoding.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (CultureInfo != null ? CultureInfo.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (FileBaseDirectory != null ? FileBaseDirectory.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ IgnoreIllegalRecipientAddresses.GetHashCode();
                 hashCode = (hashCode * 397) ^ IgnoreMissingInlineAttachments.GetHashCode();
                 hashCode = (hashCode * 397) ^ IgnoreMissingFileAttachments.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) Priority;
+                hashCode = (hashCode * 397) ^ (int)Priority;
                 hashCode = (hashCode * 397) ^ (StandardFromAddress != null ? StandardFromAddress.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Organization != null ? Organization.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Xmailer != null ? Xmailer.GetHashCode() : 0);

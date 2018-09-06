@@ -54,7 +54,7 @@
     <BinaryTransferEncoding>Base64</BinaryTransferEncoding>
     <CharacterEncoding>utf-32</CharacterEncoding>
     <CultureInfo>de-DE</CultureInfo>
-    <FileBaseDirectory>d:\Documents\Visual Studio 2015\Projects\MailMergeLib-5\UnitTests\bin\Debug\..\..\TestFiles\</FileBaseDirectory>
+    <FileBaseDirectory>C:\</FileBaseDirectory>
     <IgnoreIllegalRecipientAddresses>False</IgnoreIllegalRecipientAddresses>
     <IgnoreMissingInlineAttachments>True</IgnoreMissingInlineAttachments>
     <IgnoreMissingFileAttachments>True</IgnoreMissingFileAttachments>
