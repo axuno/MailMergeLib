@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/MailMergeLib/blob/master/License.txt)
 [![Build status](https://ci.appveyor.com/api/projects/status/9gpm43038riwlbu2/branch/master?svg=true)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master)
 [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/mailmergelib.svg)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master/tests)
+[![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib)
 
 
 
