@@ -6,7 +6,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
     /// <summary>
     /// Do the default formatting, same logic as "String.Format".
     /// </summary>
-    public class DefaultFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class DefaultFormatter : IFormatter
     {
         public string[] Names { get; set; } = {"default", "d", ""};
 

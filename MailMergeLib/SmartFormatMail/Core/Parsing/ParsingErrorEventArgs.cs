@@ -5,7 +5,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// <summary>
     /// Supplies information about parsing errors.
     /// </summary>
-    public class ParsingErrorEventArgs : EventArgs
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ParsingErrorEventArgs : EventArgs
     {
         internal ParsingErrorEventArgs(ParsingErrors errors, bool throwsException)
         {

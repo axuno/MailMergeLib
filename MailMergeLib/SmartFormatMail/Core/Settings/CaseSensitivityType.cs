@@ -1,6 +1,6 @@
 ﻿namespace MailMergeLib.SmartFormatMail.Core.Settings
 {
-    public enum CaseSensitivityType
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public enum CaseSensitivityType
     {
         CaseSensitive,
         CaseInsensitive

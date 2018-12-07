@@ -5,6 +5,7 @@ using System.Threading;
 using MailMergeLib.SmartFormatMail.Core.Extensions;
 using MailMergeLib.SmartFormatMail.Core.Parsing;
 using MailMergeLib.SmartFormatMail.Core.Settings;
+
 #if !NETSTANDARD
 // Not supported by .Net Core
 using System.Runtime.Remoting.Messaging;
@@ -32,7 +33,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
     /// CustomFormat("{Sizes:{Width}x{Height}|, }", {new Size(4,3), new Size(16,9)}) = "4x3, 16x9"
     /// In this example, format = "{Width}x{Height}".  Notice the nested braces.
     /// </summary>
-    public class ListFormatter : IFormatter, ISource
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ListFormatter : IFormatter, ISource
     {
         private readonly SmartSettings _smartSettings;
 
@@ -98,7 +99,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
 
-#if NET45
+#if !NETSTANDARD
         /// <summary>
         /// The key for CallContext.Logical[Get|Set]Data().
         /// </summary>

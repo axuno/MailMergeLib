@@ -4,7 +4,7 @@ using MailMergeLib.SmartFormatMail.Core.Extensions;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class XElementFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class XElementFormatter : IFormatter
     {
         public string[] Names { get; set; } = {"xelement", "xml", "x", ""};
 

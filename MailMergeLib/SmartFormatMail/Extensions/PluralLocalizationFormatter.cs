@@ -8,7 +8,7 @@ using MailMergeLib.SmartFormatMail.Utilities;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class PluralLocalizationFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class PluralLocalizationFormatter : IFormatter
     {
         private PluralRules.PluralRuleDelegate defaultPluralRule;
         private string defaultTwoLetterISOLanguageName;
@@ -108,7 +108,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
     /// <summary>
     /// Use this class to provide custom plural rules to Smart.Format
     /// </summary>
-    public class CustomPluralRuleProvider : IFormatProvider
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class CustomPluralRuleProvider : IFormatProvider
     {
         private readonly PluralRules.PluralRuleDelegate _pluralRule;
 

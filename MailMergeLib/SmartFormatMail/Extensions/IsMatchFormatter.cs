@@ -14,7 +14,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
     /// Or in context of a list:
     /// {myList:list:{:ismatch(^regex$):{:format}|'no match'}|, | and }
     /// </remarks>
-    public class IsMatchFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class IsMatchFormatter : IFormatter
     {
         public string[] Names { get; set; } = { "ismatch" };
 

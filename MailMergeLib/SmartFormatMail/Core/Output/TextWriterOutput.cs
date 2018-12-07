@@ -6,7 +6,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Output
     /// <summary>
     /// Wraps a TextWriter so that it can be used for output.
     /// </summary>
-    public class TextWriterOutput : IOutput
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class TextWriterOutput : IOutput
     {
         public TextWriterOutput(TextWriter output)
         {

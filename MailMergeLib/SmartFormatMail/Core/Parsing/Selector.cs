@@ -7,7 +7,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// in the text in a <see cref="Placeholder" />
     /// that comes before the colon.
     /// </summary>
-    public class Selector : FormatItem
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class Selector : FormatItem
     {
         /// <summary>
         /// Keeps track of where the "operators" started for this item.

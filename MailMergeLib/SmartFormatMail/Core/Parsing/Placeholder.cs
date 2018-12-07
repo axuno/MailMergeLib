@@ -15,7 +15,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// the <see cref="FormatterOptions" /> is "1,2,3",
     /// and the <see cref="Format" /> is "one|two|three".
     /// </example>
-    public class Placeholder : FormatItem
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class Placeholder : FormatItem
     {
         public readonly Format parent;
 

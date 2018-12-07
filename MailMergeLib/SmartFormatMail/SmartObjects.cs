@@ -24,7 +24,7 @@ namespace MailMergeLib.SmartFormatMail
     /// Smart.Format("{myKey} - {mySecondKey}", smartSrc);
     /// result: "myValue - mySecondValue"
     /// </code>
-    public class SmartObjects : List<object>
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class SmartObjects : List<object>
     {
         /// <summary>
         /// Initializes a new instance of the <c>SmartObjects</c> class.

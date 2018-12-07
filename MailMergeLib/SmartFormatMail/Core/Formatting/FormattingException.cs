@@ -6,7 +6,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Formatting
     /// <summary>
     /// An exception caused while attempting to output the format.
     /// </summary>
-    public class FormattingException : Exception
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormattingException : Exception
     {
         public FormattingException(FormatItem errorItem, Exception formatException, int index)
         {

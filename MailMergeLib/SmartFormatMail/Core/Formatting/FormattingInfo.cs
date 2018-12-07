@@ -3,7 +3,7 @@ using MailMergeLib.SmartFormatMail.Core.Parsing;
 
 namespace MailMergeLib.SmartFormatMail.Core.Formatting
 {
-    public class FormattingInfo : IFormattingInfo, ISelectorInfo
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormattingInfo : IFormattingInfo, ISelectorInfo
     {
         public FormattingInfo(FormatDetails formatDetails, Format format, object currentValue)
             : this(null, formatDetails, format, currentValue)

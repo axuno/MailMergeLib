@@ -10,7 +10,7 @@ namespace MailMergeLib.SmartFormatMail.Utilities
     ///  var textWithLink = String.Format("Please click on {0:this link}.", new FormatDelegate((text) => Html.ActionLink(text, "SomeAction"));
     ///  </code>
     /// </summary>
-    public class FormatDelegate : IFormattable
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormatDelegate : IFormattable
     {
         private readonly Func<string, string> getFormat1;
         private readonly Func<string, IFormatProvider, string> getFormat2;

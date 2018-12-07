@@ -1,17 +1,13 @@
-﻿using MailMergeLib.SmartFormatMail;
-using MailMergeLib.SmartFormatMail.Core.Extensions;
-using MailMergeLib.SmartFormatMail.Extensions;
+﻿using SmartFormat;
+using SmartFormat.Core.Extensions;
+using SmartFormat.Extensions;
+using SmartFormatMail = SmartFormat;
 
 namespace MailMergeLib
 {
     /// <summary>
     /// The formatter used by MailMergeLib for replacing placeholders with variables' content.
     /// </summary>
-    /// <remarks>
-    /// MailSmartFormatter derives from SmartFormatter.
-    /// SmartFormatter was extend with public HashSet&lt;string&gt; properties MissingVariables and MissingFormatters.
-    /// This way we can set formatErrorAction = ErrorAction.Ignore, track missing variables and decide for throwing an exception later when generating the MimeMessage.
-    /// </remarks>
     /// <example>
     /// Assume an object x with property "Name"
     /// a) Format depending on Name is null or string.Empty or other: Format("{Name:choose(null|):N/A|empty|{Name}}", x);
@@ -26,7 +22,7 @@ namespace MailMergeLib
             // Note, the order is important; the extensions
             // will be executed in this order:
             var listFormatter = new ListFormatter(this);
-
+            
             AddExtensions(
                 (ISource)listFormatter, // ListFormatter MUST be first
                 new DictionarySource(this),

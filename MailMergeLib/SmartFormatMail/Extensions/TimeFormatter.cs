@@ -5,7 +5,7 @@ using MailMergeLib.SmartFormatMail.Utilities;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class TimeFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class TimeFormatter : IFormatter
     {
         public string[] Names { get; set; } = {"timespan", "time", "t", ""};
 

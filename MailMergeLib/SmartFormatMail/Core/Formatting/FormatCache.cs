@@ -7,7 +7,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Formatting
     /// Caches information about a format operation
     /// so that repeat calls can be optimized to run faster.
     /// </summary>
-    public class FormatCache
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormatCache
     {
         private Dictionary<string, object> cachedObjects;
 

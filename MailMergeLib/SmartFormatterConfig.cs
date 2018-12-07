@@ -1,5 +1,6 @@
 ﻿using System;
-using MailMergeLib.SmartFormatMail.Core.Settings;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
 namespace MailMergeLib
 {
@@ -54,7 +55,7 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        /// This setting is relevant for the <see cref="SmartFormatMail.Core.Parsing.LiteralText"/>.
+        /// This setting is relevant for the <see cref="LiteralText"/>.
         /// If true (the default), character string literals are treated like in "normal" string.Format:
         ///    string.Format("\t")   will return a "TAB" character
         /// If false, character string literals are not converted, just like with this string.Format:

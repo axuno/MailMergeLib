@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using MailMergeLib.MessageStore;
 using MailMergeLib.Serialization;
-using MailMergeLib.SmartFormatMail.Extensions;
+using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
 using YAXLib;
@@ -349,11 +349,11 @@ namespace MailMergeLib
             {
                 return SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
             }
-            catch (SmartFormatMail.Core.Parsing.ParsingErrors ex)
+            catch (SmartFormat.Core.Parsing.ParsingErrors ex)
             {
                 return text;
             }
-            catch (SmartFormatMail.Core.Formatting.FormattingException)
+            catch (SmartFormat.Core.Formatting.FormattingException)
             {
                 return text;
             }
@@ -383,11 +383,11 @@ namespace MailMergeLib
                 filenameSmartFormatter.Settings.ConvertCharacterStringLiterals = false;
                 return filenameSmartFormatter.Format(Config?.CultureInfo, text, dataItem);
             }
-            catch (SmartFormatMail.Core.Parsing.ParsingErrors)
+            catch (SmartFormat.Core.Parsing.ParsingErrors)
             {
                 return text;
             }
-            catch (SmartFormatMail.Core.Formatting.FormattingException)
+            catch (SmartFormat.Core.Formatting.FormattingException)
             {
                 return text;
             }

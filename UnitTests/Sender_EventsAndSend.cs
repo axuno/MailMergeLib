@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
 using MailMergeLib;
-using MailMergeLib.SmartFormatMail.Core.Settings;
+using SmartFormat.Core.Settings;
 using MimeKit;
 using netDumbster.smtp;
 using NUnit.Framework;

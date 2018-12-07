@@ -5,7 +5,7 @@ using MailMergeLib.SmartFormatMail.Core.Extensions;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class DictionarySource : ISource
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class DictionarySource : ISource
     {
         public DictionarySource(SmartFormatter formatter)
         {

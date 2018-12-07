@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class JsonSource : ISource
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class JsonSource : ISource
     {
         public JsonSource(SmartFormatter formatter)
         {

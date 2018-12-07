@@ -7,7 +7,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Output
     /// Wraps a StringBuilder so it can be used for output.
     /// This is used for the default output.
     /// </summary>
-    public class StringOutput : IOutput
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class StringOutput : IOutput
     {
         private readonly StringBuilder output;
 

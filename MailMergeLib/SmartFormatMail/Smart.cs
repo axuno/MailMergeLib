@@ -8,7 +8,7 @@ namespace MailMergeLib.SmartFormatMail
     /// This class holds a Default instance of the SmartFormatter.
     /// The default instance has all extensions registered.
     /// </summary>
-    public static class Smart
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public static class Smart
     {
         #region: Smart.Format :
 
@@ -86,6 +86,7 @@ namespace MailMergeLib.SmartFormatMail
                 new TimeFormatter("en"),
                 new XElementFormatter(),
                 new ChooseFormatter(),
+                new SubStringFormatter(),
                 new DefaultFormatter()
             );
 

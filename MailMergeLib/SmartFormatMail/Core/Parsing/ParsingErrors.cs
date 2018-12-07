@@ -8,7 +8,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// Represents parsing errors in a Format string.
     /// This exception only gets thrown when Parser.ErrorAction is set to ThrowError.
     /// </summary>
-    public class ParsingErrors : Exception
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ParsingErrors : Exception
     {
         private readonly Format result;
 
@@ -69,7 +69,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             Issues.Add(new ParsingIssue(issue, startIndex, endIndex - startIndex));
         }
 
-        public class ParsingIssue
+        [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ParsingIssue
         {
             public ParsingIssue(string issue, int index, int length)
             {

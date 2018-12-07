@@ -5,7 +5,7 @@ using MailMergeLib.SmartFormatMail.Core.Parsing;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class ChooseFormatter : IFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ChooseFormatter : IFormatter
     {
         public char SplitChar { get; set; } = '|';
         public string[] Names { get; set; } = {"choose", "c"};

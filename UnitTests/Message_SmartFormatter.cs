@@ -4,8 +4,8 @@ using System.Data;
 using System.Dynamic;
 using System.Globalization;
 using MailMergeLib;
-using MailMergeLib.SmartFormatMail.Core.Parsing;
-using MailMergeLib.SmartFormatMail.Core.Settings;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 

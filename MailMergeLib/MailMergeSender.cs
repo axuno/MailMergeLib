@@ -682,7 +682,7 @@ namespace MailMergeLib
                     sendException = ex;
                     // exceptions which are thrown by SmtpClient:
                     if (ex is SmtpCommandException || ex is SmtpProtocolException ||
-                        ex is AuthenticationException || ex is System.Net.Sockets.SocketException)
+                        ex is AuthenticationException || ex is System.Net.Sockets.SocketException || ex is System.IO.IOException)
                     {
                         failureCounter++;
                         OnSendFailure?.Invoke(smtpClient,
@@ -758,6 +758,10 @@ namespace MailMergeLib
                 throw new SmtpProtocolException(
                     $"{errorConnect} {hostPortConfig}'. " + ex.Message);
             }
+            catch (System.IO.IOException ex)
+            {
+                throw new System.IO.IOException($"{errorConnect} {hostPortConfig}'. " + ex.Message);
+            }
 
             if (config.NetworkCredential != null && !smtpClient.IsAuthenticated && smtpClient.Capabilities.HasFlag(SmtpCapabilities.Authentication))
             {
@@ -771,7 +775,8 @@ namespace MailMergeLib
                 }
                 catch (SmtpCommandException ex)
                 {
-                    throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"{errorAuth} {hostPortConfig}. " + ex.Message);
+                    throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                        $"{errorAuth} {hostPortConfig}. " + ex.Message);
                 }
                 catch (SmtpProtocolException ex)
                 {

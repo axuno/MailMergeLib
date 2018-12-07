@@ -13,7 +13,7 @@ namespace MailMergeLib.SmartFormatMail
     /// This class contains the Format method that constructs
     /// the composite string by invoking each extension.
     /// </summary>
-    public class SmartFormatter
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class SmartFormatter
     {
         #region : EventHandlers :
 

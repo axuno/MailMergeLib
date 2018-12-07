@@ -5,9 +5,9 @@ using MailMergeLib.SmartFormatMail.Core.Parsing;
 namespace MailMergeLib.SmartFormatMail.Core.Settings
 {
     /// <summary>
-    /// <see cref="MailMergeLib.SmartFormatMail" /> settings to be applied for parsing and formatting.
+    /// <see cref="SmartFormatMail" /> settings to be applied for parsing and formatting.
     /// </summary>
-    public class SmartSettings
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class SmartSettings
     {
         internal SmartSettings()
         {

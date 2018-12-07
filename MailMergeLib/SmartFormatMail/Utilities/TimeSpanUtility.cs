@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace MailMergeLib.SmartFormatMail.Utilities
 {
-    public static class TimeSpanUtility
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public static class TimeSpanUtility
     {
         #region: ToTimeString :
 
@@ -236,7 +236,7 @@ namespace MailMergeLib.SmartFormatMail.Utilities
     /// </para>
     /// </summary>
     [Flags]
-    public enum TimeSpanFormatOptions
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public enum TimeSpanFormatOptions
     {
         /// <summary>
         /// Specifies that all <c>timeSpanFormatOptions</c> should be inherited from
@@ -482,7 +482,7 @@ namespace MailMergeLib.SmartFormatMail.Utilities
     /// <summary>
     /// Supplies the localized text used for TimeSpan formatting.
     /// </summary>
-    public class TimeTextInfo
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class TimeTextInfo
     {
         private readonly string[] d;
         private readonly string[] day;
@@ -572,7 +572,7 @@ namespace MailMergeLib.SmartFormatMail.Utilities
         }
     }
 
-    public static class CommonLanguagesTimeTextInfo
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public static class CommonLanguagesTimeTextInfo
     {
         public static TimeTextInfo English => new TimeTextInfo(
             PluralRules.GetPluralRule("en"),

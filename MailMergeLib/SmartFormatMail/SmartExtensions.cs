@@ -5,7 +5,7 @@ using MailMergeLib.SmartFormatMail.Core.Output;
 
 namespace MailMergeLib.SmartFormatMail
 {
-    public static class SmartExtensions
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public static class SmartExtensions
     {
         #region: StringBuilder :
 

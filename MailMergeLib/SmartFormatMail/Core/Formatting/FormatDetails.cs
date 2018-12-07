@@ -9,7 +9,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Formatting
     /// Contains extra information about the item currently being formatted.
     /// These objects are not often used, so they are all wrapped up here.
     /// </summary>
-    public class FormatDetails
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormatDetails
     {
         public FormatDetails(SmartFormatter formatter, Format originalFormat, object[] originalArgs,
             FormatCache formatCache, IFormatProvider provider, IOutput output)

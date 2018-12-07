@@ -4,7 +4,7 @@ using MailMergeLib.SmartFormatMail.Core.Extensions;
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class ReflectionSource : ISource
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ReflectionSource : ISource
     {
         public ReflectionSource(SmartFormatter formatter)
         {

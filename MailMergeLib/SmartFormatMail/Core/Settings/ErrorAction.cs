@@ -3,7 +3,7 @@
     /// <summary>
     /// Determines how format errors are handled.
     /// </summary>
-    public enum ErrorAction
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public enum ErrorAction
     {
         /// <summary>Throws an exception.  This is only recommended for debugging, so that formatting errors can be easily found.</summary>
         ThrowError,

@@ -5,7 +5,7 @@ namespace MailMergeLib.SmartFormatMail
     /// <summary>
     /// Supplies information about formatting errors.
     /// </summary>
-    public class FormattingErrorEventArgs : EventArgs
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class FormattingErrorEventArgs : EventArgs
     {
         internal FormattingErrorEventArgs(string rawText, int errorIndex, bool ignoreError)
         {

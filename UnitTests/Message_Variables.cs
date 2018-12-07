@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using NUnit.Framework;
 using MailMergeLib;
-using MailMergeLib.SmartFormatMail;
+using SmartFormat;
 using Newtonsoft.Json.Linq;
 
 namespace UnitTests

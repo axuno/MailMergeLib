@@ -7,7 +7,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// Represents the literal text that is found
     /// in a parsed format string.
     /// </summary>
-    public class LiteralText : FormatItem
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class LiteralText : FormatItem
     {
         public LiteralText(SmartSettings smartSettings, Format parent, int startIndex) : base(smartSettings, parent,
             startIndex)

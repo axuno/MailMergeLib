@@ -12,7 +12,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// including <see cref="LiteralText" />s
     /// and <see cref="Placeholder" />s.
     /// </summary>
-    public class Format : FormatItem
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class Format : FormatItem
     {
         #region: Constructors :
 

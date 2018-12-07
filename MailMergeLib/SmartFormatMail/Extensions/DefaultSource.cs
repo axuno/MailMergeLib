@@ -2,7 +2,7 @@
 
 namespace MailMergeLib.SmartFormatMail.Extensions
 {
-    public class DefaultSource : ISource
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class DefaultSource : ISource
     {
         public DefaultSource(SmartFormatter formatter)
         {

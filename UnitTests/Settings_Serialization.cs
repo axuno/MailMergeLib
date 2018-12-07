@@ -5,7 +5,7 @@ using System.Security.Authentication;
 using System.Text;
 using MailKit.Security;
 using MailMergeLib;
-using MailMergeLib.SmartFormatMail.Core.Settings;
+using SmartFormat.Core.Settings;
 using MimeKit;
 using NUnit.Framework;
 

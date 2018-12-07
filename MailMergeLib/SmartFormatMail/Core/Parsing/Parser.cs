@@ -8,7 +8,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
     /// <summary>
     /// Parses a format string.
     /// </summary>
-    public class Parser
+    [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class Parser
     {
         #region: Settings :
 
@@ -474,7 +474,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             set => Settings.ParseErrorAction = value;
         }
 
-        public enum ParsingError
+        [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public enum ParsingError
         {
             TooManyClosingBraces = 1,
             TrailingOperatorsInSelector,
@@ -482,7 +482,7 @@ namespace MailMergeLib.SmartFormatMail.Core.Parsing
             MissingClosingBrace
         }
 
-        public class ParsingErrorText
+        [System.Obsolete("Use classes in namespace 'SmartFormat' instead of 'MailMergeLib.SmartFormatMail'", false)] public class ParsingErrorText
         {
             private readonly Dictionary<ParsingError, string> _errors = new Dictionary<ParsingError, string>
             {
