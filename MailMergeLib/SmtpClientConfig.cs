@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using MailMergeLib.Serialization;
 using YAXLib;
-#if !NETSTANDARD
+#if NET45
 using System.Configuration;
 using System.Net.Configuration;
 #endif

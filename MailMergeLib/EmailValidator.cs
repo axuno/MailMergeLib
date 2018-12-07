@@ -1,9 +1,9 @@
 ﻿//
 // EmailValidator.cs
 //
-// Author: Jeffrey Stedfast <jeff@xamarin.com>
+// Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2013 Xamarin Inc.
+// Copyright (c) 2013-2017 Jeffrey Stedfast
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,34 +28,105 @@ using System;
 namespace MailMergeLib
 {
     /// <summary>
-    /// A simple (but correct) .NET class for validating email addresses by Jeffrey Stedfast.
-    /// Supports mail addresses as defined in rfc5322 as well as the new Internationalized Mail Address standards(rfc653x)..
+    /// An Email validator.
     /// </summary>
     /// <remarks>
-    /// Other Implementations:
-    /// javascript by Pavel Azanov: https://github.com/azanov/isMailFine
-    /// pascal by Ugochukwu Mmaduekwe: https://github.com/Xor-el/EmailValidationPascal
+    /// An Email validator.
     /// </remarks>
     public static class EmailValidator
     {
-        private const string AtomCharacters = "!#$%&'*+-/=?^_`{|}~";
+        const string AtomCharacters = "!#$%&'*+-/=?^_`{|}~";
 
-        private static bool IsLetterOrDigit(char c)
+        [Flags]
+        enum SubDomainType
         {
-            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+            None = 0,
+            Alphabetic = 1,
+            Numeric = 2,
+            AlphaNumeric = 3
         }
 
-        private static bool IsAtom(char c, bool allowInternational)
+        static bool IsDigit(char c)
+        {
+            return (c >= '0' && c <= '9');
+        }
+
+        static bool IsLetter(char c)
+        {
+            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+        }
+
+        static bool IsLetterOrDigit(char c)
+        {
+            return IsLetter(c) || IsDigit(c);
+        }
+
+        static bool IsAtom(char c, bool allowInternational)
         {
             return c < 128 ? IsLetterOrDigit(c) || AtomCharacters.IndexOf(c) != -1 : allowInternational;
         }
 
-        private static bool IsDomain(char c, bool allowInternational)
+        static bool IsDomain(char c, bool allowInternational, ref SubDomainType type)
         {
-            return c < 128 ? IsLetterOrDigit(c) || c == '-' : allowInternational;
+            if (c < 128)
+            {
+                if (IsLetter(c) || c == '-')
+                {
+                    type |= SubDomainType.Alphabetic;
+                    return true;
+                }
+
+                if (IsDigit(c))
+                {
+                    type |= SubDomainType.Numeric;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (allowInternational)
+            {
+                type |= SubDomainType.Alphabetic;
+                return true;
+            }
+
+            return false;
         }
 
-        private static bool SkipAtom(string text, ref int index, bool allowInternational)
+        static bool IsDomainStart(char c, bool allowInternational, out SubDomainType type)
+        {
+            if (c < 128)
+            {
+                if (IsLetter(c))
+                {
+                    type = SubDomainType.Alphabetic;
+                    return true;
+                }
+
+                if (IsDigit(c))
+                {
+                    type = SubDomainType.Numeric;
+                    return true;
+                }
+
+                type = SubDomainType.None;
+
+                return false;
+            }
+
+            if (allowInternational)
+            {
+                type = SubDomainType.Alphabetic;
+                return true;
+            }
+
+            type = SubDomainType.None;
+
+            return false;
+        }
+
+        static bool SkipAtom(string text, ref int index, bool allowInternational)
         {
             int startIndex = index;
 
@@ -65,24 +136,26 @@ namespace MailMergeLib
             return index > startIndex;
         }
 
-        private static bool SkipSubDomain(string text, ref int index, bool allowInternational)
+        static bool SkipSubDomain(string text, ref int index, bool allowInternational, out SubDomainType type)
         {
             int startIndex = index;
 
-            if (!IsDomain(text[index], allowInternational) || text[index] == '-')
+            if (!IsDomainStart(text[index], allowInternational, out type))
                 return false;
 
             index++;
 
-            while (index < text.Length && IsDomain(text[index], allowInternational))
+            while (index < text.Length && IsDomain(text[index], allowInternational, ref type))
                 index++;
 
             return (index - startIndex) < 64 && text[index - 1] != '-';
         }
 
-        private static bool SkipDomain(string text, ref int index, bool allowTopLevelDomains, bool allowInternational)
+        static bool SkipDomain(string text, ref int index, bool allowTopLevelDomains, bool allowInternational)
         {
-            if (!SkipSubDomain(text, ref index, allowInternational))
+            SubDomainType type;
+
+            if (!SkipSubDomain(text, ref index, allowInternational, out type))
                 return false;
 
             if (index < text.Length && text[index] == '.')
@@ -94,7 +167,7 @@ namespace MailMergeLib
                     if (index == text.Length)
                         return false;
 
-                    if (!SkipSubDomain(text, ref index, allowInternational))
+                    if (!SkipSubDomain(text, ref index, allowInternational, out type))
                         return false;
                 } while (index < text.Length && text[index] == '.');
             }
@@ -103,10 +176,14 @@ namespace MailMergeLib
                 return false;
             }
 
+            // Note: by allowing AlphaNumeric, we get away with not having to support punycode.
+            if (type == SubDomainType.Numeric)
+                return false;
+
             return true;
         }
 
-        private static bool SkipQuoted(string text, ref int index, bool allowInternational)
+        static bool SkipQuoted(string text, ref int index, bool allowInternational)
         {
             bool escaped = false;
 
@@ -143,15 +220,7 @@ namespace MailMergeLib
             return true;
         }
 
-        private static bool SkipWord(string text, ref int index, bool allowInternational)
-        {
-            if (text[index] == '"')
-                return SkipQuoted(text, ref index, allowInternational);
-
-            return SkipAtom(text, ref index, allowInternational);
-        }
-
-        private static bool SkipIPv4Literal(string text, ref int index)
+        static bool SkipIPv4Literal(string text, ref int index)
         {
             int groups = 0;
 
@@ -162,7 +231,7 @@ namespace MailMergeLib
 
                 while (index < text.Length && text[index] >= '0' && text[index] <= '9')
                 {
-                    value = (value*10) + (text[index] - '0');
+                    value = (value * 10) + (text[index] - '0');
                     index++;
                 }
 
@@ -178,7 +247,7 @@ namespace MailMergeLib
             return groups == 4;
         }
 
-        private static bool IsHexDigit(char c)
+        static bool IsHexDigit(char c)
         {
             return (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || (c >= '0' && c <= '9');
         }
@@ -198,7 +267,7 @@ namespace MailMergeLib
         //             ; The "::" represents at least 2 16-bit groups of zeros
         //             ; No more than 4 groups in addition to the "::" and
         //             ; IPv4-address-literal may be present
-        private static bool SkipIPv6Literal(string text, ref int index)
+        static bool SkipIPv6Literal(string text, ref int index)
         {
             bool compact = false;
             int colons = 0;
@@ -264,13 +333,15 @@ namespace MailMergeLib
         /// </summary>
         /// <remarks>
         /// <para>Validates the syntax of an email address.</para>
-        /// <para>If <paramref name="allowInternational"/> is <value>true</value>, then the validator
+        /// <para>If <paramref name="allowTopLevelDomains"/> is <c>true</c>, then the validator will
+        /// allow addresses with top-level domains like <c>postmaster@dk</c>.</para>
+        /// <para>If <paramref name="allowInternational"/> is <c>true</c>, then the validator
         /// will use the newer International Email standards for validating the email address.</para>
         /// </remarks>
-        /// <returns><c>true</c> if the email address is valid; otherwise <c>false</c>.</returns>
+        /// <returns><c>true</c> if the email address is valid; otherwise, <c>false</c>.</returns>
         /// <param name="email">An email address.</param>
-        /// <param name="allowTopLevelDomains"><value>true</value> if the validator should allow addresses at top-level domains; otherwise, <value>false</value>.</param>
-        /// <param name="allowInternational"><value>true</value> if the validator should allow international characters; otherwise, <value>false</value>.</param>
+        /// <param name="allowTopLevelDomains"><c>true</c> if the validator should allow addresses at top-level domains; otherwise, <c>false</c>.</param>
+        /// <param name="allowInternational"><c>true</c> if the validator should allow international characters; otherwise, <c>false</c>.</param>
         /// <exception cref="System.ArgumentNullException">
         /// <paramref name="email"/> is <c>null</c>.
         /// </exception>
@@ -279,26 +350,40 @@ namespace MailMergeLib
             int index = 0;
 
             if (email == null)
-                throw new ArgumentNullException("email");
+                throw new ArgumentNullException(nameof(email));
 
             if (email.Length == 0 || email.Length >= 255)
                 return false;
 
-            if (!SkipWord(email, ref index, allowInternational) || index >= email.Length)
-                return false;
-
-            while (email[index] == '.')
+            // Local-part = Dot-string / Quoted-string
+            //       ; MAY be case-sensitive
+            //
+            // Dot-string = Atom *("." Atom)
+            //
+            // Quoted-string = DQUOTE *qcontent DQUOTE
+            if (email[index] == '"')
             {
-                index++;
-
-                if (index >= email.Length)
+                if (!SkipQuoted(email, ref index, allowInternational) || index >= email.Length)
+                    return false;
+            }
+            else
+            {
+                if (!SkipAtom(email, ref index, allowInternational) || index >= email.Length)
                     return false;
 
-                if (!SkipWord(email, ref index, allowInternational))
-                    return false;
+                while (email[index] == '.')
+                {
+                    index++;
 
-                if (index >= email.Length)
-                    return false;
+                    if (index >= email.Length)
+                        return false;
+
+                    if (!SkipAtom(email, ref index, allowInternational))
+                        return false;
+
+                    if (index >= email.Length)
+                        return false;
+                }
             }
 
             if (index + 1 >= email.Length || index > 64 || email[index++] != '@')

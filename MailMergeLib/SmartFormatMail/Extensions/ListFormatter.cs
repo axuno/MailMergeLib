@@ -98,7 +98,7 @@ namespace MailMergeLib.SmartFormatMail.Extensions
         // same with: private static ThreadLocal<int> CollectionIndex2 = new ThreadLocal<int>(() => -1);
         // Good example: https://msdn.microsoft.com/en-us/library/dn906268(v=vs.110).aspx
 
-#if !NETSTANDARD
+#if NET45
         /// <summary>
         /// The key for CallContext.Logical[Get|Set]Data().
         /// </summary>

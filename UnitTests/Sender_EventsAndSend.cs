@@ -48,6 +48,7 @@ namespace UnitTests
             mms.OnSendFailure += onSendFailure;
            
             mms.Send(mmm, (object) data);
+            mms.Dispose();
         }
 
         [Test]
@@ -74,8 +75,8 @@ namespace UnitTests
 
             SendMail(OnAfterSend, OnSmtpConnected, OnSmtpDisconnected);
 
-            Assert.AreEqual(connCounter, 1);
-            Assert.AreEqual(disconnCounter, 1);
+            Assert.AreEqual(1, connCounter);
+            Assert.AreEqual(1, disconnCounter);
             Assert.AreEqual(1, _server.ReceivedEmailCount);
             Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig.Name);
 
@@ -175,8 +176,8 @@ namespace UnitTests
                 sequenceOfExpectedEvents.Clear();
                 sequenceOfExpectedEvents.AddRange(new[]
                 {
-                    nameof(mms.OnMessageFailure),
-                    nameof(mms.OnSmtpDisconnected)
+                    nameof(mms.OnMessageFailure)/*,
+                    nameof(mms.OnSmtpDisconnected)*/
                 });
             }
             else
@@ -301,7 +302,7 @@ namespace UnitTests
                 sequenceOfExpectedEvents.AddRange(new[]
                 {
                     nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnMessageFailure),
-                    nameof(mms.OnMergeProgress), nameof(mms.OnSmtpDisconnected), nameof(mms.OnMergeComplete)
+                    nameof(mms.OnMergeProgress), nameof(mms.OnMergeComplete)
                 });
             }
             else

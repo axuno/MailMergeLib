@@ -160,6 +160,7 @@ namespace MailMergeLib
                         }
 
                         smtpClient.ProtocolLogger?.Dispose();
+                        smtpClient.Disconnect(true, _cancellationTokenSource.Token);
                     }
                 }, _cancellationTokenSource.Token);
             }
@@ -240,6 +241,7 @@ namespace MailMergeLib
 
                         await SendMimeMessageAsync(smtpClient, mimeMessage, smtpClientConfig).ConfigureAwait(false);
                         smtpClient.ProtocolLogger?.Dispose();
+                        smtpClient.Disconnect(true, _cancellationTokenSource.Token);
                     }
 
                 }, _cancellationTokenSource.Token).ConfigureAwait(false);
@@ -323,6 +325,7 @@ namespace MailMergeLib
 
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
                             config = backupConfig;
+                            smtpClient.Disconnect(false, _cancellationTokenSource.Token);
                             smtpClient = GetInitializedSmtpClient(config);
                         }
                     }
@@ -544,7 +547,8 @@ namespace MailMergeLib
                     }
                     
                     smtpClient.ProtocolLogger?.Dispose();
-                    smtpClient.Dispose(); // fire OnSmtpDisconnected before OnMergeComplete
+                    smtpClient.Disconnect(true); // fire OnSmtpDisconnected before OnMergeComplete
+                    smtpClient.Dispose();
                     OnMergeComplete?.Invoke(this,
                         new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 0, 1));
                 }
@@ -613,6 +617,7 @@ namespace MailMergeLib
 
                     SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
                     smtpClient.ProtocolLogger?.Dispose();
+                    smtpClient.Disconnect(true);
                 }
             }
             finally
@@ -693,7 +698,13 @@ namespace MailMergeLib
 
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
                             config = backupConfig;
+                            smtpClient.Disconnect(false);
                             smtpClient = GetInitializedSmtpClient(config);
+                        }
+
+                        if (failureCounter == config.MaxFailures && smtpClient.IsConnected)
+                        {
+                            smtpClient.Disconnect(false);
                         }
                     }
                     else
