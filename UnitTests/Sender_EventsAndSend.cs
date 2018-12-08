@@ -698,7 +698,7 @@ namespace UnitTests
                         {
                             MessageOutput = MessageOutput.SmtpServer,
                             SmtpHost = "localhost",
-                            SmtpPort = _server.Port,
+                            SmtpPort = _server.Configuration.Port,
                             NetworkCredential = new Credential("user", "pwd"), // not used for netDumbster
                             SecureSocketOptions = SecureSocketOptions.None,
                             Name = "Standard",
@@ -710,7 +710,7 @@ namespace UnitTests
                         {
                             MessageOutput = MessageOutput.SmtpServer,
                             SmtpHost = "localhost",
-                            SmtpPort = _server.Port,
+                            SmtpPort = _server.Configuration.Port,
                             NetworkCredential = new Credential("user", "pwd"), // not used for netDumbster
                             SecureSocketOptions = SecureSocketOptions.None,
                             Name = "Backup",
