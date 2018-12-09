@@ -1,0 +1,57 @@
+﻿<MailMergeLibSettings xmlns:yaxlib="http://www.sinairv.com/yaxlib/">
+  <Sender>
+    <MaxNumOfSmtpClients>5</MaxNumOfSmtpClients>
+    <SmtpClients>
+      <SmtpClientConfig Name="Best">
+        <SmtpHost>some.host.com</SmtpHost>
+        <SmtpPort>123</SmtpPort>
+        <ClientDomain>TestDomain</ClientDomain>
+        <LocalEndPoint Address="57.48.0.0" Port="123" />
+        <NetworkCredential Username="H2GOPqvaw08=" Password="EiEGuNuyHIH/jB0gGQOnrQ==" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
+        <MailOutputDirectory />
+        <MessageOutput>SmtpServer</MessageOutput>
+        <SslProtocols>Ssl3</SslProtocols>
+        <SecureSocketOptions>StartTlsWhenAvailable</SecureSocketOptions>
+        <Timeout>4321</Timeout>
+        <DelayBetweenMessages>543</DelayBetweenMessages>
+        <MaxFailures>1</MaxFailures>
+        <RetryDelayTime>1234</RetryDelayTime>
+      </SmtpClientConfig>
+      <SmtpClientConfig Name="Next best">
+        <SmtpHost>some.otherhost.com</SmtpHost>
+        <SmtpPort>25</SmtpPort>
+        <ClientDomain />
+        <LocalEndPoint />
+        <NetworkCredential Username="3DezsHsenro=" Password="EiEGuNuyHIE0fj2Qo385WQ==" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
+        <MailOutputDirectory />
+        <MessageOutput>SmtpServer</MessageOutput>
+        <SslProtocols>None</SslProtocols>
+        <SecureSocketOptions>None</SecureSocketOptions>
+        <Timeout>100000</Timeout>
+        <DelayBetweenMessages>2000</DelayBetweenMessages>
+        <MaxFailures>2</MaxFailures>
+        <RetryDelayTime>0</RetryDelayTime>
+      </SmtpClientConfig>
+    </SmtpClients>
+  </Sender>
+  <Message>
+    <TextTransferEncoding>QuotedPrintable</TextTransferEncoding>
+    <BinaryTransferEncoding>UUEncode</BinaryTransferEncoding>
+    <CharacterEncoding>utf-32</CharacterEncoding>
+    <CultureInfo>de-DE</CultureInfo>
+    <FileBaseDirectory>C:\Path-to-Base-Dir</FileBaseDirectory>
+    <IgnoreIllegalRecipientAddresses>False</IgnoreIllegalRecipientAddresses>
+    <IgnoreMissingInlineAttachments>True</IgnoreMissingInlineAttachments>
+    <IgnoreMissingFileAttachments>True</IgnoreMissingFileAttachments>
+    <Priority>Urgent</Priority>
+    <StandardFromAddress>"sender name" &lt;sender@example.com&gt;</StandardFromAddress>
+    <Organization>axuno gGmbH</Organization>
+    <Xmailer>MailMergeLib 5</Xmailer>
+    <SmartFormatterConfig>
+      <ParseErrorAction>MaintainTokens</ParseErrorAction>
+      <FormatErrorAction>OutputErrorInResult</FormatErrorAction>
+      <CaseSensitivity>CaseInsensitive</CaseSensitivity>
+      <ConvertCharacterStringLiterals>True</ConvertCharacterStringLiterals>
+    </SmartFormatterConfig>
+  </Message>
+</MailMergeLibSettings>

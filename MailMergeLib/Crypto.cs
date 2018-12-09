@@ -10,11 +10,13 @@ namespace MailMergeLib
     /// </summary>
     public static class Crypto
     {
-        // The Initialization Vector for the DES encryption routine. You may change this value, but keep the 8 bytes.
-        private static readonly byte[] _Iv = new byte[8] { 255, 33, 128, 49, 0, 76, 177, 155 };
+        /// <summary>
+        /// The Initialization Vector for the DES encryption routine. You should change the default value, but keep the 8 bytes.
+        /// </summary>
+        public static byte[] IV { get; set; } = new byte[8] {255, 33, 128, 49, 0, 76, 177, 155};
 
         /// <summary>
-        /// The crypto key used to calculate an MD5 hash. Change this value before using the Crypto class.
+        /// The crypto key used to calculate an MD5 hash. You should change the default value before using the Crypto class.
         /// </summary>
         public static string CryptoKey { get; set; } = "MailMergeLibCrypt";
 
@@ -36,7 +38,7 @@ namespace MailMergeLib
             var buffer = Encoding.GetBytes(s);
             var des = TripleDES.Create();
             des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
-            des.IV = _Iv;
+            des.IV = IV;
 
             return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
         }
@@ -54,7 +56,7 @@ namespace MailMergeLib
             var buffer = Convert.FromBase64String(s);
             var des = TripleDES.Create();
             des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
-            des.IV = _Iv;
+            des.IV = IV;
 
             return Encoding.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
         }

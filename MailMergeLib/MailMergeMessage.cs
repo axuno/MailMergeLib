@@ -257,7 +257,7 @@ namespace MailMergeLib
         public List<StreamAttachment> StreamAttachments
         {
             get => _streamAttachments;
-            private set => _streamAttachments = value ?? new List<StreamAttachment>();
+            internal set => _streamAttachments = value ?? new List<StreamAttachment>();
         }
 
         /// <summary>
@@ -986,26 +986,6 @@ namespace MailMergeLib
         {
             // not any enty missing in sa11, nor in the other list
             return !sa1.Except(sa2).Union(sa2.Except(sa1)).Any();
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (_mailMergeAddresses != null ? _mailMergeAddresses.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Info != null ? Info.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Headers != null ? Headers.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Subject != null ? Subject.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (PlainText != null ? PlainText.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (HtmlText != null ? HtmlText.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (SmartFormatter != null ? SmartFormatter.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Config != null ? Config.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (FileAttachments != null ? FileAttachments.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (ExternalInlineAttachments != null ? ExternalInlineAttachments.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (StringAttachments != null ? StringAttachments.GetHashCode() : 0);
-
-                return hashCode;
-            }
         }
 
         #endregion

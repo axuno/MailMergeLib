@@ -59,11 +59,11 @@ namespace MailMergeLib
         /// Write MailMergeLib settings to a file.
         /// </summary>
         /// <param name="filename"></param>
-        public void Serialize(string filename)
+        public void Serialize(string filename, Encoding encoding = null)
         {
             using (var fs = new FileStream(filename, FileMode.Create))
             {
-                using (var sr = new StreamWriter(fs))
+                using (var sr = new StreamWriter(fs, encoding ?? Encoding.UTF8))
                 {
                     Serialize(sr, false);
                 }
@@ -106,7 +106,7 @@ namespace MailMergeLib
         /// <param name="encoding"></param>
         public static Settings Deserialize(string filename, Encoding encoding)
         {
-            return SerializationFactory.Deserialize<Settings>(filename, encoding);
+            return SerializationFactory.Deserialize<Settings>(filename, encoding ?? Encoding.UTF8);
         }
 
         /// <summary>

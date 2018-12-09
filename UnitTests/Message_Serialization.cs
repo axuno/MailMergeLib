@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using MailMergeLib;
@@ -22,6 +23,18 @@ namespace UnitTests
         }
 
         [Test]
+        public void SerializationFromToFile()
+        {
+            var filename = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            var mmm = MessageFactory.GetMessageWithAllPropertiesSet();
+            mmm.Serialize(filename, Encoding.Unicode);
+            var back = MailMergeMessage.Deserialize(filename, Encoding.Unicode);
+
+            Assert.True(mmm.Equals(back));
+            Assert.AreEqual(mmm.Serialize(), back.Serialize());
+        }
+
+        [Test]
         public void SerializationFromToStream()
         {
             var mmm = MessageFactory.GetMessageWithAllPropertiesSet();
@@ -35,6 +48,22 @@ namespace UnitTests
 
             Assert.True(mmm.Equals(back));
             Assert.AreEqual(mmm.Serialize(), back.Serialize());
+        }
+
+        [Test]
+        public void MessageClearExternalInlineAttachments()
+        {
+            var mmm = MessageFactory.GetMessageWithAllPropertiesSet();
+            mmm.MailMergeAddresses.Clear();
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "test1@abc.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "test2@abc.com"));
+
+            var mime = mmm.GetMimeMessage(new {Date = DateTime.Now, Success = true, Name = "Joe"});
+            Assert.IsTrue(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") != null);
+
+            mmm.ClearExternalInlineAttachment();
+            mime = mmm.GetMimeMessage(new { Date = DateTime.Now, Success = true, Name = "Joe" });
+            Assert.IsTrue(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") == null);
         }
 
         [Test]

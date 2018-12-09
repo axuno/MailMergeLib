@@ -14,6 +14,7 @@ namespace UnitTests
     [TestFixture]
     public class Settings_Serialization
     {
+        private const string _settingsFilename = "TestSettings.xml";
         private Settings _outSettings;
 
         [OneTimeSetUp]
@@ -80,6 +81,17 @@ namespace UnitTests
                     MaxNumOfSmtpClients = 5
                 }
             };
+            _outSettings.Serialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename));
+        }
+
+        [Test]
+        public void CryptoKey()
+        {
+            const string newKey = "some-random-key-for-testing";
+            var oldValue = Settings.CryptoKey;
+            Settings.CryptoKey = newKey;
+            Assert.AreEqual(newKey, Settings.CryptoKey);
+            Settings.CryptoKey = oldValue;
         }
 
         [Test]
@@ -92,6 +104,22 @@ namespace UnitTests
 
             Assert.IsTrue(inSettings.SenderConfig.Equals(_outSettings.SenderConfig));
             outMs.Dispose();
+        }
+
+        [Test]
+        public void Settings_Save_and_Restore_With_String()
+        {
+            var serialized = _outSettings.Serialize();
+            var restored = Settings.Deserialize(serialized);
+
+            Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+        }
+
+        [Test]
+        public void Settings_Restore_From_File()
+        {
+            var restored = Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null);
+            Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
         }
     }
 }

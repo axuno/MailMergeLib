@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MailKit.Security;
 using MailMergeLib;
@@ -52,10 +53,106 @@ namespace UnitTests
         }
 
         [Test]
+        public void TryToSendWhenSenderIsBusy()
+        {
+            var mmm = new MailMergeMessage("Subject", "plain text");
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name 2", "test2@example.com"));
+
+            var mms = new MailMergeSender
+            {
+                IsBusy = true
+            };
+
+            // single mail
+            Assert.Throws<InvalidOperationException>(() => mms.Send(mmm, new object()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await mms.SendAsync(mmm, new object()));
+
+            // several mails
+            Assert.Throws<InvalidOperationException>(() => mms.Send(mmm, new Dictionary<string, string>()));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await mms.SendAsync(mmm, new Dictionary<string, string>()));
+
+            mms.IsBusy = false;
+        }
+
+        [Test]
+        public void TryToSendWithNullMessage()
+        {
+            var mms = new MailMergeSender();
+
+            // single mail
+            Assert.Throws<ArgumentNullException>(() => mms.Send(null, new object()));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(null, new object()));
+
+            // several mails
+            Assert.Throws<ArgumentNullException>(() => mms.Send(null, new Dictionary<string, string>()));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(null, new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void TryToSendWithNullAsEnumerable()
+        {
+            var mms = new MailMergeSender();
+            var mmm = new MailMergeMessage(); // no need to fully prepare for this test
+
+            Assert.Throws<ArgumentNullException>(() => mms.Send(null, (Dictionary<string, string>) null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(mmm, (Dictionary<string, string>) null));
+        }
+
+        [Test]
+        public async Task CancelSendOperationWithDelay()
+        {
+            var mmm = new MailMergeMessage("Cancel with delay", "plain text");
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
+
+            var mms = new MailMergeSender();
+            mms.Config = _settings.SenderConfig;
+            mms.Config.MaxNumOfSmtpClients = 1;
+            mms.Config.SmtpClientConfig[0].MessageOutput = MessageOutput.SmtpServer;
+            mms.Config.SmtpClientConfig[0].DelayBetweenMessages = 2000;
+
+            var anyData = new[] { new { mailNo = 1 }, new { mailNo = 2 }, new { mailNo = 3 } };
+            
+            mms.SendCancel(500);
+            Assert.ThrowsAsync<OperationCanceledException>(() => mms.SendAsync(mmm, anyData));
+            Assert.AreEqual(0, _server.ReceivedEmailCount);
+        }
+
+        [Test]
+        public async Task CancelSendOperation()
+        {
+            var mmm = new MailMergeMessage("Cancel immediately", "plain text");
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
+
+            var mms = new MailMergeSender();
+            mms.Config = _settings.SenderConfig;
+            mms.Config.MaxNumOfSmtpClients = 1;
+            mms.Config.SmtpClientConfig[0].MessageOutput = MessageOutput.SmtpServer;
+            mms.Config.SmtpClientConfig[0].DelayBetweenMessages = 2000;
+
+            var anyData = new[] { new { mailNo = 1 }, new { mailNo = 2 }, new { mailNo = 3 } };
+
+            var tasks = new [] {
+                await Task.Factory.StartNew(async () => await mms.SendAsync(mmm, anyData)),
+                Task.Factory.StartNew(() => mms.SendCancel()),
+                Task.Factory.StartNew(() => mms.SendCancel())  // a second cancel operation will
+            };
+
+            Assert.Throws<AggregateException>(() =>
+            {
+                Task.WaitAll(tasks);
+            });
+
+            Assert.AreEqual(0, _server.ReceivedEmailCount);
+        }
+
+        [Test]
         public void SendMailWithStandardConfig()
         {
-            var connCounter = 0;
-            var disconnCounter = 0;
+            var connectedCounter = 0;
+            var disconnectedCounter = 0;
             SmtpClientConfig usedClientConfig = null;
 
             void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
@@ -65,18 +162,18 @@ namespace UnitTests
 
             void OnSmtpConnected(object sender, MailSenderSmtpClientEventArgs args)
             {
-                lock (_locker) {connCounter++;}
+                lock (_locker) {connectedCounter++;}
             }
 
             void OnSmtpDisconnected(object sender, MailSenderSmtpClientEventArgs args)
             {
-                lock (_locker) {disconnCounter++;}
+                lock (_locker) {disconnectedCounter++;}
             }
 
             SendMail(OnAfterSend, OnSmtpConnected, OnSmtpDisconnected);
 
-            Assert.AreEqual(1, connCounter);
-            Assert.AreEqual(1, disconnCounter);
+            Assert.AreEqual(1, connectedCounter);
+            Assert.AreEqual(1, disconnectedCounter);
             Assert.AreEqual(1, _server.ReceivedEmailCount);
             Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig.Name);
 
@@ -602,9 +699,8 @@ namespace UnitTests
             #endregion
         }
 
-        [Test]
         [TestCase(10)]
-        [TestCase(1000, Ignore = "Only for performance tests")]
+        //[TestCase(1000, Ignore = "Only for performance tests")]
         public async Task SendSyncAndAsyncPerformance(int numOfRecipients)
         {
             // In this sample:
@@ -667,8 +763,11 @@ namespace UnitTests
         [SetUp]
         public void SetUp()
         {
-            _settings = GetSettings();
             _server.ClearReceivedEmail();
+            _server.Stop();
+            _server.Dispose();
+            _server = SimpleSmtpServer.Start(_rnd.Next(50000, 60000));
+            _settings = GetSettings();
         }
 
         private static Settings GetSettings()

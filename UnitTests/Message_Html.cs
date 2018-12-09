@@ -1,7 +1,9 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using MailMergeLib;
@@ -20,6 +22,29 @@ namespace UnitTests
             {
                 return ConstantText;
             }
+        }
+
+        [Test]
+        public void CreateTextMessageWithFileAttachments()
+        {
+            var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            var mmm = new MailMergeMessage("The subject", "plain text", basicMmm.FileAttachments);
+
+            Assert.AreEqual("The subject", mmm.Subject);
+            Assert.AreEqual("plain text", mmm.PlainText);
+            Assert.AreEqual(basicMmm.FileAttachments.Count, mmm.FileAttachments.Count);
+        }
+
+        [Test]
+        public void CreateTextAndHtmlMessageWithFileAttachments()
+        {
+            var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            var mmm = new MailMergeMessage("The subject", "plain text", "<html>html</html>", basicMmm.FileAttachments);
+
+            Assert.AreEqual("The subject", mmm.Subject);
+            Assert.AreEqual("plain text", mmm.PlainText);
+            Assert.AreEqual("<html>html</html>", mmm.HtmlText);
+            Assert.AreEqual(basicMmm.FileAttachments.Count, mmm.FileAttachments.Count);
         }
 
         [Test]
@@ -54,6 +79,31 @@ namespace UnitTests
 
             MailMergeMessage.DisposeFileStreams(msg);
         }
+
+        [Test]
+        public void HtmlStreamAttachments()
+        {
+            var streamAttachments = new List<StreamAttachment>();
+            var text = "Some test for stream attachment";
+            var streamAttFilename = "StreamFilename.txt";
+            var mmm = new MailMergeMessage("The subject", "plain text");
+
+            using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text)))
+            {
+                streamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
+                streamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
+                mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
+            }
+
+            Assert.IsTrue(mmm.StreamAttachments.Count == 1);
+            mmm.StreamAttachments.Clear();
+            Assert.IsTrue(mmm.StreamAttachments.Count == 0);
+            mmm.StreamAttachments = null;
+            Assert.IsTrue(mmm.StreamAttachments != null && mmm.StreamAttachments.Count == 0);
+            mmm.StreamAttachments = streamAttachments;
+            Assert.IsTrue(mmm.StreamAttachments.Count == 2);
+        }
+
 
         [Test]
         public void HtmlMailMergeWithStreamAttachment()

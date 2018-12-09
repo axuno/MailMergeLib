@@ -16,7 +16,7 @@ namespace MailMergeLib
     public class MailMergeSender : IDisposable
     {
         private bool _disposed;
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource;
 
         /// <summary>
         /// CTOR
@@ -24,14 +24,31 @@ namespace MailMergeLib
         public MailMergeSender()
         {
             IsBusy = false;
+            GetInitializedSmtpClientDelegate = GetInitializedSmtpClient;
+            RenewCancellationTokenSource();
+        }
+
+        /// <summary>
+        /// Renews the <see cref="CancellationTokenSource"/> in a way that it renews after
+        /// the <see cref="CancellationToken"/> has canceled.
+        /// </summary>
+        /// <remarks>
+        /// This allows the current instance of a <see cref="MailMergeSender"/> can be reused after a cancellation.
+        /// Otherwise the <see cref="CancellationToken"/> will be left in the canceled state, and a
+        /// <see cref="TaskCanceledException"/> will throw when sending is invoked again after the first cancellation.
+        /// </remarks>
+        private void RenewCancellationTokenSource()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource.Token.Register(RenewCancellationTokenSource);
         }
         
         /// <summary>
         /// Returns true, while a Send method is pending.
         /// Entering a Send method while IsBusy will raise an InvalidOperationException.
         /// </summary>
-        public bool IsBusy { get; private set; }
-        
+        public bool IsBusy { get; internal set; }
+
         #region *** Async Methods ***
 
         /// <summary>
@@ -53,13 +70,16 @@ namespace MailMergeLib
         /// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
         /// </exception>
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
-        /// <exception cref="NullReferenceException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="Exception">The first exception found in one of the async tasks.</exception>
         /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public async Task SendAsync<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
         {
-            if (mailMergeMessage == null || dataSource == null)
-                throw new NullReferenceException($"{nameof(mailMergeMessage)} and {nameof(dataSource)} must not be null.");
+            if (mailMergeMessage == null)
+                throw new ArgumentNullException($"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
+
+            if (dataSource == null)
+                throw new ArgumentNullException($"{nameof(dataSource)} is null.");
 
             if (IsBusy)
                 throw new InvalidOperationException($"{nameof(SendAsync)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
@@ -100,7 +120,7 @@ namespace MailMergeLib
                 var taskNo = i;
                 sendTasks[taskNo] = Task.Run(async () =>
                 {
-                    using (var smtpClient = GetInitializedSmtpClient(smtpConfigForTask[taskNo]))
+                    using (var smtpClient = GetInitializedSmtpClientDelegate(smtpConfigForTask[taskNo]))
                     {
                         while (queue.TryDequeue(out var dataItem))
                         {
@@ -147,10 +167,7 @@ namespace MailMergeLib
 
                             OnMergeProgress?.Invoke(this,
                                 new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-                            /*
-                            if (OnMergeProgress != null)
-                                Task.Factory.FromAsync((asyncCallback, obj) => OnMergeProgress.BeginInvoke(this, new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount), asyncCallback, obj), OnMergeProgress.EndInvoke, null);
-                            */
+
                             await SendMimeMessageAsync(smtpClient, mimeMessage, smtpConfigForTask[taskNo]).ConfigureAwait(false); 
 
                             OnMergeProgress?.Invoke(this,
@@ -196,11 +213,15 @@ namespace MailMergeLib
         /// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
         /// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
         /// </exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
         /// <exception cref="AggregateException"></exception>
         /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public async Task SendAsync(MailMergeMessage mailMergeMessage, object dataItem)
         {
+            if (mailMergeMessage == null)
+                throw new ArgumentNullException($"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
+
             if (IsBusy)
                 throw new InvalidOperationException($"{nameof(SendAsync)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
 
@@ -211,7 +232,7 @@ namespace MailMergeLib
                 await Task.Run(async () =>
                 {
                     var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                    using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
+                    using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
                     {
                         MimeMessage mimeMessage = null;
                         try
@@ -267,7 +288,7 @@ namespace MailMergeLib
         /// <exception cref="SmtpProtocolException"></exception>
         /// <exception cref="AuthenticationException"></exception>
         /// <exception cref="System.Net.Sockets.SocketException"></exception>
-        private async Task SendMimeMessageAsync(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
+        internal async Task SendMimeMessageAsync(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
         {
             var startTime = DateTime.Now;
             Exception sendException;
@@ -326,7 +347,7 @@ namespace MailMergeLib
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
                             config = backupConfig;
                             smtpClient.Disconnect(false, _cancellationTokenSource.Token);
-                            smtpClient = GetInitializedSmtpClient(config);
+                            smtpClient = GetInitializedSmtpClientDelegate(config);
                         }
                     }
                     else
@@ -361,7 +382,7 @@ namespace MailMergeLib
         /// <param name="smtpClient"></param>
         /// <param name="message"></param>
         /// <param name="config"></param>
-        private async Task SendMimeMessageToSmtpServerAsync(SmtpClient smtpClient, MimeMessage message, SmtpClientConfig config)
+        internal async Task SendMimeMessageToSmtpServerAsync(SmtpClient smtpClient, MimeMessage message, SmtpClientConfig config)
         {
             var hostPortConfig = $"{config.SmtpHost}:{config.SmtpPort} using configuration '{config.Name}'";
             const string errorConnect = "Error trying to connect";
@@ -443,7 +464,7 @@ namespace MailMergeLib
         public void SendCancel(int waitTime = 0)
         {
             if (_cancellationTokenSource.IsCancellationRequested) return;
-
+            
             if (waitTime == 0) _cancellationTokenSource.Cancel();
             else _cancellationTokenSource.CancelAfter(new TimeSpan(0, 0, 0, 0, waitTime));
         }
@@ -470,6 +491,7 @@ namespace MailMergeLib
         /// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
         /// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
         /// </exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
         /// <exception cref="SmtpCommandException"></exception>
         /// <exception cref="SmtpProtocolException"></exception>
@@ -477,6 +499,12 @@ namespace MailMergeLib
         /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public void Send<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
         {
+            if (mailMergeMessage == null)
+                throw new ArgumentNullException($"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
+
+            if (dataSource == null)
+                throw new ArgumentNullException($"{nameof(dataSource)} is null.");
+
             if (IsBusy)
                 throw new InvalidOperationException($"{nameof(Send)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
 
@@ -492,7 +520,7 @@ namespace MailMergeLib
                 var numOfRecords = dataSourceList.Count;
 
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
+                using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
                 {
                     OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
 
@@ -572,6 +600,7 @@ namespace MailMergeLib
         /// If the SMTP transaction is the cause, SmtpFailedRecipientsException, SmtpFailedRecipientException or SmtpException can be expected.
         /// These exceptions throw after re-trying to send after failures (i.e. after MaxFailures * RetryDelayTime).
         /// </exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
         /// <exception cref="SmtpCommandException"></exception>
         /// <exception cref="SmtpProtocolException"></exception>
@@ -579,6 +608,9 @@ namespace MailMergeLib
         /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
         public void Send(MailMergeMessage mailMergeMessage, object dataItem)
         {
+            if (mailMergeMessage == null)
+                throw new ArgumentNullException($"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
+
             if (IsBusy)
                 throw new InvalidOperationException($"{nameof(Send)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
 
@@ -587,7 +619,7 @@ namespace MailMergeLib
             try
             {
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                using (var smtpClient = GetInitializedSmtpClient(smtpClientConfig))
+                using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
                 {
                     MimeMessage mimeMessage = null;
                     try
@@ -640,7 +672,7 @@ namespace MailMergeLib
         /// <exception cref="SmtpProtocolException"></exception>
         /// <exception cref="AuthenticationException"></exception>
         /// <exception cref="System.Net.Sockets.SocketException"></exception>
-        private void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
+        internal void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
         {
             var startTime = DateTime.Now;
             Exception sendException;
@@ -693,13 +725,13 @@ namespace MailMergeLib
                         // on first SMTP failure switch to the backup configuration, if one exists
                         if (failureCounter == 1 && config.MaxFailures > 1)
                         {
-                            var backupConfig = Config.SmtpClientConfig.FirstOrDefault(c => c != config);
+                            var backupConfig = Config.SmtpClientConfig.FirstOrDefault(c => !c.Equals(config));
                             if (backupConfig == null) continue;
 
                             backupConfig.MaxFailures = config.MaxFailures; // keep the logic within the current loop unchanged
                             config = backupConfig;
                             smtpClient.Disconnect(false);
-                            smtpClient = GetInitializedSmtpClient(config);
+                            smtpClient = GetInitializedSmtpClientDelegate(config);
                         }
 
                         if (failureCounter == config.MaxFailures && smtpClient.IsConnected)
@@ -729,12 +761,12 @@ namespace MailMergeLib
 
         /// <summary>
         /// Sends the MimeMessage to an SMTP server. This is the lowest level of sending a message.
-        /// Connects and authenficates if necessary, but leaves the connection open.
+        /// Connects and authenticates if necessary, but leaves the connection open.
         /// </summary>
         /// <param name="smtpClient"></param>
         /// <param name="message"></param>
         /// <param name="config"></param>
-        private void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message, SmtpClientConfig config)
+        internal void SendMimeMessageToSmtpServer(SmtpClient smtpClient, MimeMessage message, SmtpClientConfig config)
         {
             var hostPortConfig = $"{config.SmtpHost}:{config.SmtpPort} using configuration '{config.Name}'";
             const string errorConnect = "Error trying to connect";
@@ -873,6 +905,11 @@ namespace MailMergeLib
 
         #endregion
 
+        /// <summary>
+        /// Function delegate that returns an initialized <see cref="SmtpClient"/> using the <see cref="SmtpClientConfig"/> configuration.
+        /// </summary>
+        internal Func<SmtpClientConfig, SmtpClient> GetInitializedSmtpClientDelegate { get; set; }
+        
         /// <summary>
         /// Get a new instance of a pre-configured SmtpClient
         /// </summary>

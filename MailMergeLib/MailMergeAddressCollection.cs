@@ -146,10 +146,10 @@ namespace MailMergeLib
             return !this.Except(addressCollection).Union(addressCollection.Except(this)).Any();
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
-            var hashCode = (MailMergeMessage != null ? MailMergeMessage.GetHashCode() : 0);
-            return this.Aggregate(hashCode, (current, item) => (current * 397) ^ (item != null ? item.GetHashCode() : 0));
+            return this.Aggregate(0, (current, item) => unchecked (current * 397) ^ (item != null ? item.GetHashCode() : 0));
         }
 
         #endregion
