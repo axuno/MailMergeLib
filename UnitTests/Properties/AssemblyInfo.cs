@@ -8,8 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription(".NET library for email merge")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("axuno gGmbH")]
-[assembly: AssemblyProduct("MailMergeLib 5 UnitTests")]
-[assembly: AssemblyCopyright("Copyright © 2007-2018 by axuno gGmbH")]
+[assembly: AssemblyProduct("MailMergeLib UnitTests")]
+[assembly: AssemblyCopyright("Copyright © 2007-2019 by axuno gGmbH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,6 +31,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyInformationalVersion ("5.5.0.0")]
-[assembly: AssemblyFileVersion ("5.5.0.0")]
-[assembly: AssemblyVersion ("5.5.0.0")]
+[assembly: AssemblyInformationalVersion ("5.6.0.0")]
+[assembly: AssemblyFileVersion ("5.6.0.0")]
+[assembly: AssemblyVersion ("5.6.0.0")]

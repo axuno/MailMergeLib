@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <Description>MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
-    <Copyright>© 2007-2018 by axuno gGmbH</Copyright>
+    <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib 5</AssemblyTitle>
-    <Version>5.5.1.0</Version>
+    <Version>5.6.0.0</Version>
     <VersionPrefix>5.5.1.0</VersionPrefix>
     <Authors>axuno gGmbH</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
@@ -19,14 +19,16 @@
     <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
-    <PackageReleaseNotes>
-      Classes in namespace 'MailMergLib.SmartFormatMail' are obsolete. Use 'SmartFormat' from dependency 'SmartFormat.Net' instead.
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>* Classes in namespace 'MailMergLib.SmartFormatMail' are obsolete. Use namespace 'SmartFormat' from dependency 'SmartFormat.Net' instead.
+* This is the last version which supports netstandard1.6
+* Updated versions of dependencies</PackageReleaseNotes>
     <PackageTags>smtp mime mail email merge template netcore netstandard net45 c#</PackageTags>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RootNamespace>MailMergeLib</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <AssemblyVersion>5.6.0.0</AssemblyVersion>
+    <FileVersion>5.6.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -52,8 +54,8 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.9.11" />
-    <PackageReference Include="MailKit" Version="2.1.0.3" />
-    <PackageReference Include="MimeKit" Version="2.1.0" />
+    <PackageReference Include="MailKit" Version="2.1.1" />
+    <PackageReference Include="MimeKit" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="SmartFormat.NET" Version="2.3.1.1" />
     <PackageReference Include="YAXLib" Version="2.15.0" />
