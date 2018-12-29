@@ -68,8 +68,9 @@ namespace MailMergeLib
 
         /// <summary>
         /// Gets or sets the local base directory of HTML linked resources and other attachments.
-        /// The <see cref="FileBaseDirectory"/> must be a an absolute path, while *file paths are relative* to the <see cref="FileBaseDirectory"/>.
+        /// The <see cref="FileBaseDirectory"/> must be a an absolute path *when processing the message* (not when setting the value), while *file paths are relative* to the <see cref="FileBaseDirectory"/>.
         /// It is useful for retrieval of inline attachments (linked resources of the HTML body).
+        /// Defaults to <see cref="string.Empty"/>.
         /// </summary>
         [YAXSerializableField]
         public string FileBaseDirectory
@@ -79,15 +80,9 @@ namespace MailMergeLib
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    _fileBaseDirectory = Path.GetTempPath();
+                    _fileBaseDirectory = string.Empty;
                     return;
                 }
-
-                if (!Tools.IsFullPath(value))
-                {
-                    throw new ArgumentException($"{value} is not a full path for property {nameof(FileBaseDirectory)}.");
-                }
-
                 _fileBaseDirectory = value;
             }
         }

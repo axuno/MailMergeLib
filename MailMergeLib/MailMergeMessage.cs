@@ -349,7 +349,7 @@ namespace MailMergeLib
             {
                 return SmartFormatter.Format(Config?.CultureInfo, text, dataItem);
             }
-            catch (SmartFormat.Core.Parsing.ParsingErrors ex)
+            catch (SmartFormat.Core.Parsing.ParsingErrors)
             {
                 return text;
             }
@@ -649,10 +649,31 @@ namespace MailMergeLib
                 AddAddressesToMailMessage(mimeMessage, dataItem);
                 AddAttributesToMailMessage(mimeMessage, dataItem);
 
-                BuildTextMessagePart(dataItem);
-                BuildAttachmentPartsForMessage(dataItem);
-
                 var exceptions = new List<Exception>();
+
+                if (Config.FileBaseDirectory != string.Empty && !Tools.IsFullPath(Config.FileBaseDirectory))
+                {
+                    exceptions.Add(new DirectoryNotFoundException(
+                        $"'{nameof(Config)}.{nameof(Config.FileBaseDirectory)}' is not a full path."));
+                }
+
+                try
+                {
+                    BuildTextMessagePart(dataItem);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                }
+
+                try
+                {
+                    BuildAttachmentPartsForMessage(dataItem);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                }
 
                 if (mimeMessage.To.Count == 0 && mimeMessage.Cc.Count == 0 && mimeMessage.Bcc.Count == 0)
                     exceptions.Add(new AddressException("No recipients.", _badMailAddr, null));

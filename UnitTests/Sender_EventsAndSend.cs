@@ -137,14 +137,14 @@ namespace UnitTests
             var tasks = new [] {
                 await Task.Factory.StartNew(async () => await mms.SendAsync(mmm, anyData)),
                 Task.Factory.StartNew(() => mms.SendCancel()),
-                Task.Factory.StartNew(() => mms.SendCancel())  // a second cancel operation will
+                Task.Factory.StartNew(() => mms.SendCancel())  // a second cancel operation will just return
             };
-
+            
             Assert.Throws<AggregateException>(() =>
             {
                 Task.WaitAll(tasks);
             });
-
+            
             Assert.AreEqual(0, _server.ReceivedEmailCount);
         }
 

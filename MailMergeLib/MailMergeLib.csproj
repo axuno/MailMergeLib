@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>MailMergeLib is an SMTP mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
+    <Description>MailMergeLib is a mail client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
     <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
-    <AssemblyTitle>MailMergeLib 5</AssemblyTitle>
-    <Version>5.6.0.0</Version>
-    <VersionPrefix>5.5.1.0</VersionPrefix>
+    <AssemblyTitle>MailMergeLib</AssemblyTitle>
+    <Version>5.6.1.0</Version>
+    <AssemblyVersion>5.6.1.0</AssemblyVersion>
+    <FileVersion>5.6.1.0</FileVersion>
     <Authors>axuno gGmbH</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
@@ -19,7 +20,8 @@
     <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
-    <PackageReleaseNotes>* Classes in namespace 'MailMergLib.SmartFormatMail' are obsolete. Use namespace 'SmartFormat' from dependency 'SmartFormat.Net' instead.
+    <PackageReleaseNotes>* Reverted back to v5.5.0 behavior: MessageConfig.FileBaseDirectory must be a full path only before the MailMergeMessage is processed (not already, when the property is set).
+* Classes in namespace 'MailMergLib.SmartFormatMail' are obsolete. Use namespace 'SmartFormat' from dependency 'SmartFormat.Net' instead.
 * This is the last version which supports netstandard1.6
 * Updated versions of dependencies</PackageReleaseNotes>
     <PackageTags>smtp mime mail email merge template netcore netstandard net45 c#</PackageTags>
@@ -27,8 +29,6 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RootNamespace>MailMergeLib</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>5.6.0.0</AssemblyVersion>
-    <FileVersion>5.6.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

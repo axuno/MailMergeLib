@@ -82,6 +82,8 @@
     <Compile Include="FakeSmtpClient.cs" />
     <Compile Include="FileMessageStore_Serialization.cs" />
     <Compile Include="FileMessageInfo.cs" />
+    <Compile Include="HtmlBodyBuilderTest.cs" />
+    <Compile Include="Sender_Config.cs" />
     <Compile Include="Message_Config.cs" />
     <Compile Include="MessageInfo.cs" />
     <Compile Include="Message_Variables.cs" />

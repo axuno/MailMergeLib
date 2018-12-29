@@ -9,6 +9,7 @@ using AngleSharp.Parser.Html;
 using MailMergeLib;
 using MimeKit;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 
 namespace UnitTests
 {
@@ -21,6 +22,38 @@ namespace UnitTests
             public string ToPlainText(string html)
             {
                 return ConstantText;
+            }
+        }
+
+        [Test]
+        public void MimeMessageSize()
+        {
+            var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>some body</body></html>");
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
+            var mimeMessage = mmm.GetMimeMessage(null);
+
+            var size = MailMergeLib.Tools.CalcMessageSize(mimeMessage);
+            Assert.IsTrue(size > 0);
+
+            Assert.IsTrue(MailMergeLib.Tools.CalcMessageSize(null) == 0);
+        }
+
+        [Test]
+        public void EmptyContent()
+        {
+            var mmm = new MailMergeMessage();
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
+
+            try
+            {
+                mmm.GetMimeMessage(null);
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e is MailMergeMessage.MailMergeMessageException);
+                Assert.IsTrue(e.InnerException is MailMergeMessage.EmtpyContentException);
             }
         }
 
@@ -261,6 +294,44 @@ namespace UnitTests
 
             mmm.ConvertHtmlToPlainText(new DummyHtmlConverter());
             Assert.AreEqual(DummyHtmlConverter.ConstantText, mmm.PlainText);
+        }
+
+        [TestCase("{Name} {SenderAddr}", "John test@specimen.com")]
+        [TestCase("{Name {SenderAddr}", "{Name {SenderAddr}")] // parsing error
+        [TestCase("{NotExisting}", "{NotExisting}")] // formatting error
+        [TestCase(null, null)]
+        public void SearchAndReplace(string text, string expected)
+        {
+            var dataItem = new
+            {
+                Name = "John",
+                SenderAddr = "test@specimen.com",
+            };
+
+            var mmm = new MailMergeMessage();
+            mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.ThrowError;
+            mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.ThrowError;
+            var result = mmm.SearchAndReplaceVars(text, dataItem);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCase("{Name} {SenderAddr}", "John test@specimen.com")]
+        [TestCase("{Name {SenderAddr}", "{Name {SenderAddr}")] // parsing error
+        [TestCase("{NotExisting}", "{NotExisting}")] // formatting error
+        [TestCase(null, null)]
+        public void SearchAndReplaceFilename(string text, string expected)
+        {
+            var dataItem = new
+            {
+                Name = "John",
+                SenderAddr = "test@specimen.com",
+            };
+
+            var mmm = new MailMergeMessage();
+            mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.ThrowError;
+            mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.ThrowError;
+            var result = mmm.SearchAndReplaceVarsInFilename(text, dataItem);
+            Assert.AreEqual(expected, result);
         }
     }
 }

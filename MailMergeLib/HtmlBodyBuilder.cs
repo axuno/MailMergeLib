@@ -24,6 +24,7 @@ namespace MailMergeLib
         private readonly IHtmlDocument _htmlDocument;
         private Uri _docBaseUri;
         private readonly object _dataItem;
+        private readonly string _defaultDocBaseUri = new Uri(string.Concat(UriScheme.File, UriScheme.SchemeDelimiter)).ToString();
 
         /// <summary>
         /// Constructor.
@@ -32,7 +33,7 @@ namespace MailMergeLib
         /// <param name="dataItem"></param>
         public HtmlBodyBuilder(MailMergeMessage mailMergeMessage, object dataItem)
         {
-            _docBaseUri = new Uri(string.Concat(UriScheme.File, UriScheme.SchemeDelimiter));
+            DocBaseUri = mailMergeMessage.Config.FileBaseDirectory;
             _mailMergeMessage = mailMergeMessage;
             _dataItem = dataItem;
             BinaryTransferEncoding = mailMergeMessage.Config.BinaryTransferEncoding;
@@ -78,7 +79,7 @@ namespace MailMergeLib
             var baseDir = baseEle?.Href == null ? null : new Uri(baseEle.Href);
 
             // only replace the base url if it was not set programmatically
-            if (_docBaseUri == null)
+            if (baseDir != null && _docBaseUri == new Uri(_defaultDocBaseUri))
             {
                 _docBaseUri = baseDir;
             }
@@ -151,8 +152,11 @@ namespace MailMergeLib
         /// </summary>
         public string DocBaseUri
         {
-            set { _docBaseUri = new Uri(string.IsNullOrEmpty(value) ?  string.Concat(UriScheme.File, UriScheme.SchemeDelimiter) : value); }
-            get { return _docBaseUri.AbsolutePath; }
+            set
+            {
+                _docBaseUri = new Uri(string.IsNullOrEmpty(value) ? string.Concat(UriScheme.File, UriScheme.SchemeDelimiter) : value); 
+            }
+            get => _docBaseUri.ToString();
         }
 
         /// <summary>

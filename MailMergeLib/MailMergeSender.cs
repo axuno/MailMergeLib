@@ -29,8 +29,7 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        /// Renews the <see cref="CancellationTokenSource"/> in a way that it renews after
-        /// the <see cref="CancellationToken"/> has canceled.
+        /// Renews the <see cref="CancellationTokenSource"/>. The method is called after the "Send" methods have completed.
         /// </summary>
         /// <remarks>
         /// This allows the current instance of a <see cref="MailMergeSender"/> can be reused after a cancellation.
@@ -40,7 +39,6 @@ namespace MailMergeLib
         private void RenewCancellationTokenSource()
         {
             _cancellationTokenSource = new CancellationTokenSource();
-            _cancellationTokenSource.Token.Register(RenewCancellationTokenSource);
         }
         
         /// <summary>
@@ -195,6 +193,7 @@ namespace MailMergeLib
 
                 OnAfterSend -= AfterSend;
 
+                RenewCancellationTokenSource();
                 IsBusy = false;
             }
         }
@@ -269,6 +268,7 @@ namespace MailMergeLib
             }
             finally
             {
+                RenewCancellationTokenSource();
                 IsBusy = false;
             }
         }
@@ -583,6 +583,7 @@ namespace MailMergeLib
             }
             finally
             {
+                RenewCancellationTokenSource();
                 IsBusy = false;
             }
         }
@@ -654,6 +655,7 @@ namespace MailMergeLib
             }
             finally
             {
+                RenewCancellationTokenSource();
                 IsBusy = false;
             }
         }
