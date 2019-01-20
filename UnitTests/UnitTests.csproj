@@ -83,6 +83,7 @@
     <Compile Include="FileMessageStore_Serialization.cs" />
     <Compile Include="FileMessageInfo.cs" />
     <Compile Include="HtmlBodyBuilderTest.cs" />
+    <Compile Include="Message_VariableExceptions.cs" />
     <Compile Include="Sender_Config.cs" />
     <Compile Include="Message_Config.cs" />
     <Compile Include="MessageInfo.cs" />
@@ -114,6 +115,7 @@
     <Content Include="TestFiles\LogFile.txt" />
     <Content Include="TestFiles\Msg01.xml" />
     <Content Include="TestFiles\Msg02.xml" />
+    <Content Include="TestFiles\TestSettings.xml" />
     <Content Include="TestFiles\TextForHtmlConverter.html" />
     <Content Include="TestFiles\SameImageSeveralTimes.html" />
     <Content Include="TestFiles\Mailtext.html" />

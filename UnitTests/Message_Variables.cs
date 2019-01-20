@@ -166,6 +166,28 @@ namespace UnitTests
             }
         }
 
+        [Test]
+        public void SingleMessageFromSmartObjects()
+        {
+            var anonymous = new {Email = "test@example.com"};
+            var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+            var so = new SmartObjects(new object[]
+            {
+                anonymous,
+                new Dictionary<string, string> {{"Continent", "Europe"}}
+            });
+
+            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
+
+            var mimeMessage = mmm.GetMimeMessage(so);
+            
+            Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
+            Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", ((Dictionary<string, string>)so[1])["Continent"])));
+            MailMergeMessage.DisposeFileStreams(mimeMessage);
+        }
+
         private class Recipient
         {
             public string Name { get; set; }

@@ -199,7 +199,7 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        /// Sends a single mail message asyncronously.
+        /// Sends a single mail message asynchronously.
         /// </summary>
         /// <remarks>The method raises events before and after sending, as well as on send failure.</remarks>
         /// <param name="mailMergeMessage">Mail merge message.</param>
