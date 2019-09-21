@@ -115,7 +115,7 @@ namespace UnitTests
             var anyData = new[] { new { mailNo = 1 }, new { mailNo = 2 }, new { mailNo = 3 } };
             
             mms.SendCancel(500);
-            Assert.ThrowsAsync<OperationCanceledException>(() => mms.SendAsync(mmm, anyData));
+            Assert.ThrowsAsync<TaskCanceledException>(() => mms.SendAsync(mmm, anyData));
             Assert.AreEqual(0, _server.ReceivedEmailCount);
         }
 
