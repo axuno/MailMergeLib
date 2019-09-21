@@ -47,30 +47,37 @@ namespace MailMergeLib.Tests
             }
         }
 
+        [Test]
+        [TestCase(@"..\..", @"folder1\folder2\folder3\", @"folder1")]
+        [TestCase(@"", @"folder1\folder2\folder3\", @"folder1\folder2\folder3\")]
+        [TestCase(@"folder2\folder3", @"folder1\", @"folder1\folder2\folder3")]
+        public void RelativePathTo(string expected, string from, string to)
+        {
+            Assert.AreEqual(expected, MailMergeLib.Tools.RelativePathTo(from, to));
+        }
 
+        [Test]
+        [TestCase(null, @"C:\Temp", @"D:\")]
+        public void RelativePathTo_Different_Path_Roots(string expected, string from, string to)
+        {
+            Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
+        }
+
+        [Test]
+        [TestCase(null, @"folder1\", @"folder2")]
+        public void RelativePathTo_No_Common_Prefix_Path(string expected, string from, string to)
+        {
+            Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
+        }
 
         [Test]
         [TestCase(null, null, "")]
         [TestCase(null, "", null)]
-        [TestCase(null, @"C:\Temp", @"D:\")]
-        [TestCase(@"..\..", @"folder1\folder2\folder3\", @"folder1")]
-        [TestCase(@"", @"folder1\folder2\folder3\", @"folder1\folder2\folder3\")]
-        public void RelativePathTo(string expected, string from, string to)
+        public void RelativePathTo_NullTests(string expected, string from, string to)
         {
-            if (from == null || to == null)
-            {
-                Assert.Throws<ArgumentNullException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
-                return;
-            }
-
-            if (from.StartsWith(@"C:\") && to.StartsWith(@"D:\"))
-            {
-                Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
-                return;
-            }
-
-            Assert.AreEqual(expected, MailMergeLib.Tools.RelativePathTo(from, to));
+            Assert.Throws<ArgumentNullException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
         }
+
 
         [Test]
         [TestCase(true, "abcdef")]
@@ -123,12 +130,17 @@ namespace MailMergeLib.Tests
         [TestCase("utf-32", "utf-32")]
         [TestCase("utf-16", "utf-16")]
         [TestCase("iso-8859-1", "iso-8859-1")]
+#if !NETCOREAPP
         [TestCase("windows-1252", "windows-1252")]
         [TestCase("iso-2022-jp", "shift_jis")]
         [TestCase("iso-2022-jp", "csISO2022JP")]
+        [TestCase("euc-kr", "ks_c_5601-1987")]
+        [TestCase("euc-kr", "iso-2022-kr")]
+#endif
         public void GetMimeCharset(string expected, string encoding)
         {
             Assert.AreEqual(expected, MailMergeLib.Tools.GetMimeCharset(Encoding.GetEncoding(encoding)));
+            Assert.Throws<ArgumentNullException>(() => MailMergeLib.Tools.GetMimeCharset(null));
         }
     }
 }

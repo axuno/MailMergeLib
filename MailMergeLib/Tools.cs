@@ -87,7 +87,7 @@ namespace MailMergeLib
             // find common root
             for (int x = 0; x < length; x++)
             {
-                if (string.Compare(fromDirectories[x], toDirectories[x], true) != 0)
+                if (string.Compare(fromDirectories[x], toDirectories[x], StringComparison.OrdinalIgnoreCase) != 0)
                     break;
                 lastCommonRoot = x;
             }
@@ -271,14 +271,16 @@ namespace MailMergeLib
 
             if (encoding == null)
                 throw new ArgumentNullException(nameof(encoding));
-
+            
             // There are only these 4 differences between Encoding.HeaderName and Encoding.WebName
             switch (encoding.CodePage)
             {
+#if NETFRAMEWORK
                 case 932: return "iso-2022-jp"; // shift_jis
-                case 949: return "euc-kr";      // ks_c_5601-1987
                 case 50221: return "iso-2022-jp"; // csISO2022JP
+                case 949: return "euc-kr";      // ks_c_5601-1987
                 case 50225: return "euc-kr";      // iso-2022-kr
+#endif
                 default:
                     return encoding.WebName.ToLowerInvariant();
             }

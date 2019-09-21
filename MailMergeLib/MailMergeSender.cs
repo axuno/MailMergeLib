@@ -377,7 +377,7 @@ namespace MailMergeLib
 
         /// <summary>
         /// Sends the MimeMessage to an SMTP server. This is the lowest level of sending a message.
-        /// Connects and authenficates if necessary, but leaves the connection open.
+        /// Connects and authenticates if necessary, but leaves the connection open.
         /// </summary>
         /// <param name="smtpClient"></param>
         /// <param name="message"></param>

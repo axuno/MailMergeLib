@@ -22,7 +22,7 @@
         <SmtpPort>25</SmtpPort>
         <ClientDomain />
         <LocalEndPoint />
-        <NetworkCredential Username="user2" Password="password2" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
+        <NetworkCredential Username="user2" Password="password2" Domain="axuno.net" yaxlib:realtype="MailMergeLib.Credential" />
         <MailOutputDirectory />
         <MessageOutput>SmtpServer</MessageOutput>
         <SslProtocols>None</SslProtocols>

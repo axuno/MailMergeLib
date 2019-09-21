@@ -75,7 +75,7 @@ namespace MailMergeLib.Tests
                             MessageOutput = MessageOutput.SmtpServer,
                             SmtpHost = "some.otherhost.com",
                             SmtpPort = 25,
-                            NetworkCredential = new Credential("user2", "password2"),
+                            NetworkCredential = new Credential("user2", "password2", "axuno.net"),
                             Name = "Next best",
                             DelayBetweenMessages = 2000
                         }
@@ -94,6 +94,25 @@ namespace MailMergeLib.Tests
             Settings.CryptoKey = newKey;
             Assert.AreEqual(newKey, Settings.CryptoKey);
             Settings.CryptoKey = oldValue;
+        }
+
+        [Test]
+        public void Credential_Without_Domain()
+        {
+            var credential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+            var networkCredential = credential.GetCredential(null, null);
+            Assert.AreEqual(credential.Username, networkCredential.UserName);
+            Assert.AreEqual(credential.Password, networkCredential.Password);
+        }
+
+        [Test]
+        public void Credential_With_Domain()
+        {
+            var credential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.Last().NetworkCredential;
+            var networkCredential = credential.GetCredential(null, null);
+            Assert.AreEqual(credential.Username, networkCredential.UserName);
+            Assert.AreEqual(credential.Password, networkCredential.Password);
+            Assert.AreEqual(credential.Domain, networkCredential.Domain);
         }
 
         [Test]
