@@ -265,12 +265,12 @@ namespace MailMergeLib
         /// Excluding those properties which are not serialized:
         /// ClientCertificates, ServerCertificateValidationCallback, NetworkCredential, ProtocolLoggerDelegate
         /// </remarks>
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SmtpClientConfig)obj);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other.GetType() != this.GetType()) return false;
+            return Equals((SmtpClientConfig)other);
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        ///  Returns the hastcode for this object.
+        ///  Returns the hashcode for this object.
         /// </summary>
         /// <returns></returns>
         /// <remarks>

@@ -6,10 +6,15 @@ namespace MailMergeLib
 {
     /// <summary>
     /// Simple encryption. Used to encrypt security relevant entries in configuration files.
-    /// This is not "safe", but better than storing e.g. network credentials as plain text.
+    /// Encryption can be enabled/disabled by setting <see cref="Enabled"/>.
     /// </summary>
     public static class Crypto
     {
+        /// <summary>
+        /// Switches encryption on and off. Default is <c>off</c>.
+        /// </summary>
+        public static bool Enabled { get; set; } = false;
+
         /// <summary>
         /// The Initialization Vector for the DES encryption routine. You should change the default value, but keep the 8 bytes.
         /// </summary>
@@ -32,15 +37,20 @@ namespace MailMergeLib
         /// <returns>Returns the encrypted and base64 encoded string.</returns>
         public static string Encrypt(string s)
         {
-            if (string.IsNullOrEmpty(s))
+            if (!Enabled || string.IsNullOrEmpty(s))
                 return s;
         
             var buffer = Encoding.GetBytes(s);
-            var des = TripleDES.Create();
-            des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
-            des.IV = IV;
+            using (var des = TripleDES.Create())
+            {
+                using (var md5 = MD5.Create())
+                {
+                    des.Key = md5.ComputeHash(Encoding.GetBytes(CryptoKey));
+                    des.IV = IV;
 
-            return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+                    return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+                }
+            }
         }
 
         /// <summary>
@@ -50,15 +60,21 @@ namespace MailMergeLib
         /// <returns>Returns the decrypted, encoded string.</returns>
         public static string Decrypt(string s)
         {
-            if (string.IsNullOrEmpty(s))
+            if (!Enabled || string.IsNullOrEmpty(s))
                 return s;
 
             var buffer = Convert.FromBase64String(s);
-            var des = TripleDES.Create();
-            des.Key = MD5.Create().ComputeHash(Encoding.GetBytes(CryptoKey));
-            des.IV = IV;
 
-            return Encoding.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+            using (var des = TripleDES.Create())
+            {
+                using (var md5 = MD5.Create())
+                {
+                    des.Key = md5.ComputeHash(Encoding.GetBytes(CryptoKey));
+                    des.IV = IV;
+
+                    return Encoding.GetString(des.CreateDecryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+                }
+            }
         }
     }
 }

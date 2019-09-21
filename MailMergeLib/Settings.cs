@@ -41,10 +41,19 @@ namespace MailMergeLib
         /// </summary>
         public static string CryptoKey
         {
-            get { return Crypto.CryptoKey; }
-            set { Crypto.CryptoKey = value; }
+            get => Crypto.CryptoKey;
+            set => Crypto.CryptoKey = value;
         }
-        
+
+        /// <summary>
+        /// Switches encryption on and off. Default is <c>off</c>.
+        /// </summary>
+        public static bool CryptoEnabled
+        {
+            get => Crypto.Enabled;
+            set => Crypto.Enabled = value;
+        }
+
         /// <summary>
         /// Write MailMergeLib settings to a stream.
         /// </summary>

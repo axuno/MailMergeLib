@@ -54,7 +54,7 @@ namespace MailMergeLib
         #region *** MailMergeLib properties ***
 
         /// <summary>
-        /// User name, set as plain text, returned encrypted.
+        /// User name as plain text.
         /// </summary>
         [YAXDontSerialize]
         public string Username { get; set; }
@@ -64,12 +64,12 @@ namespace MailMergeLib
         [YAXSerializableField]
         internal string UsernameEncrypted
         {
-            get { return Crypto.Encrypt(Username); }
-            set { Username = Crypto.Decrypt(value); }
+            get => Crypto.Encrypt(Username);
+            set => Username = Crypto.Decrypt(value);
         }
 
         /// <summary>
-        /// Password, set as plain text, returned encrypted.
+        /// Password as plain text.
         /// </summary>
         [YAXDontSerialize]
         public string Password { get; set; }
@@ -79,8 +79,8 @@ namespace MailMergeLib
         [YAXSerializableField]
         internal string PasswordEncrypted
         {
-            get { return Crypto.Encrypt(Password); }
-            set { Password = Crypto.Decrypt(value); }
+            get => Crypto.Encrypt(Password);
+            set => Password = Crypto.Decrypt(value);
         }
 
         /// <summary>

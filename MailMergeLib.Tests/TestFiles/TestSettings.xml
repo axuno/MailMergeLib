@@ -7,7 +7,7 @@
         <SmtpPort>123</SmtpPort>
         <ClientDomain>TestDomain</ClientDomain>
         <LocalEndPoint Address="57.48.0.0" Port="123" />
-        <NetworkCredential Username="H2GOPqvaw08=" Password="EiEGuNuyHIH/jB0gGQOnrQ==" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
+        <NetworkCredential Username="user" Password="password" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
         <MailOutputDirectory />
         <MessageOutput>SmtpServer</MessageOutput>
         <SslProtocols>Ssl3</SslProtocols>
@@ -22,7 +22,7 @@
         <SmtpPort>25</SmtpPort>
         <ClientDomain />
         <LocalEndPoint />
-        <NetworkCredential Username="3DezsHsenro=" Password="EiEGuNuyHIE0fj2Qo385WQ==" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
+        <NetworkCredential Username="user2" Password="password2" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
         <MailOutputDirectory />
         <MessageOutput>SmtpServer</MessageOutput>
         <SslProtocols>None</SslProtocols>

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Text;
@@ -22,6 +23,8 @@ namespace MailMergeLib.Tests
             // initialize settings with non-default values
 
             Settings.CryptoKey = "SomeSecretCryptoKey";
+            Settings.CryptoEnabled = false;
+
             _outSettings = new Settings
             {
                 MessageConfig =
@@ -94,31 +97,58 @@ namespace MailMergeLib.Tests
         }
 
         [Test]
-        public void Settings_Save_and_Restore()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Settings_Save_and_Restore(bool cryptoEnabled)
         {
+            Settings.CryptoEnabled = cryptoEnabled;
             var outMs = new MemoryStream();
-
+            
             _outSettings.Serialize(outMs, Encoding.UTF8);
             var inSettings = Settings.Deserialize(outMs, Encoding.UTF8);
 
             Assert.IsTrue(inSettings.SenderConfig.Equals(_outSettings.SenderConfig));
             outMs.Dispose();
+
+            var smtpCredential = (Credential) _outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+            Assert.AreEqual(cryptoEnabled, smtpCredential.Password != smtpCredential.PasswordEncrypted && smtpCredential.Username != smtpCredential.UsernameEncrypted);
         }
 
         [Test]
-        public void Settings_Save_and_Restore_With_String()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Settings_Save_and_Restore_With_String(bool cryptoEnabled)
         {
+            Settings.CryptoEnabled = cryptoEnabled;
+
             var serialized = _outSettings.Serialize();
             var restored = Settings.Deserialize(serialized);
 
             Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+
+            var smtpCredential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+            Assert.AreEqual(cryptoEnabled, smtpCredential.Password != smtpCredential.PasswordEncrypted && smtpCredential.Username != smtpCredential.UsernameEncrypted);
         }
 
         [Test]
-        public void Settings_Restore_From_File()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Settings_Restore_From_File(bool cryptoEnabled)
         {
-            var restored = Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null);
-            Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+            Settings.CryptoEnabled = cryptoEnabled;
+            if (!cryptoEnabled)
+            {
+                var restored =
+                    Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null);
+                Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+            }
+            else
+            {
+                // An exception is thrown because username / password are saved as plain text,
+                // while with encryption enabled, both should be encrypted.
+                Assert.Throws<YAXLib.YAXPropertyCannotBeAssignedTo>(() =>
+                    Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null));
+            }
         }
     }
 }
