@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using NUnit.Framework;
-using MailMergeLib;
-using SmartFormat;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using SmartFormat;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     class Message_Variables

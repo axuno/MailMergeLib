@@ -1,17 +1,14 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
-using MailMergeLib;
 using MimeKit;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Message_Html

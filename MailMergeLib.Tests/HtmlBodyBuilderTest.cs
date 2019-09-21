@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MailMergeLib;
 using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class HtmlBodyBuilderTest

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
-using MailMergeLib;
-using MailMergeLib.MessageStore;
 using MailMergeLib.Templates;
+using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     class Message_Templates
@@ -83,7 +80,7 @@ namespace UnitTests
             var templates = mmm.Templates;
             var tempFilename = Path.GetTempFileName();
             templates.Serialize(tempFilename, Encoding.UTF8);
-            Assert.True(templates.Equals(Templates.Deserialize(tempFilename, Encoding.UTF8)));
+            Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)));
             File.Delete(tempFilename);
         }
 
@@ -95,7 +92,7 @@ namespace UnitTests
             var stream = new MemoryStream();
             templates.Serialize(stream, Encoding.UTF8);
             stream.Position = 0;
-            var restoredTemplates = Templates.Deserialize(stream, Encoding.UTF8);
+            var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8);
             Assert.True(templates.Equals(restoredTemplates));
 
             Assert.True(templates.Equals(templates));

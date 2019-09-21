@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class MessageInfo

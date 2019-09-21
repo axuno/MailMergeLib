@@ -2,12 +2,10 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
-using MailMergeLib;
-using MailMergeLib.MessageStore;
 using MailMergeLib.Templates;
 using MimeKit;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     public class MessageFactory
     {

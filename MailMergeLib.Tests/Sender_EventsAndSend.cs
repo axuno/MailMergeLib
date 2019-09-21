@@ -5,16 +5,14 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using MailKit.Security;
-using MailMergeLib;
-using SmartFormat.Core.Settings;
 using MimeKit;
 using netDumbster.smtp;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Sender_EventsAndSend

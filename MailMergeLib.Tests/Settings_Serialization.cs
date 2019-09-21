@@ -4,12 +4,11 @@ using System.Net;
 using System.Security.Authentication;
 using System.Text;
 using MailKit.Security;
-using MailMergeLib;
-using SmartFormat.Core.Settings;
 using MimeKit;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Settings_Serialization

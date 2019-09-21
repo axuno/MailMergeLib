@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     internal class Helper
     {

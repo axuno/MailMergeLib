@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Globalization;
-using MailMergeLib;
-using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using SmartFormat.Core.Parsing;
+using SmartFormat.Core.Settings;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Message_SmartFormatter

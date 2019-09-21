@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using MailMergeLib;
 using MimeKit;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     /// <inheritdoc />
     public class FakeSmtpClient : SmtpClient

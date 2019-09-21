@@ -2,11 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
-using MailMergeLib;
 using MailMergeLib.Templates;
+using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Message_Serialization
@@ -83,7 +82,7 @@ namespace UnitTests
         [Test]
         public void SerializeTemplates()
         {
-            var templates = new Templates
+            var templates = new Templates.Templates
             {
                 new Template()
                 {
@@ -97,7 +96,7 @@ namespace UnitTests
             };
             var result = templates.Serialize();
             var back = new MailMergeMessage();
-            back.Templates.AddRange(Templates.Deserialize(result));
+            back.Templates.AddRange(Templates.Templates.Deserialize(result));
 
             Assert.True(templates.Equals(back.Templates));
             Assert.AreEqual(templates.Serialize(), back.Templates.Serialize());

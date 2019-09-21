@@ -20,9 +20,8 @@
 
 using System;
 using NUnit.Framework;
-using MailMergeLib;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Test

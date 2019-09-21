@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
-using MailMergeLib;
 using MailMergeLib.Templates;
+using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     class Message_VariableExceptions

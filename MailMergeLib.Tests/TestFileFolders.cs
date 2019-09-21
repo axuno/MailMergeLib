@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     internal static class TestFileFolders
     {

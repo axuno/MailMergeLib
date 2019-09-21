@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
-using MailMergeLib;
 using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Message_Equality

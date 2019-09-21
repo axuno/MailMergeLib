@@ -5,7 +5,7 @@ using System.Text;
 using MailMergeLib.MessageStore;
 using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class FileMessageStore_Serialization

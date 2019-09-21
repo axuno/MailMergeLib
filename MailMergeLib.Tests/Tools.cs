@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Tools
@@ -24,8 +24,11 @@ namespace UnitTests
         [TestCase(null, false, false)]
         [TestCase("", false, false)]
         [TestCase("   ", false, false)]
+#if !NETCOREAPP
+        // does not throw for net core
         [TestCase(@"C:\inval|d", false, false)]
         [TestCase(@"\\is_this_a_dir_or_a_hostname", false, false)]
+#endif
         public static void IsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
         {
             Assert.AreEqual(expectedIsFull, MailMergeLib.Tools.IsFullPath(path), "IsFullPath('" + path + "')");

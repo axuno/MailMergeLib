@@ -1,7 +1,6 @@
-﻿using MailMergeLib;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace UnitTests
+namespace MailMergeLib.Tests
 {
     [TestFixture]
     public class Sender_Config
