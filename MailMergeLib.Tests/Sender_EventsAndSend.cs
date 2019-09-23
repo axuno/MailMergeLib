@@ -97,7 +97,7 @@ namespace MailMergeLib.Tests
             Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(mmm, (Dictionary<string, string>) null));
         }
 
-        [Test]
+        [TestCase(ExcludePlatform="Linux")]
         public async Task CancelSendOperationWithDelay()
         {
             var mmm = new MailMergeMessage("Cancel with delay", "plain text");

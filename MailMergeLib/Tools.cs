@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using MimeKit;
+using System.Runtime.InteropServices;
 
 namespace MailMergeLib
 {
@@ -25,10 +26,14 @@ namespace MailMergeLib
             if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
                 return false;
 
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return true;
+            }
+
             var pathRoot = Path.GetPathRoot(path);
             if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
                 return false;
-
             return !(pathRoot == path && pathRoot.StartsWith("\\\\") && pathRoot.IndexOf('\\', 2) == -1); // A UNC server name without a share name (e.g "\\NAME") is invalid
         }
 

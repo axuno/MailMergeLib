@@ -17,8 +17,9 @@ namespace MailMergeLib.Tests
 
         [TestCase(null)]
         [TestCase("")]
-        [TestCase("C:\\Temp")]
-        [TestCase("\\\\some\\unc\\path")]
+        [TestCase("/tmp", IncludePlatform="Linux")]
+        [TestCase("C:\\Temp", ExcludePlatform="Linux")]
+        [TestCase("\\\\some\\unc\\path", ExcludePlatform="Linux")]
         public void SetHtmlBuilderDocBaseUri_NoException(string baseUri)
         {
             var mmm = new MailMergeMessage("subject", "plain text", "<html><head><base href=\"\" /></head><body></body></html>");
