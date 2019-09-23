@@ -26,7 +26,7 @@ namespace MailMergeLib
             if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
                 return false;
 
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!Platform.IsWindows)
             {
                 return true;
             }
