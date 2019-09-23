@@ -6,7 +6,7 @@
     <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
     <Authors>axuno gGmbH</Authors>
     <Version>5.6.1.0</Version>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants)</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>MailMergeLib.Tests</AssemblyName>
@@ -17,7 +17,6 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
     <Company>axuno gGmbH</Company>
-    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
