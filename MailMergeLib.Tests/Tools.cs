@@ -9,25 +9,30 @@ namespace MailMergeLib.Tests
     public class Tools
     {
         [Test]
-        [TestCase(@"C:\dir\file.ext", true)]
-        [TestCase(@"C:\dir\", true)]
-        [TestCase(@"C:\dir", true)]
-        [TestCase(@"C:\", true)]
-        [TestCase(@"\\unc\share\dir\file.ext", true)]
-        [TestCase(@"\\unc\share", true)]
+        [TestCase(@"C:\dir\file.ext", true, ExcludePlatform="Linux")]
+        [TestCase(@"C:\dir\", true, ExcludePlatform="Linux")]
+        [TestCase(@"C:\dir", true, ExcludePlatform="Linux")]
+        [TestCase(@"C:\", true, ExcludePlatform="Linux")]
+        [TestCase(@"\\unc\share\dir\file.ext", true, ExcludePlatform="Linux")]
+        [TestCase(@"\\unc\share", true, ExcludePlatform="Linux")]
+        [TestCase(@"C:", false, ExcludePlatform="Linux")]
+        [TestCase(@"C:dir\file.ext", false, ExcludePlatform="Linux")]
+        [TestCase(@"\dir\file.ext", false, ExcludePlatform="Linux")]
+        [TestCase(@"\dir", false, ExcludePlatform="Linux")] // An "absolute", but not "full" path
         [TestCase(@"file.ext", false)]
         [TestCase(@"dir\file.ext", false)]
-        [TestCase(@"\dir\file.ext", false)]
-        [TestCase(@"C:", false)]
-        [TestCase(@"C:dir\file.ext", false)]
-        [TestCase(@"\dir", false)] // An "absolute", but not "full" path
         [TestCase(null, false, false)]
         [TestCase("", false, false)]
-        [TestCase("   ", false, false)]
+        [TestCase("   ", false, false, ExcludePlatform="Linux")]
+
+
+        [TestCase(@"/dir", true, IncludePlatform="Linux")] // An "absolute", "full" path
+        [TestCase(@"/dir/file.ext", true, IncludePlatform="Linux")]
+
 #if !NETCOREAPP
         // does not throw for net core
-        [TestCase(@"C:\inval|d", false, false)]
-        [TestCase(@"\\is_this_a_dir_or_a_hostname", false, false)]
+        [TestCase(@"C:\inval|d", false, false, ExcludePlatform="Linux")]
+        [TestCase(@"\\is_this_a_dir_or_a_hostname", false, false, ExcludePlatform="Linux")]
 #endif
         public static void IsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
         {
@@ -48,23 +53,27 @@ namespace MailMergeLib.Tests
         }
 
         [Test]
-        [TestCase(@"..\..", @"folder1\folder2\folder3\", @"folder1")]
-        [TestCase(@"", @"folder1\folder2\folder3\", @"folder1\folder2\folder3\")]
-        [TestCase(@"folder2\folder3", @"folder1\", @"folder1\folder2\folder3")]
+        [TestCase(@"..\..", @"folder1\folder2\folder3\", @"folder1", ExcludePlatform="Linux")]
+        [TestCase(@"", @"folder1\folder2\folder3\", @"folder1\folder2\folder3\", ExcludePlatform="Linux")]
+        [TestCase(@"folder2\folder3", @"folder1\", @"folder1\folder2\folder3", ExcludePlatform="Linux")]
+        [TestCase(@"../..", @"folder1/folder2/folder3/", @"folder1", IncludePlatform="Linux")]
+        [TestCase(@"", @"folder1/folder2/folder3/", @"folder1/folder2/folder3/", IncludePlatform="Linux")]
+        [TestCase(@"folder2/folder3", @"folder1/", @"folder1/folder2/folder3", IncludePlatform="Linux")]
         public void RelativePathTo(string expected, string from, string to)
         {
             Assert.AreEqual(expected, MailMergeLib.Tools.RelativePathTo(from, to));
         }
 
         [Test]
-        [TestCase(null, @"C:\Temp", @"D:\")]
+        [TestCase(null, @"C:\Temp", @"D:\", ExcludePlatform="Linux")]
         public void RelativePathTo_Different_Path_Roots(string expected, string from, string to)
         {
             Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
         }
 
         [Test]
-        [TestCase(null, @"folder1\", @"folder2")]
+        [TestCase(null, @"folder1\", @"folder2", ExcludePlatform="Linux")]
+        [TestCase(null, @"folder1/", @"folder2", IncludePlatform="Linux")]
         public void RelativePathTo_No_Common_Prefix_Path(string expected, string from, string to)
         {
             Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
-    <Copyright>© 2007-2019 by axuno gGmbH</Copyright>    
+    <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
     <Authors>axuno gGmbH</Authors>
     <Version>5.6.1.0</Version>

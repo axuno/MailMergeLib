@@ -13,11 +13,8 @@ namespace MailMergeLib
     public static class Tools
     {
         /// <summary>
-        /// Checks whether the given path is a full path
+        /// Checks whether the given path is a full path, depending on the <see cref="OpSys"/>.
         /// </summary>
-        /// <remarks>
-        /// Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
-        /// </remarks>
         /// <param name="path"></param>
         /// <returns>Returns true if the path is absolute, else false.</returns>
         public static bool IsFullPath(string path)
@@ -25,10 +22,14 @@ namespace MailMergeLib
             if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
                 return false;
 
+            if (Platform.OpSys != OpSys.Win)
+            {
+                return true;
+            }
+
             var pathRoot = Path.GetPathRoot(path);
             if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
                 return false;
-
             return !(pathRoot == path && pathRoot.StartsWith("\\\\") && pathRoot.IndexOf('\\', 2) == -1); // A UNC server name without a share name (e.g "\\NAME") is invalid
         }
 
@@ -67,23 +68,23 @@ namespace MailMergeLib
         public static string RelativePathTo(string fromDirectory, string toPath)
         {
             if (fromDirectory == null)
-                throw new ArgumentNullException("fromDirectory");
+                throw new ArgumentNullException(nameof(fromDirectory));
             if (toPath == null)
-                throw new ArgumentNullException("toPath");
+                throw new ArgumentNullException(nameof(toPath));
             if (Path.IsPathRooted(fromDirectory) && Path.IsPathRooted(toPath))
             {
                 if (string.Compare(Path.GetPathRoot(fromDirectory),
-                                   Path.GetPathRoot(toPath), true) != 0)
+                                   Path.GetPathRoot(toPath), StringComparison.OrdinalIgnoreCase) != 0)
                 {
                     throw new ArgumentException(
                         $"The paths '{fromDirectory} and '{toPath}' have different path roots.");
                 }
             }
             var relativePath = new StringCollection();
-            string[] fromDirectories = fromDirectory.Split(Path.DirectorySeparatorChar);
-            string[] toDirectories = toPath.Split(Path.DirectorySeparatorChar);
-            int length = Math.Min(fromDirectories.Length, toDirectories.Length);
-            int lastCommonRoot = -1;
+            var fromDirectories = fromDirectory.Split(Path.DirectorySeparatorChar);
+            var toDirectories = toPath.Split(Path.DirectorySeparatorChar);
+            var length = Math.Min(fromDirectories.Length, toDirectories.Length);
+            var lastCommonRoot = -1;
             // find common root
             for (int x = 0; x < length; x++)
             {
@@ -94,20 +95,19 @@ namespace MailMergeLib
             if (lastCommonRoot == -1)
             {
                 throw new ArgumentException(
-                    string.Format("The paths '{0} and '{1}' do not have a common prefix path.",
-                                  fromDirectory, toPath));
+                    $"The paths '{fromDirectory} and '{toPath}' do not have a common prefix path.");
             }
             // add relative folders in from path
-            for (int x = lastCommonRoot + 1; x < fromDirectories.Length; x++)
+            for (var x = lastCommonRoot + 1; x < fromDirectories.Length; x++)
                 if (fromDirectories[x].Length > 0)
                     relativePath.Add("..");
             // add to folders to path
-            for (int x = lastCommonRoot + 1; x < toDirectories.Length; x++)
+            for (var x = lastCommonRoot + 1; x < toDirectories.Length; x++)
                 relativePath.Add(toDirectories[x]);
             // create relative path
             var relativeParts = new string[relativePath.Count];
             relativePath.CopyTo(relativeParts, 0);
-            string newPath = string.Join(Path.DirectorySeparatorChar.ToString(), relativeParts);
+            var newPath = string.Join(Path.DirectorySeparatorChar.ToString(), relativeParts);
             return newPath;
         }
 
