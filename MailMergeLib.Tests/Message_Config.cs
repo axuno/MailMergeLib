@@ -14,8 +14,9 @@ namespace MailMergeLib.Tests
         [TestCase("", "")]
         [TestCase(null, "")]
         [TestCase("noFullPath", "noFullPath")]
-        [TestCase("C:\\some\\path\\to\\folder", "C:\\some\\path\\to\\folder", ExcludePlatform="Linux")]
-        [TestCase("/some/path/to/folder", "/some/path/to/folder", IncludePlatform="Linux")]
+        [TestCase("C:\\some\\path\\to\\folder", "C:\\some\\path\\to\\folder", ExcludePlatform =
+            nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("/some/path/to/folder", "/some/path/to/folder", IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
         public void SetFileBaseDirectory(string path, string expected)
         {
             _msgConfig.FileBaseDirectory = path;
@@ -26,12 +27,12 @@ namespace MailMergeLib.Tests
         [TestCase(" ", false)]
         [TestCase("", false)]
         [TestCase(null, false)]
-        [TestCase("C:\\some\\path\\to\\folder", false, ExcludePlatform="Linux")]
-        [TestCase("/some/path/to/folder", false, IncludePlatform="Linux")]
-        [TestCase("\\\\some\\unc\\path", false, ExcludePlatform="Linux")]
+        [TestCase("C:\\some\\path\\to\\folder", false, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("/some/path/to/folder", false, IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("\\\\some\\unc\\path", false, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
         [TestCase("noFullPath", true)]
-        [TestCase("..\\..\\relativePath", true, ExcludePlatform="Linux")]
-        [TestCase("../../relativePath", true, IncludePlatform="Linux")]
+        [TestCase("..\\..\\relativePath", true, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("../../relativePath", true, IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
         public void FileBaseDirectory_must_be_full_path_when_processing_the_message(string path, bool shouldThrow)
         {
             var mmm = new MailMergeMessage("subject", "plain text", "<html><body></body></html>");
@@ -60,12 +61,13 @@ namespace MailMergeLib.Tests
         [TestCase(" \t", "file:///")]
         [TestCase(" ", "file:///")]
         [TestCase("", "file:///")]
-        [TestCase("C:\\some\\path\\to\\folder", "file:///C:/some/path/to/folder", ExcludePlatform="Linux")]
-        [TestCase("/some/path/to/folder", "file:///some/path/to/folder", IncludePlatform="Linux")]
-        [TestCase("\\\\some\\unc\\path", "file://some/unc/path", ExcludePlatform="Linux")]
+        [TestCase("C:\\some\\path\\to\\folder", "file:///C:/some/path/to/folder", ExcludePlatform =
+            nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("/some/path/to/folder", "file:///some/path/to/folder", IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("\\\\some\\unc\\path", "file://some/unc/path", ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
         [TestCase("noFullPath", null)]
-        [TestCase("..\\..\\relativePath", null, ExcludePlatform="Linux")]
-        [TestCase("../../relativePath", null, IncludePlatform="Linux")]
+        [TestCase("..\\..\\relativePath", null, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
+        [TestCase("../../relativePath", null, IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
         public void HtmlBodyBuilderDocBaseUri_vs_MessageConfig_FileBaseDirectory(string path, string expected)
         {
             var mmm = new MailMergeMessage("subject", "plain text", "<html><body></body></html>");
