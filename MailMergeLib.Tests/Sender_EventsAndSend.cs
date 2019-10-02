@@ -104,11 +104,7 @@ namespace MailMergeLib.Tests
                 await mms.SendAsync(mmm, (Dictionary<string, string>) null));
         }
 
-// ********************************************
-// Todo: This test SHOULD run on Linux as well!
-// ********************************************
-        [TestCase(ExcludePlatform = nameof(OpSys.Linux))]
-        public async Task CancelSendOperationWithDelay()
+        public void CancelSendOperationWithDelay()
         {
             var mmm = new MailMergeMessage("Cancel with delay", "plain text");
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));

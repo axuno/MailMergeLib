@@ -131,7 +131,7 @@ namespace MailMergeLib
                             MimeMessage mimeMessage = null;
                             try
                             {
-                                mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem)).ConfigureAwait(false);
+                                mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem), _cancellationTokenSource.Token).ConfigureAwait(false);
                             }
                             catch (Exception exception)
                             {
@@ -308,9 +308,9 @@ namespace MailMergeLib
                         case MessageOutput.None:
                             break;
                         case MessageOutput.Directory:
-                            mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
+                            await mimeMsg.WriteToAsync(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                             break;
-#if NET45
+#if NETFRAMEWORK
                         case MessageOutput.PickupDirectoryFromIis:
                             // for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
                             // and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
@@ -460,7 +460,7 @@ namespace MailMergeLib
         /// <summary>
         /// Cancel any transactions sending or merging mail.
         /// </summary>
-        /// <param name="waitTime">The number of milliseconds to wait before cancelation.</param>
+        /// <param name="waitTime">The number of milliseconds to wait before cancellation.</param>
         public void SendCancel(int waitTime = 0)
         {
             if (_cancellationTokenSource.IsCancellationRequested) return;
@@ -696,7 +696,7 @@ namespace MailMergeLib
                         case MessageOutput.Directory:
                             mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                             break;
-#if NET45
+#if NETFRAMEWORK
                         case MessageOutput.PickupDirectoryFromIis:
                             // for requirements of message format see: https://technet.microsoft.com/en-us/library/bb124230(v=exchg.150).aspx
                             // and here http://www.vsysad.com/2014/01/iis-smtp-folders-and-domains-explained/
