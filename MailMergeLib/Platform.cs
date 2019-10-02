@@ -30,14 +30,19 @@ namespace MailMergeLib
     {
         static Platform()
         {
-            var windir = Environment.GetEnvironmentVariable("windir");
+            DeterminePlatform();
+        }
+
+        internal static void DeterminePlatform()
+        {
+            var windir = Environment.GetEnvironmentVariable(WinEnvironmentVariable);
             if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
             {
                 OpSys = OpSys.Win;
             }
-            else if (File.Exists("/proc/sys/kernel/ostype"))
+            else if (File.Exists(LinuxIdentifyingFile))
             {
-                var osType = File.ReadAllText(@"/proc/sys/kernel/ostype");
+                var osType = File.ReadAllText(LinuxIdentifyingFile);
                 if (osType.StartsWith("Linux", StringComparison.OrdinalIgnoreCase))
                 {
                     // Note: Android gets here, too
@@ -48,7 +53,7 @@ namespace MailMergeLib
                     throw new UnsupportedPlatformException(osType);
                 }
             }
-            else if (File.Exists("/System/Library/CoreServices/SystemVersion.plist"))
+            else if (File.Exists(MacOsxIdentifyingFile))
             {
                 // Note: iOS gets here, too
                 OpSys = OpSys.MacOsX;
@@ -59,9 +64,15 @@ namespace MailMergeLib
             }
         }
 
+        internal static string WinEnvironmentVariable { get; set; } = "windir";
+
+        internal static string LinuxIdentifyingFile { get; set; } = "/proc/sys/kernel/ostype";
+
+        internal static string MacOsxIdentifyingFile { get; set; } = "/System/Library/CoreServices/SystemVersion.plist";
+
         /// <summary>
         /// The operating system of the platform.
         /// </summary>
-        public static OpSys OpSys { get; }
+        public static OpSys OpSys { get; private set; }
     }
 }
