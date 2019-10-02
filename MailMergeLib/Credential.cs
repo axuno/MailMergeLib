@@ -64,8 +64,8 @@ namespace MailMergeLib
         [YAXSerializableField]
         internal string UsernameEncrypted
         {
-            get => Crypto.Encrypt(Username);
-            set => Username = Crypto.Decrypt(value);
+            get => Settings.CryptoEnabled ? Crypto.Encrypt(Username) : Username;
+            set => Username = Settings.CryptoEnabled ? Crypto.Decrypt(value) : value;
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace MailMergeLib
         [YAXSerializableField]
         internal string PasswordEncrypted
         {
-            get => Crypto.Encrypt(Password);
-            set => Password = Crypto.Decrypt(value);
+            get => Settings.CryptoEnabled ? Crypto.Encrypt(Password) : Password;
+            set => Password = Settings.CryptoEnabled ? Crypto.Decrypt(value) : value;
         }
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace MailMergeLib
         public MessageConfig MessageConfig { get; set; }
 
         /// <summary>
-        /// Gets or sets the Key used for encryption and decryption.
+        /// Gets or sets the static <see cref="Crypto.CryptoKey"/> used for encryption and decryption.
         /// Should be set individually.
         /// </summary>
         public static string CryptoKey
@@ -46,13 +46,10 @@ namespace MailMergeLib
         }
 
         /// <summary>
-        /// Switches encryption on and off. Default is <c>off</c>.
+        /// Static switch to set encryption for settings on or off. Default is <c>false</c>.
         /// </summary>
-        public static bool CryptoEnabled
-        {
-            get => Crypto.Enabled;
-            set => Crypto.Enabled = value;
-        }
+        [YAXDontSerialize]
+        public static bool CryptoEnabled { get; set; } = false;
 
         /// <summary>
         /// Write MailMergeLib settings to a stream.

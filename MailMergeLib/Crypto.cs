@@ -6,15 +6,9 @@ namespace MailMergeLib
 {
     /// <summary>
     /// Simple encryption. Used to encrypt security relevant entries in configuration files.
-    /// Encryption can be enabled/disabled by setting <see cref="Enabled"/>.
     /// </summary>
     public static class Crypto
     {
-        /// <summary>
-        /// Switches encryption on and off. Default is <c>off</c>.
-        /// </summary>
-        public static bool Enabled { get; set; } = false;
-
         /// <summary>
         /// The Initialization Vector for the DES encryption routine. You should change the default value, but keep the 8 bytes.
         /// </summary>
@@ -37,7 +31,7 @@ namespace MailMergeLib
         /// <returns>Returns the encrypted and base64 encoded string.</returns>
         public static string Encrypt(string s)
         {
-            if (!Enabled || string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
                 return s;
         
             var buffer = Encoding.GetBytes(s);
@@ -60,7 +54,7 @@ namespace MailMergeLib
         /// <returns>Returns the decrypted, encoded string.</returns>
         public static string Decrypt(string s)
         {
-            if (!Enabled || string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
                 return s;
 
             var buffer = Convert.FromBase64String(s);

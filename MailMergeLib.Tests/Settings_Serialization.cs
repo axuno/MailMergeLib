@@ -23,7 +23,6 @@ namespace MailMergeLib.Tests
             // initialize settings with non-default values
 
             Settings.CryptoKey = "SomeSecretCryptoKey";
-            Settings.CryptoEnabled = false;
 
             _outSettings = new Settings
             {
