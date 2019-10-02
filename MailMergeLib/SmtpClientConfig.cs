@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using MailMergeLib.Serialization;
 using YAXLib;
-#if NET45
+#if NETFRAMEWORK
 using System.Configuration;
 using System.Net.Configuration;
 #endif
@@ -32,14 +32,39 @@ namespace MailMergeLib
             MailOutputDirectory = System.IO.Path.GetTempPath();
         }
 
-#if NET45
+#if NETFRAMEWORK
         /// <summary>
-        /// If MailMergeLib runs on an IIS web application, it can load the following settings from system.net/mailSettings/smtp configuration section of web.donfig:
+        /// If MailMergeLib runs on an IIS web application, it can load the following settings from system.net/mailSettings/smtp configuration section of web.config:
         /// DeliveryMethod, MessageOutput, EnableSsl, Network.UserName, Network.Password, Network.Host, Network.Port, Network.ClientDomain
         /// </summary>
+        [Obsolete("Use method " + nameof(ReadSmtpConfigurationFromConfigFile) + " instead", false)]
         public void ReadSmtpConfigurationFromWebConfig()
         {
-            var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
+            ReadSmtpConfigurationFromConfigFile();
+        }
+
+        /// <summary>
+        /// MailMergeLib loads the following settings from system.net/mailSettings/smtp
+        /// configuration section of an app.config or web.config:
+        /// DeliveryMethod, EnableSsl, Network.UserName,
+        /// Network.Password, Network.Host, Network.Port, Network.ClientDomain
+        /// </summary>
+        public void ReadSmtpConfigurationFromConfigFile()
+        {
+            SmtpSection smtpSection;
+            try
+            {
+                // runs in a standalone app
+                smtpSection =
+                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
+                        .GetSection("system.net/mailSettings/smtp") as SmtpSection;
+            }
+            catch (Exception)
+            {
+                // probably runs under System.Web context, because ConfigurationManager.OpenExeConfiguration cannot be used
+                smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
+            }
+
             if (smtpSection == null) return;
 
             switch (smtpSection.DeliveryMethod)
@@ -52,15 +77,16 @@ namespace MailMergeLib
                     break;
                 case System.Net.Mail.SmtpDeliveryMethod.SpecifiedPickupDirectory:
                     MessageOutput = MessageOutput.Directory;
-                    _mailOutputDirectory = string.IsNullOrEmpty(smtpSection.SpecifiedPickupDirectory?.PickupDirectoryLocation) ? null : smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation;
+                    _mailOutputDirectory = smtpSection.SpecifiedPickupDirectory?.PickupDirectoryLocation;
                     break;
             }
 
             if (smtpSection.Network.EnableSsl) SecureSocketOptions = SecureSocketOptions.Auto;
 
-            if (!string.IsNullOrEmpty(smtpSection.Network.UserName) && !string.IsNullOrEmpty(smtpSection.Network.Password))
+            if (!string.IsNullOrEmpty(smtpSection.Network.UserName) &&
+                !string.IsNullOrEmpty(smtpSection.Network.Password))
                 NetworkCredential = new Credential(smtpSection.Network.UserName, smtpSection.Network.Password);
-            
+
             SmtpPort = smtpSection.Network.Port;
             SmtpHost = smtpSection.Network.Host;
             ClientDomain = smtpSection.Network.ClientDomain;
@@ -145,7 +171,7 @@ namespace MailMergeLib
                         return null;
                     case MessageOutput.Directory:
                         return _mailOutputDirectory ?? System.IO.Path.GetTempPath();
-#if NET45
+#if NETFRAMEWORK
                     case MessageOutput.PickupDirectoryFromIis:
                         return GetPickDirectoryFromIis();
 #endif
@@ -225,7 +251,7 @@ namespace MailMergeLib
             set { _retryDelayTime = (value >= 0 && value <= 10000) ? value : 0; }
         }
 
-#if NET45
+#if NETFRAMEWORK
         private static string GetPickDirectoryFromIis()
         {
             try
