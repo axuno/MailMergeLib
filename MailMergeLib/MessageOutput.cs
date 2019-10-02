@@ -17,7 +17,7 @@ namespace MailMergeLib
         /// Writes messages to the specified MailOutputDirectory.
         /// </summary>
         Directory
-#if NET45
+#if NETFRAMEWORK
             ,
         
         /// <summary>

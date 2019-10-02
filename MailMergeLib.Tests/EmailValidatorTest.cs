@@ -24,7 +24,7 @@ using NUnit.Framework;
 namespace MailMergeLib.Tests
 {
     [TestFixture]
-    public class Test
+    public class EmailValidatorTest
     {
         static readonly string[] ValidAddresses =
         {
