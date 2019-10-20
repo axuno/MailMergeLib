@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,6 +9,9 @@ using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
 using YAXLib;
+#if NETFRAMEWORK || NETSTANDARD2_0
+using System.Data;
+#endif
 
 namespace MailMergeLib
 {
@@ -336,8 +338,8 @@ namespace MailMergeLib
         /// <param name="dataItem"></param>
         /// <returns>Returns the text with all variables replaced.</returns>
         /// <remarks>
-        /// In case <see cref="SmartFormatMail.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
-        /// or <see cref="SmartFormatMail.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
+        /// In case <see cref="SmartFormat.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
+        /// or <see cref="SmartFormat.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
         /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
         /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
         /// </remarks>
@@ -369,8 +371,8 @@ namespace MailMergeLib
         /// <param name="dataItem"></param>
         /// <returns>Returns the text with all variables replaced.</returns>
         /// <remarks>
-        /// In case <see cref="SmartFormatMail.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
-        /// or <see cref="SmartFormatMail.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
+        /// In case <see cref="SmartFormat.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
+        /// or <see cref="SmartFormat.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
         /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
         /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
         /// </remarks>

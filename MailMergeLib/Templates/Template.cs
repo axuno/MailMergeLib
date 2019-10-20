@@ -66,13 +66,13 @@ namespace MailMergeLib.Templates
         }
 
         /// <summary>
-        /// Gets the parts for the <see cref="key"/> argument.
+        /// Gets the parts for the key parameter.
         /// If there is no part for the key, and the <see cref="DefaultKey"/> is not Null,
         /// the parts for the default key are returned. If neither can be found, but there are only max.
         /// 2 entries with 1 key, this one is returned. If all fail the returned array will be empty.
         /// </summary>
         /// <param name="key">The key to get the parts for. If null or omitted, the <see cref="Key"/> property of the <see cref="Template"/> will be used.</param>
-        /// <returns>If the <param name="key"/> parameter is found, it returns an array of <see cref="Part"/> for the <param name="key"/> parameter, else from the default key.</returns>
+        /// <returns>If the key parameter is found, it returns an array of <see cref="Part"/> for the <param name="key"/> parameter, else from the default key.</returns>
         public Part[] GetParts(string key = null)
         {
             if (key == null) key = Key;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using MimeKit;
 
@@ -13,7 +14,7 @@ namespace MailMergeLib
     public static class Tools
     {
         /// <summary>
-        /// Checks whether the given path is a full path, depending on the <see cref="OpSys"/>.
+        /// Checks whether the given path is a full path, depending on the platform.
         /// </summary>
         /// <param name="path"></param>
         /// <returns>Returns true if the path is absolute, else false.</returns>
@@ -21,12 +22,12 @@ namespace MailMergeLib
         {
             if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
                 return false;
-
-            if (Platform.OpSys != OpSys.Win)
+#if NETSTANDARD
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return true;
             }
-
+#endif
             var pathRoot = Path.GetPathRoot(path);
             if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
                 return false;

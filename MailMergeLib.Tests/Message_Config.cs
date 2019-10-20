@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using MailMergeLib.Tests.NUnit;
 using NUnit.Framework;
 
 namespace MailMergeLib.Tests

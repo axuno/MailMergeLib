@@ -4,9 +4,9 @@
     <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
     <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib</AssemblyTitle>
-    <Version>5.6.1.0</Version>
-    <AssemblyVersion>5.6.1.0</AssemblyVersion>
-    <FileVersion>5.6.1.0</FileVersion>
+    <Version>5.6.2.0</Version>
+    <AssemblyVersion>5.6.2.0</AssemblyVersion>
+    <FileVersion>5.6.2.0</FileVersion>
     <Authors>axuno gGmbH</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
@@ -18,17 +18,20 @@
     <PackageId>MailMergeLib</PackageId>
     <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
     <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
-    <PackageLicenseUrl>https://github.com/axuno/MailMergeLib/blob/master/MailMergeLib/License.txt</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
-    <PackageReleaseNotes>* Reverted back to v5.5.0 behavior: MessageConfig.FileBaseDirectory must be a full path only before the MailMergeMessage is processed (not already, when the property is set).
-* Classes in namespace 'MailMergLib.SmartFormatMail' are obsolete. Use namespace 'SmartFormat' from dependency 'SmartFormat.Net' instead.
-* This is the last version which supports netstandard1.6
+    <PackageReleaseNotes>* Encryption of Credential in Settings can now be disabled. Breaking change: disabled is the default.
+* SMTP settings can now be read from app.config/web.config
+* Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows
+* Classes in namespace 'MailMergLib.SmartFormatMail' were obsolete and are now removed.
 * Updated versions of dependencies</PackageReleaseNotes>
     <PackageTags>smtp mime mail email merge template netcore netstandard net45 c#</PackageTags>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RootNamespace>MailMergeLib</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>GitHub</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
