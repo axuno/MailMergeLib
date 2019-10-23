@@ -126,7 +126,10 @@ namespace MailMergeLib
                             {
                                 tasksUsed.Add(taskNo);
                             }
-
+                            
+                            // Delay between messages is also the delay until the first message will be sent
+                            await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
+                            
                             var localDataItem = dataItem;  // no modified enclosure
                             MimeMessage mimeMessage = null;
                             try
@@ -170,8 +173,6 @@ namespace MailMergeLib
 
                             OnMergeProgress?.Invoke(this,
                                 new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-
-                            await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
                         }
 
                         smtpClient.ProtocolLogger?.Dispose();
