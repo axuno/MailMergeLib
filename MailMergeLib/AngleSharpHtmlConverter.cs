@@ -30,8 +30,8 @@ namespace MailMergeLib
         /// <returns>The plain text representation of the HTML content.</returns>
         public string ToPlainText(string html)
         {
-            var parser = new AngleSharp.Parser.Html.HtmlParser();
-            var document = parser.Parse(html);
+            var parser = new AngleSharp.Html.Parser.HtmlParser();
+            var document = parser.ParseDocument(html);
 
             var sw = new StringWriter();
             ConvertContentToText(document.ChildNodes, sw);

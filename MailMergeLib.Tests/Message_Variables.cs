@@ -143,9 +143,9 @@ namespace MailMergeLib.Tests
         public void MessagesFromListOfSmartObjects()
         {
             var dataList = new List<SmartObjects>();
-            var so1 = new SmartObjects(new []{new Dictionary<string, string>(){{"Email", "test@example.com"}}, new Dictionary<string, string>() { { "Continent", "Europe" } } });
-            var so2 = new SmartObjects(new[] { new Dictionary<string, string>() { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string>() { { "Continent", "Asia" } } });
-            var so3 = new SmartObjects(new[] { new Dictionary<string, string>() { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string>() { { "Continent", "America" } } });
+            var so1 = new SmartObjects(new[] {new Dictionary<string, string> {{"Email", "test@example.com"}}, new Dictionary<string, string> { { "Continent", "Europe" } } });
+            var so2 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "Asia" } } });
+            var so3 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "America" } } });
 
             dataList.AddRange(new []{so1, so2, so3});
 
@@ -184,6 +184,52 @@ namespace MailMergeLib.Tests
             
             Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
             Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", ((Dictionary<string, string>)so[1])["Continent"])));
+            MailMergeMessage.DisposeFileStreams(mimeMessage);
+        }
+
+        [Test]
+        public void MessagesFromListOfValueTuples()
+        {
+            var dataList = new List<ValueTuple<Dictionary<string,string>,Dictionary<string,string>>>();
+            var t1 = (new Dictionary<string, string> {{"Email", "test@example.com"}}, new Dictionary<string, string> {{"Continent", "Europe"}});
+            var t2 = (new Dictionary<string, string> {{"Email", "2ndRow@example.com"}}, new Dictionary<string, string> {{"Continent", "Asia"}});
+            var t3 = (new Dictionary<string, string> {{"Email", "3ndRow@example.com"}}, new Dictionary<string, string> {{"Continent", "America"}});
+
+            dataList.AddRange(new[] { t1, t2, t3 });
+
+            const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+
+            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
+
+            var i = 0;
+            foreach (var mimeMessage in mmm.GetMimeMessages<ValueTuple<Dictionary<string, string>, Dictionary<string, string>>>(dataList))
+            {
+                var (emailPart, continentPart) = dataList[i];
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(((Dictionary<string, string>)emailPart)["Email"]));
+                Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", emailPart["Email"]).Replace("{Continent}", continentPart["Continent"])));
+                MailMergeMessage.DisposeFileStreams(mimeMessage);
+                i++;
+            }
+        }
+
+        [Test]
+        public void SingleMessageFromValueTuple()
+        {
+            var anonymous = new { Email = "test@example.com" };
+            const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+            var so = (anonymous, new Dictionary<string, string> {{"Continent", "Europe"}});
+
+            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
+
+            var mimeMessage = mmm.GetMimeMessage(so);
+            var (emailPart, continentPart) = so;
+
+            Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
+            Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", continentPart["Continent"])));
             MailMergeMessage.DisposeFileStreams(mimeMessage);
         }
 

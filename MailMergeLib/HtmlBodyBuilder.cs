@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AngleSharp.Dom.Html;
-using AngleSharp.Extensions;
-using AngleSharp.Parser.Html;
+using AngleSharp;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using MimeKit;
 using MimeKit.Utils;
 
@@ -41,7 +41,7 @@ namespace MailMergeLib
             // Create a new parser front-end (can be re-used)
             var parser = new HtmlParser();
             //Just get the DOM representation
-            _htmlDocument = parser.Parse(mailMergeMessage.HtmlText);
+            _htmlDocument = parser.ParseDocument(mailMergeMessage.HtmlText);
         }
 
         /// <summary>

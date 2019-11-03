@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using MimeKit;
 using NUnit.Framework;
 using SmartFormat.Core.Settings;
@@ -189,7 +189,7 @@ namespace MailMergeLib.Tests
             msg.WriteTo(msgFilename);
             Console.WriteLine($"Test mime message saved as {msgFilename}");
             
-            Assert.IsTrue(new HtmlParser().Parse(msg.HtmlBody).All.Count(m => m is IHtmlImageElement) == 3);
+            Assert.IsTrue(new HtmlParser().ParseDocument((string)msg.HtmlBody).All.Count(m => m is IHtmlImageElement) == 3);
             Assert.IsTrue(msg.BodyParts.Count(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")) == 1);
 
             MailMergeMessage.DisposeFileStreams(msg);
