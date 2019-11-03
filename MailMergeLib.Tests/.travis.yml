@@ -1,0 +1,7 @@
+﻿language: csharp
+solution: MailMergeLib.sln
+mono: none
+dotnet: 2.2.401
+script:
+ - dotnet restore
+ - dotnet test MailMergeLib.Tests/MailMergeLib.Tests.csproj --framework netcoreapp2.0 --configuration Debug
