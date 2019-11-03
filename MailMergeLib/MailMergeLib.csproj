@@ -4,11 +4,11 @@
     <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
     <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib</AssemblyTitle>
-    <Version>5.6.2.0</Version>
-    <AssemblyVersion>5.6.2.0</AssemblyVersion>
-    <FileVersion>5.6.2.0</FileVersion>
+    <Version>5.7.0.0</Version>
+    <AssemblyVersion>5.7.0.0</AssemblyVersion>
+    <FileVersion>5.7.0.0</FileVersion>
     <Authors>axuno gGmbH</Authors>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>MailMergeLib</AssemblyName>
@@ -56,11 +56,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.9.11" />
-    <PackageReference Include="MailKit" Version="2.3.1.6" />
-    <PackageReference Include="MimeKit" Version="2.3.1" />
+    <PackageReference Include="AngleSharp" Version="0.13.0" />
+    <PackageReference Include="MailKit" Version="2.4.0" />
+    <PackageReference Include="MimeKit" Version="2.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="SmartFormat.NET" Version="2.4.2" />
+    <PackageReference Include="SmartFormat.NET" Version="2.5.0" />
     <PackageReference Include="YAXLib" Version="2.15.0" />
   </ItemGroup>
 
