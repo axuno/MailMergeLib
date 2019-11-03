@@ -3,10 +3,10 @@
 [![GitHub release](https://img.shields.io/github/release/axuno/mailmergelib.svg)](https://github.com/axuno/MailMergeLib/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/MailMergeLib/blob/master/License.txt)
 
-| Platform  | Build Status | Code Coverage |
-|:----------|:------------:|:-------------:|
-| Windows   | [![Build status](https://ci.appveyor.com/api/projects/status/9gpm43038riwlbu2/branch/master?svg=true)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master) | ![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/mailmergelib.svg)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master/tests) |
-| Linux/Mac |[![Build Status](https://api.travis-ci.org/axuno/MailMergeLib.svg](https://travis-ci.org/axuno/MailMergeLib) | [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/mailmergelib.svg)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master/tests) |
+| Platform  | Build Status | Tests | Code Coverage  |
+|-----------|--------------|-------|----------------|
+| Windows   | [![Build status](https://ci.appveyor.com/api/projects/status/9gpm43038riwlbu2/branch/master?svg=true)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master)  | [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/mailmergelib.svg)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master/tests) | [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib) |
+| Linux/Mac | [![Build Status](https://travis-ci.org/axuno/MailMergeLib.svg)](https://travis-ci.org/axuno/MailMergeLib) | [![AppVeyor tests](https://img.shields.io/appveyor/tests/axuno/mailmergelib.svg)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master/tests) | [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib) |
 
 ```MailMergeLib``` version 5 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
 
