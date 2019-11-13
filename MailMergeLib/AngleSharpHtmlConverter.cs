@@ -33,7 +33,7 @@ namespace MailMergeLib
             var parser = new AngleSharp.Html.Parser.HtmlParser();
             var document = parser.ParseDocument(html);
 
-            var sw = new StringWriter();
+            using var sw = new StringWriter();
             ConvertContentToText(document.ChildNodes, sw);
             sw.Flush();
             var text = sw.ToString();

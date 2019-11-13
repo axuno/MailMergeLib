@@ -72,7 +72,7 @@ namespace MailMergeLib.Templates
         /// 2 entries with 1 key, this one is returned. If all fail the returned array will be empty.
         /// </summary>
         /// <param name="key">The key to get the parts for. If null or omitted, the <see cref="Key"/> property of the <see cref="Template"/> will be used.</param>
-        /// <returns>If the key parameter is found, it returns an array of <see cref="Part"/> for the <param name="key"/> parameter, else from the default key.</returns>
+        /// <returns>If the key parameter is found, it returns an array of <see cref="Part"/> for the key parameter, else from the default key.</returns>
         public Part[] GetParts(string key = null)
         {
             if (key == null) key = Key;
@@ -150,7 +150,7 @@ namespace MailMergeLib.Templates
         /// <returns>Returns true, if both instances are equal, else false.</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((Template)obj);

@@ -10,7 +10,7 @@
         <NetworkCredential Username="user" Password="password" Domain="" yaxlib:realtype="MailMergeLib.Credential" />
         <MailOutputDirectory />
         <MessageOutput>SmtpServer</MessageOutput>
-        <SslProtocols>Ssl3</SslProtocols>
+        <SslProtocols>Tls12</SslProtocols>
         <SecureSocketOptions>StartTlsWhenAvailable</SecureSocketOptions>
         <Timeout>4321</Timeout>
         <DelayBetweenMessages>543</DelayBetweenMessages>

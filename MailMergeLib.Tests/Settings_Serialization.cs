@@ -64,7 +64,7 @@ namespace MailMergeLib.Tests
                             DelayBetweenMessages = 543,
                             SecureSocketOptions = SecureSocketOptions.StartTlsWhenAvailable,
                             LocalEndPoint = new IPEndPoint(12345, 123),
-                            SslProtocols = SslProtocols.Ssl3,
+                            SslProtocols = SslProtocols.Tls12,
                             ClientDomain = "TestDomain",
                             MailOutputDirectory = "Path-to-folder",
                             Timeout = 4321

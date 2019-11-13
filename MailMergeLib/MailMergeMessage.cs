@@ -633,7 +633,7 @@ namespace MailMergeLib
         /// </param>
         /// <returns>Returns a MailMessage ready to be sent by an SmtpClient.</returns>
         /// <exception cref="MailMergeMessageException">Throws a general <see cref="MailMergeMessageException"/>, which contains a list of exceptions giving more details.</exception>
-        public MimeMessage GetMimeMessage(object dataItem = default(object))
+        public MimeMessage GetMimeMessage(object dataItem = default)
         {
             lock (SyncRoot)
             {
@@ -931,7 +931,9 @@ namespace MailMergeLib
         /// <param name="encoding"></param>
         public static MailMergeMessage Deserialize(Stream stream, Encoding encoding)
         {
+#pragma warning disable IDE0068 // Use recommended dispose pattern
             return Deserialize(new StreamReader(stream, encoding), true);
+#pragma warning restore IDE0068 // Use recommended dispose pattern
         }
 
         /// <summary>
@@ -961,7 +963,7 @@ namespace MailMergeLib
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((MailMergeMessage)obj);
@@ -1025,13 +1027,13 @@ namespace MailMergeLib
             if (mimeMessage == null) return;
 
             // Dispose the streams of file attachments
-            foreach (var mimePart in mimeMessage.Attachments?.Where(mp => mp is MimePart).Cast<MimePart>())
+            foreach (var mimePart in mimeMessage.Attachments?.Where(mp => mp is MimePart)?.Cast<MimePart>())
             {
                 mimePart?.Content?.Stream?.Dispose();
             }
 
             // Dispose the streams of HTML inline file attachments
-            foreach (var mimePart in mimeMessage.BodyParts?.Where(mp => mp is MimePart).Cast<MimePart>())
+            foreach (var mimePart in mimeMessage.BodyParts?.Where(mp => mp is MimePart)?.Cast<MimePart>())
             {
                 mimePart?.Content?.Stream?.Dispose();
             }

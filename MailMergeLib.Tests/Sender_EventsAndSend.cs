@@ -17,9 +17,9 @@ namespace MailMergeLib.Tests
     [TestFixture]
     public class Sender_EventsAndSend
     {
-        private static object _locker = new object();
+        private static readonly object _locker = new object();
         private static SimpleSmtpServer _server;
-        private Random _rnd = new Random();
+        private readonly Random _rnd = new Random();
         private Settings _settings = new Settings();
 
         public Sender_EventsAndSend()
@@ -76,6 +76,8 @@ namespace MailMergeLib.Tests
                 await mms.SendAsync(mmm, new Dictionary<string, string>()));
 
             mms.IsBusy = false;
+            mmm.Dispose();
+            mms.Dispose();
         }
 
         [Test]
@@ -91,6 +93,7 @@ namespace MailMergeLib.Tests
             Assert.Throws<ArgumentNullException>(() => mms.Send(null, new Dictionary<string, string>()));
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await mms.SendAsync(null, new Dictionary<string, string>()));
+            mms.Dispose();
         }
 
         [Test]
@@ -102,25 +105,34 @@ namespace MailMergeLib.Tests
             Assert.Throws<ArgumentNullException>(() => mms.Send(null, (Dictionary<string, string>) null));
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await mms.SendAsync(mmm, (Dictionary<string, string>) null));
+
+            mms.Dispose();
+            mmm.Dispose();
         }
 
+        [Test]
         public void CancelSendOperationWithDelay()
         {
             var mmm = new MailMergeMessage("Cancel with delay", "plain text");
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
 
-            var mms = new MailMergeSender();
-            mms.Config = _settings.SenderConfig;
+            var mms = new MailMergeSender
+            {
+                Config = _settings.SenderConfig
+            };
             mms.Config.MaxNumOfSmtpClients = 1;
             mms.Config.SmtpClientConfig[0].MessageOutput = MessageOutput.SmtpServer;
             mms.Config.SmtpClientConfig[0].DelayBetweenMessages = 2000;
 
             var anyData = new[] {new {mailNo = 1}, new {mailNo = 2}, new {mailNo = 3}};
-
+            
             mms.SendCancel(500);
             Assert.ThrowsAsync<TaskCanceledException>(() => mms.SendAsync(mmm, anyData));
             Assert.AreEqual(0, _server.ReceivedEmailCount);
+
+            mmm.Dispose();
+            mms.Dispose();
         }
 
         [Test]
@@ -130,8 +142,7 @@ namespace MailMergeLib.Tests
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
 
-            var mms = new MailMergeSender();
-            mms.Config = _settings.SenderConfig;
+            var mms = new MailMergeSender {Config = _settings.SenderConfig};
             mms.Config.MaxNumOfSmtpClients = 1;
             mms.Config.SmtpClientConfig[0].MessageOutput = MessageOutput.SmtpServer;
             mms.Config.SmtpClientConfig[0].DelayBetweenMessages = 2000;
@@ -148,6 +159,9 @@ namespace MailMergeLib.Tests
             Assert.Throws<AggregateException>(() => { Task.WaitAll(tasks); });
 
             Assert.AreEqual(0, _server.ReceivedEmailCount);
+
+            mms.Dispose();
+            mmm.Dispose();
         }
 
         [Test]
@@ -364,6 +378,9 @@ namespace MailMergeLib.Tests
             }
 
             #endregion
+
+            mms.Dispose();
+            mmm.Dispose();
         }
 
         [Test]
@@ -507,6 +524,10 @@ namespace MailMergeLib.Tests
             }
 
             #endregion
+
+            mms.Dispose();
+            mmm.Dispose();
+
         }
 
         [Test]
@@ -743,6 +764,9 @@ namespace MailMergeLib.Tests
             }
 
             #endregion
+
+            mms.Dispose();
+            mmm.Dispose();
         }
 
         [TestCase(10)]
@@ -793,6 +817,9 @@ namespace MailMergeLib.Tests
 
             Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
             Assert.IsFalse(mms.IsBusy);
+
+            mms.Dispose();
+            mmm.Dispose();
         }
 
         #region *** Test setup ***

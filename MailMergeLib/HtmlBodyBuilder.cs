@@ -68,8 +68,7 @@ namespace MailMergeLib
             }
 
             // set the HTML title tag from email subject
-            var titleEle = _htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) as IHtmlTitleElement;
-            if (titleEle != null)
+            if (_htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) is IHtmlTitleElement titleEle)
             {
                 titleEle.Text = _mailMergeMessage.SearchAndReplaceVars(_mailMergeMessage.Subject, _dataItem);
             }

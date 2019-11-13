@@ -25,13 +25,15 @@ namespace MailMergeLib.Tests
         [Test]
         public void MimeMessageSize()
         {
-            var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>some body</body></html>");
-            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
-            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
-            var mimeMessage = mmm.GetMimeMessage(null);
+            using (var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>some body</body></html>"))
+            {
+                mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
+                mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
+                var mimeMessage = mmm.GetMimeMessage(null);
 
-            var size = MailMergeLib.Tools.CalcMessageSize(mimeMessage);
-            Assert.IsTrue(size > 0);
+                var size = MailMergeLib.Tools.CalcMessageSize(mimeMessage);
+                Assert.IsTrue(size > 0);
+            }
 
             Assert.IsTrue(MailMergeLib.Tools.CalcMessageSize(null) == 0);
         }
@@ -39,7 +41,7 @@ namespace MailMergeLib.Tests
         [Test]
         public void EmptyContent()
         {
-            var mmm = new MailMergeMessage();
+            using var mmm = new MailMergeMessage();
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
 
@@ -57,9 +59,8 @@ namespace MailMergeLib.Tests
         [Test]
         public void CreateTextMessageWithFileAttachments()
         {
-            var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
-            var mmm = new MailMergeMessage("The subject", "plain text", basicMmm.FileAttachments);
-
+            using var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            using var mmm = new MailMergeMessage("The subject", "plain text", basicMmm.FileAttachments);
             Assert.AreEqual("The subject", mmm.Subject);
             Assert.AreEqual("plain text", mmm.PlainText);
             Assert.AreEqual(basicMmm.FileAttachments.Count, mmm.FileAttachments.Count);
@@ -68,9 +69,8 @@ namespace MailMergeLib.Tests
         [Test]
         public void CreateTextAndHtmlMessageWithFileAttachments()
         {
-            var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
-            var mmm = new MailMergeMessage("The subject", "plain text", "<html>html</html>", basicMmm.FileAttachments);
-
+            using var basicMmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            using var mmm = new MailMergeMessage("The subject", "plain text", "<html>html</html>", basicMmm.FileAttachments);
             Assert.AreEqual("The subject", mmm.Subject);
             Assert.AreEqual("plain text", mmm.PlainText);
             Assert.AreEqual("<html>html</html>", mmm.HtmlText);
@@ -89,20 +89,19 @@ namespace MailMergeLib.Tests
                 SenderAddr = "test@specimen.com"
             };
 
-            var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
-            
+            using var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
             var msg = mmm.GetMimeMessage(dataItem);
             var msgFilename = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "test-msg.eml"));
             msg.WriteTo(msgFilename);
             Console.WriteLine($"Test mime message saved as {msgFilename}");
-            
-            Assert.IsTrue(((MailboxAddress) msg.From.First()).Address == dataItem.SenderAddr);
+
+            Assert.IsTrue(((MailboxAddress)msg.From.First()).Address == dataItem.SenderAddr);
             Assert.IsTrue(((MailboxAddress)msg.To.First()).Address == dataItem.MailboxAddr);
             Assert.IsTrue(((MailboxAddress)msg.To.First()).Name == dataItem.Name);
             Assert.IsTrue(msg.Headers[HeaderId.Organization] == mmm.Config.Organization);
             Assert.IsTrue(msg.Priority == mmm.Config.Priority);
             Assert.IsTrue(msg.Attachments.FirstOrDefault(a => ((MimePart)a).FileName == "Log file from {Date:yyyy-MM-dd}.log".Replace("{Date:yyyy-MM-dd}", dataItem.Date.ToString("yyyy-MM-dd"))) != null);
-            Assert.IsTrue(msg.Subject == mmm.Subject.Replace("{Date:yyyy-MM-dd}",dataItem.Date.ToString("yyyy-MM-dd")));
+            Assert.IsTrue(msg.Subject == mmm.Subject.Replace("{Date:yyyy-MM-dd}", dataItem.Date.ToString("yyyy-MM-dd")));
             Assert.IsTrue(msg.HtmlBody.Contains(dataItem.Success ? "succeeded" : "failed"));
             Assert.IsTrue(msg.TextBody.Contains(dataItem.Success ? "succeeded" : "failed"));
             Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")));
@@ -116,8 +115,7 @@ namespace MailMergeLib.Tests
             var streamAttachments = new List<StreamAttachment>();
             var text = "Some test for stream attachment";
             var streamAttFilename = "StreamFilename.txt";
-            var mmm = new MailMergeMessage("The subject", "plain text");
-
+            using var mmm = new MailMergeMessage("The subject", "plain text");
             using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text)))
             {
                 streamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
@@ -150,23 +148,21 @@ namespace MailMergeLib.Tests
             var text = "Some test for stream attachment";
             var streamAttFilename = $"StreamFilename_{dataItem.Date:yyyy-MM-dd}.txt";
 
-            var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
+            using var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
             mmm.FileAttachments.Clear();
             mmm.InlineAttachments.Clear();
             mmm.StreamAttachments.Clear();
             mmm.StringAttachments.Clear();
 
-            using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text ?? string.Empty)))
-            {
-                mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
+            using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text ?? string.Empty));
+            mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
 
-                var msg = mmm.GetMimeMessage(dataItem);
-                var att = msg.Attachments.FirstOrDefault() as MimePart;
-                Assert.IsTrue(att?.FileName == streamAttFilename && att.IsAttachment);
-                Assert.IsTrue(msg.ToString().Contains(text));
+            var msg = mmm.GetMimeMessage(dataItem);
+            var att = msg.Attachments.FirstOrDefault() as MimePart;
+            Assert.IsTrue(att?.FileName == streamAttFilename && att.IsAttachment);
+            Assert.IsTrue(msg.ToString().Contains(text));
 
-                MailMergeMessage.DisposeFileStreams(msg);
-            }
+            MailMergeMessage.DisposeFileStreams(msg);
         }
 
         [Test]
@@ -182,13 +178,12 @@ namespace MailMergeLib.Tests
                 Image = MessageFactory.ImgSuccess
             };
 
-            var mmm = MessageFactory.GetHtmlMsgWithThreeInlineAttachments();
-
+            using var mmm = MessageFactory.GetHtmlMsgWithThreeInlineAttachments();
             var msg = mmm.GetMimeMessage(dataItem);
             var msgFilename = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "test-msg-equal-inline-att.eml"));
             msg.WriteTo(msgFilename);
             Console.WriteLine($"Test mime message saved as {msgFilename}");
-            
+
             Assert.IsTrue(new HtmlParser().ParseDocument((string)msg.HtmlBody).All.Count(m => m is IHtmlImageElement) == 3);
             Assert.IsTrue(msg.BodyParts.Count(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")) == 1);
 
@@ -207,8 +202,7 @@ namespace MailMergeLib.Tests
                 SenderAddr = "test@specimen.com"
             };
 
-            var mmm = MessageFactory.GetHtmlMsgWithManualLinkedResources();
-
+            using var mmm = MessageFactory.GetHtmlMsgWithManualLinkedResources();
             var msg = mmm.GetMimeMessage(dataItem);
             Assert.IsTrue(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg") && bp.ContentId == MessageFactory.MyContentId));
             MailMergeMessage.DisposeFileStreams(msg);
@@ -227,17 +221,18 @@ namespace MailMergeLib.Tests
                 Image = MessageFactory.ImgSuccess
             };
 
-            var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments();
-
-            var mimeMsg = mmm.GetMimeMessage(dataItem);
-            foreach (var filename in new[] { MessageFactory.LogFileName, dataItem.Image })
+            using (var mmm = MessageFactory.GetHtmlMailWithInlineAndOtherAttachments())
             {
-                // file streams are still in use
-                Assert.Throws<IOException>(() => File.OpenWrite(Path.Combine(TestFileFolders.FilesAbsPath, filename)));
-            }
+                var mimeMsg = mmm.GetMimeMessage(dataItem);
+                foreach (var filename in new[] { MessageFactory.LogFileName, dataItem.Image })
+                {
+                    // file streams are still in use
+                    Assert.Throws<IOException>(() => File.OpenWrite(Path.Combine(TestFileFolders.FilesAbsPath, filename)));
+                }
 
-            // dispose file streams
-            MailMergeMessage.DisposeFileStreams(mimeMsg);
+                // dispose file streams
+                MailMergeMessage.DisposeFileStreams(mimeMsg);
+            }
 
             // now all files are fully accessible
             foreach (var filename in new[] { MessageFactory.LogFileName, dataItem.Image })
@@ -251,7 +246,7 @@ namespace MailMergeLib.Tests
         public void IgnoreImgSrcWithEmbeddedBase64Image()
         {
             const string embeddedImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
-            var mmm = new MailMergeMessage
+            using var mmm = new MailMergeMessage
             {
                 // img is 1x1px black
                 HtmlText = $"<html><body><img src=\"{embeddedImage}\" width=\"30\" height=\"30\"></body></html>"
@@ -268,7 +263,7 @@ namespace MailMergeLib.Tests
         public void IgnoreImgSrcWithUriTypeHttp()
         {
             const string httpImage = "http://example.com/sample.png";
-            var mmm = new MailMergeMessage
+            using var mmm = new MailMergeMessage
             {
                 // img is 1x1px black
                 HtmlText = $"<html><base href=\"file:///\" /><body><img src=\"{httpImage}\"></body></html>"
@@ -284,7 +279,7 @@ namespace MailMergeLib.Tests
         [Test]
         public void ConvertHtmlToPlainText()
         {
-            var mmm = MessageFactory.GetHtmlMessageForHtmlConverter();
+            using var mmm = MessageFactory.GetHtmlMessageForHtmlConverter();
             Assert.IsTrue(string.IsNullOrEmpty(mmm.PlainText));
             mmm.ConvertHtmlToPlainText();
             Assert.IsTrue(mmm.PlainText.Length > 0);
@@ -305,7 +300,7 @@ namespace MailMergeLib.Tests
                 SenderAddr = "test@specimen.com",
             };
 
-            var mmm = new MailMergeMessage();
+            using var mmm = new MailMergeMessage();
             mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.ThrowError;
             mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.ThrowError;
             var result = mmm.SearchAndReplaceVars(text, dataItem);
@@ -324,7 +319,7 @@ namespace MailMergeLib.Tests
                 SenderAddr = "test@specimen.com",
             };
 
-            var mmm = new MailMergeMessage();
+            using var mmm = new MailMergeMessage();
             mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.ThrowError;
             mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.ThrowError;
             var result = mmm.SearchAndReplaceVarsInFilename(text, dataItem);

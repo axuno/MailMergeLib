@@ -118,66 +118,64 @@ namespace MailMergeLib
                 var taskNo = i;
                 sendTasks[taskNo] = Task.Run(async () =>
                 {
-                    using (var smtpClient = GetInitializedSmtpClientDelegate(smtpConfigForTask[taskNo]))
+                    using var smtpClient = GetInitializedSmtpClientDelegate(smtpConfigForTask[taskNo]);
+                    while (queue.TryDequeue(out var dataItem))
                     {
-                        while (queue.TryDequeue(out var dataItem))
+                        lock (tasksUsed)
                         {
-                            lock (tasksUsed)
-                            {
-                                tasksUsed.Add(taskNo);
-                            }
-                            
-                            // Delay between messages is also the delay until the first message will be sent
-                            await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
-                            
-                            var localDataItem = dataItem;  // no modified enclosure
-                            MimeMessage mimeMessage = null;
-                            try
-                            {
-                                mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem), _cancellationTokenSource.Token).ConfigureAwait(false);
-                            }
-                            catch (Exception exception)
-                            {
-                                OnMergeProgress?.Invoke(this,
-                                    new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-
-                                var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
-                                if (exception is MailMergeMessage.MailMergeMessageException ex)
-                                {
-                                    mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
-                                        ex.MimeMessage, true);
-                                }
-
-                                OnMessageFailure?.Invoke(this, mmFailureEventArgs);
-                                
-                                // event delegate may have modified the mimeMessage and decided not to throw an exception
-                                if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
-                                {
-                                    Interlocked.Increment(ref errorMsgCount);
-
-                                    // Fire promised events
-                                    OnMergeProgress?.Invoke(this,
-                                        new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount,
-                                            errorMsgCount));
-                                    throw;
-                                }
-
-                                // set MimeMessage from OnMessageFailure delegate
-                                mimeMessage = mmFailureEventArgs.MimeMessage;
-                            }
-
-                            OnMergeProgress?.Invoke(this,
-                                new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
-
-                            await SendMimeMessageAsync(smtpClient, mimeMessage, smtpConfigForTask[taskNo]).ConfigureAwait(false); 
-
-                            OnMergeProgress?.Invoke(this,
-                                new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+                            tasksUsed.Add(taskNo);
                         }
 
-                        smtpClient.ProtocolLogger?.Dispose();
-                        smtpClient.Disconnect(true, _cancellationTokenSource.Token);
+                        // Delay between messages is also the delay until the first message will be sent
+                        await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
+
+                        var localDataItem = dataItem;  // no modified enclosure
+                        MimeMessage mimeMessage = null;
+                        try
+                        {
+                            mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem), _cancellationTokenSource.Token).ConfigureAwait(false);
+                        }
+                        catch (Exception exception)
+                        {
+                            OnMergeProgress?.Invoke(this,
+                                new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+
+                            var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
+                            if (exception is MailMergeMessage.MailMergeMessageException ex)
+                            {
+                                mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
+                                    ex.MimeMessage, true);
+                            }
+
+                            OnMessageFailure?.Invoke(this, mmFailureEventArgs);
+
+                            // event delegate may have modified the mimeMessage and decided not to throw an exception
+                            if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
+                            {
+                                Interlocked.Increment(ref errorMsgCount);
+
+                                // Fire promised events
+                                OnMergeProgress?.Invoke(this,
+                                    new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount,
+                                        errorMsgCount));
+                                throw;
+                            }
+
+                            // set MimeMessage from OnMessageFailure delegate
+                            mimeMessage = mmFailureEventArgs.MimeMessage;
+                        }
+
+                        OnMergeProgress?.Invoke(this,
+                            new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
+
+                        await SendMimeMessageAsync(smtpClient, mimeMessage, smtpConfigForTask[taskNo]).ConfigureAwait(false);
+
+                        OnMergeProgress?.Invoke(this,
+                            new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, errorMsgCount));
                     }
+
+                    smtpClient.ProtocolLogger?.Dispose();
+                    smtpClient.Disconnect(true, _cancellationTokenSource.Token);
                 }, _cancellationTokenSource.Token);
             }
 
@@ -232,38 +230,36 @@ namespace MailMergeLib
                 await Task.Run(async () =>
                 {
                     var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                    using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
+                    using var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig);
+                    MimeMessage mimeMessage = null;
+                    try
                     {
-                        MimeMessage mimeMessage = null;
-                        try
-                        {
-                            mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
-                        }
-                        catch (Exception exception)
-                        {
-                            var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
-                            if (exception is MailMergeMessage.MailMergeMessageException ex)
-                            {
-                                mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
-                                    ex.MimeMessage, true);
-                            }
-
-                            OnMessageFailure?.Invoke(this, mmFailureEventArgs);
-
-                            // event delegate may have modified the mimeMessage and decided not to throw an exception
-                            if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
-                            {
-                                throw;
-                            }
-
-                            // set MimeMessage from OnMessageFailure delegate
-                            mimeMessage = mmFailureEventArgs.MimeMessage;
-                        }
-
-                        await SendMimeMessageAsync(smtpClient, mimeMessage, smtpClientConfig).ConfigureAwait(false);
-                        smtpClient.ProtocolLogger?.Dispose();
-                        smtpClient.Disconnect(true, _cancellationTokenSource.Token);
+                        mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
                     }
+                    catch (Exception exception)
+                    {
+                        var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
+                        if (exception is MailMergeMessage.MailMergeMessageException ex)
+                        {
+                            mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
+                                ex.MimeMessage, true);
+                        }
+
+                        OnMessageFailure?.Invoke(this, mmFailureEventArgs);
+
+                        // event delegate may have modified the mimeMessage and decided not to throw an exception
+                        if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
+                        {
+                            throw;
+                        }
+
+                        // set MimeMessage from OnMessageFailure delegate
+                        mimeMessage = mmFailureEventArgs.MimeMessage;
+                    }
+
+                    await SendMimeMessageAsync(smtpClient, mimeMessage, smtpClientConfig).ConfigureAwait(false);
+                    smtpClient.ProtocolLogger?.Dispose();
+                    smtpClient.Disconnect(true, _cancellationTokenSource.Token);
 
                 }, _cancellationTokenSource.Token).ConfigureAwait(false);
             }
@@ -435,21 +431,17 @@ namespace MailMergeLib
             }
             catch (SmtpCommandException ex)
             {
-                switch (ex.ErrorCode)
+                throw ex.ErrorCode switch
                 {
-                    case SmtpErrorCode.RecipientNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Recipient not accepted by {hostPortConfig}. " + ex.Message);
-                    case SmtpErrorCode.SenderNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Sender not accepted by {hostPortConfig}. " + ex.Message);
-                    case SmtpErrorCode.MessageNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Message not accepted by {hostPortConfig}. " + ex.Message);
-                    default:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Error sending message to {hostPortConfig}. " + ex.Message);
-                }
+                    SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                           $"Recipient not accepted by {hostPortConfig}. " + ex.Message),
+                    SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Sender not accepted by {hostPortConfig}. " + ex.Message),
+                    SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Message not accepted by {hostPortConfig}. " + ex.Message),
+                    _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Error sending message to {hostPortConfig}. " + ex.Message),
+                };
             }
             catch (SmtpProtocolException ex)
             {
@@ -521,66 +513,64 @@ namespace MailMergeLib
                 var numOfRecords = dataSourceList.Count;
 
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
+                using var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig);
+                OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
+
+                foreach (var dataItem in dataSourceList)
                 {
-                    OnMergeBegin?.Invoke(this, new MailSenderMergeBeginEventArgs(startTime, numOfRecords));
+                    OnMergeProgress?.Invoke(this,
+                        new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
 
-                    foreach (var dataItem in dataSourceList)
+                    MimeMessage mimeMessage = null;
+                    try
                     {
-                        OnMergeProgress?.Invoke(this,
-                            new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
-
-                        MimeMessage mimeMessage = null;
-                        try
-                        {
-                            mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
-                        }
-                        catch (Exception exception)
-                        {
-                            var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
-                            if (exception is MailMergeMessage.MailMergeMessageException ex)
-                            {
-                                mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
-                                    ex.MimeMessage, true);
-                            }
-
-                            OnMessageFailure?.Invoke(this, mmFailureEventArgs);
-                            
-                            // event delegate may have modified the mimeMessage and decided not to throw an exception
-                            if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
-                            {
-                                // Invoke promised events
-                                OnMergeProgress?.Invoke(this,
-                                    new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 1));
-                                smtpClient.Dispose();
-                                OnMergeComplete?.Invoke(this,
-                                    new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords,
-                                        sentMsgCount, 1, 1));
-                                throw;
-                            }
-
-                            // set MimeMessage from OnMessageFailure delegate
-                            mimeMessage = mmFailureEventArgs.MimeMessage;
-                        }
-
-                        if (_cancellationTokenSource.IsCancellationRequested) break;
-                        SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
-                        sentMsgCount++;
-                        if (_cancellationTokenSource.IsCancellationRequested) break;
-
-                        OnMergeProgress?.Invoke(this,
-                            new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
-
-                        Thread.Sleep(smtpClientConfig.DelayBetweenMessages);
-                        if (_cancellationTokenSource.IsCancellationRequested) break;
+                        mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
                     }
-                    
-                    smtpClient.ProtocolLogger?.Dispose();
-                    smtpClient.Disconnect(true); // fire OnSmtpDisconnected before OnMergeComplete
-                    smtpClient.Dispose();
-                    OnMergeComplete?.Invoke(this,
-                        new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 0, 1));
+                    catch (Exception exception)
+                    {
+                        var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
+                        if (exception is MailMergeMessage.MailMergeMessageException ex)
+                        {
+                            mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
+                                ex.MimeMessage, true);
+                        }
+
+                        OnMessageFailure?.Invoke(this, mmFailureEventArgs);
+
+                        // event delegate may have modified the mimeMessage and decided not to throw an exception
+                        if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
+                        {
+                            // Invoke promised events
+                            OnMergeProgress?.Invoke(this,
+                                new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 1));
+                            smtpClient.Dispose();
+                            OnMergeComplete?.Invoke(this,
+                                new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords,
+                                    sentMsgCount, 1, 1));
+                            throw;
+                        }
+
+                        // set MimeMessage from OnMessageFailure delegate
+                        mimeMessage = mmFailureEventArgs.MimeMessage;
+                    }
+
+                    if (_cancellationTokenSource.IsCancellationRequested) break;
+                    SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
+                    sentMsgCount++;
+                    if (_cancellationTokenSource.IsCancellationRequested) break;
+
+                    OnMergeProgress?.Invoke(this,
+                        new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
+
+                    Thread.Sleep(smtpClientConfig.DelayBetweenMessages);
+                    if (_cancellationTokenSource.IsCancellationRequested) break;
                 }
+
+                smtpClient.ProtocolLogger?.Dispose();
+                smtpClient.Disconnect(true); // fire OnSmtpDisconnected before OnMergeComplete
+                smtpClient.Dispose();
+                OnMergeComplete?.Invoke(this,
+                    new MailSenderMergeCompleteEventArgs(startTime, DateTime.Now, numOfRecords, sentMsgCount, 0, 1));
             }
             finally
             {
@@ -621,38 +611,36 @@ namespace MailMergeLib
             try
             {
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
-                using (var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig))
+                using var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig);
+                MimeMessage mimeMessage = null;
+                try
                 {
-                    MimeMessage mimeMessage = null;
-                    try
-                    {
-                        mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
-                    }
-                    catch (Exception exception)
-                    {
-                        var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
-                        if (exception is MailMergeMessage.MailMergeMessageException ex)
-                        {
-                            mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
-                                ex.MimeMessage, true);
-                        }
-
-                        OnMessageFailure?.Invoke(this, mmFailureEventArgs);
-
-                        // event delegate may have modified the mimeMessage and decided not to throw an exception
-                        if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
-                        {
-                            throw;
-                        }
-                        
-                        // set MimeMessage from OnMessageFailure delegate
-                        mimeMessage = mmFailureEventArgs.MimeMessage;
-                    }
-
-                    SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
-                    smtpClient.ProtocolLogger?.Dispose();
-                    smtpClient.Disconnect(true);
+                    mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
                 }
+                catch (Exception exception)
+                {
+                    var mmFailureEventArgs = new MailMessageFailureEventArgs(exception, mailMergeMessage, dataItem, mimeMessage, true);
+                    if (exception is MailMergeMessage.MailMergeMessageException ex)
+                    {
+                        mmFailureEventArgs = new MailMessageFailureEventArgs(ex, mailMergeMessage, dataItem,
+                            ex.MimeMessage, true);
+                    }
+
+                    OnMessageFailure?.Invoke(this, mmFailureEventArgs);
+
+                    // event delegate may have modified the mimeMessage and decided not to throw an exception
+                    if (mmFailureEventArgs.ThrowException || mmFailureEventArgs.MimeMessage == null)
+                    {
+                        throw;
+                    }
+
+                    // set MimeMessage from OnMessageFailure delegate
+                    mimeMessage = mmFailureEventArgs.MimeMessage;
+                }
+
+                SendMimeMessage(smtpClient, mimeMessage, smtpClientConfig);
+                smtpClient.ProtocolLogger?.Dispose();
+                smtpClient.Disconnect(true);
             }
             finally
             {
@@ -825,21 +813,17 @@ namespace MailMergeLib
             }
             catch (SmtpCommandException ex)
             {
-                switch (ex.ErrorCode)
+                throw ex.ErrorCode switch
                 {
-                    case SmtpErrorCode.RecipientNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Recipient not accepted by {hostPortConfig}. " + ex.Message);
-                    case SmtpErrorCode.SenderNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Sender not accepted by {hostPortConfig}. " + ex.Message);
-                    case SmtpErrorCode.MessageNotAccepted:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Message not accepted by {hostPortConfig}. " + ex.Message);
-                    default:
-                        throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
-                            $"Error sending message to {hostPortConfig}. " + ex.Message);
-                }
+                    SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                           $"Recipient not accepted by {hostPortConfig}. " + ex.Message),
+                    SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Sender not accepted by {hostPortConfig}. " + ex.Message),
+                    SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Message not accepted by {hostPortConfig}. " + ex.Message),
+                    _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                            $"Error sending message to {hostPortConfig}. " + ex.Message),
+                };
             }
             catch (SmtpProtocolException ex)
             {
@@ -959,6 +943,7 @@ namespace MailMergeLib
             {
                 if (disposing)
                 {
+                    _cancellationTokenSource.Dispose();
                     // Dispose managed resources.
                 }
 

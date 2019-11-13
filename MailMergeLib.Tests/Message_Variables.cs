@@ -30,7 +30,7 @@ namespace MailMergeLib.Tests
 
             try
             {
-                mmm.GetMimeMessage(default(object));
+                mmm.GetMimeMessage(default);
                 Assert.Fail("Expected exceptions not thrown.");
             }
             catch (MailMergeMessage.MailMergeMessageException exceptions)
@@ -96,7 +96,7 @@ namespace MailMergeLib.Tests
 
             try
             {
-                mmm.GetMimeMessage(default(object));
+                mmm.GetMimeMessage(default);
                 Assert.Fail("Expected exceptions not thrown.");
             }
             catch (MailMergeMessage.MailMergeMessageException exceptions)
@@ -117,7 +117,7 @@ namespace MailMergeLib.Tests
         [Test]
         public void MessagesFromDataRows()
         {
-            var tbl = new DataTable();
+            using var tbl = new DataTable();
             tbl.Columns.Add("Email", typeof(string));
             tbl.Columns.Add("Continent", typeof(string));
             tbl.Rows.Add("test@example.com", "Europe");
@@ -125,7 +125,7 @@ namespace MailMergeLib.Tests
             tbl.Rows.Add("3ndRow@axample.com", "America");
             var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
 
-            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text);
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
 
@@ -133,7 +133,9 @@ namespace MailMergeLib.Tests
             foreach (var mimeMessage in mmm.GetMimeMessages<DataRow>(tbl.Rows.OfType<DataRow>()))
             {
                 Assert.IsTrue(mimeMessage.To.ToString().Contains(tbl.Rows[i]["Email"].ToString()));
-                Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", tbl.Rows[i]["Email"].ToString()).Replace("{Continent}", tbl.Rows[i]["Continent"].ToString())));
+                Assert.IsTrue(mimeMessage.TextBody.Contains(text
+                    .Replace("{Email}", tbl.Rows[i]["Email"].ToString())
+                    .Replace("{Continent}", tbl.Rows[i]["Continent"].ToString())));
                 MailMergeMessage.DisposeFileStreams(mimeMessage);
                 i++;
             }
@@ -143,15 +145,15 @@ namespace MailMergeLib.Tests
         public void MessagesFromListOfSmartObjects()
         {
             var dataList = new List<SmartObjects>();
-            var so1 = new SmartObjects(new[] {new Dictionary<string, string> {{"Email", "test@example.com"}}, new Dictionary<string, string> { { "Continent", "Europe" } } });
+            var so1 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "test@example.com" } }, new Dictionary<string, string> { { "Continent", "Europe" } } });
             var so2 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "Asia" } } });
             var so3 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "America" } } });
 
-            dataList.AddRange(new []{so1, so2, so3});
+            dataList.AddRange(new[] { so1, so2, so3 });
 
-            var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+            const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
 
-            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text);
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
 
@@ -168,7 +170,7 @@ namespace MailMergeLib.Tests
         [Test]
         public void SingleMessageFromSmartObjects()
         {
-            var anonymous = new {Email = "test@example.com"};
+            var anonymous = new { Email = "test@example.com" };
             var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
             var so = new SmartObjects(new object[]
             {
@@ -176,12 +178,12 @@ namespace MailMergeLib.Tests
                 new Dictionary<string, string> {{"Continent", "Europe"}}
             });
 
-            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text);
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
 
             var mimeMessage = mmm.GetMimeMessage(so);
-            
+
             Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
             Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", ((Dictionary<string, string>)so[1])["Continent"])));
             MailMergeMessage.DisposeFileStreams(mimeMessage);
@@ -190,16 +192,16 @@ namespace MailMergeLib.Tests
         [Test]
         public void MessagesFromListOfValueTuples()
         {
-            var dataList = new List<ValueTuple<Dictionary<string,string>,Dictionary<string,string>>>();
-            var t1 = (new Dictionary<string, string> {{"Email", "test@example.com"}}, new Dictionary<string, string> {{"Continent", "Europe"}});
-            var t2 = (new Dictionary<string, string> {{"Email", "2ndRow@example.com"}}, new Dictionary<string, string> {{"Continent", "Asia"}});
-            var t3 = (new Dictionary<string, string> {{"Email", "3ndRow@example.com"}}, new Dictionary<string, string> {{"Continent", "America"}});
+            var dataList = new List<ValueTuple<Dictionary<string, string>, Dictionary<string, string>>>();
+            var t1 = (new Dictionary<string, string> { { "Email", "test@example.com" } }, new Dictionary<string, string> { { "Continent", "Europe" } });
+            var t2 = (new Dictionary<string, string> { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "Asia" } });
+            var t3 = (new Dictionary<string, string> { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "America" } });
 
             dataList.AddRange(new[] { t1, t2, t3 });
 
             const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
 
-            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text);
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
 
@@ -219,14 +221,14 @@ namespace MailMergeLib.Tests
         {
             var anonymous = new { Email = "test@example.com" };
             const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
-            var so = (anonymous, new Dictionary<string, string> {{"Continent", "Europe"}});
+            var so = (anonymous, new Dictionary<string, string> { { "Continent", "Europe" } });
 
-            var mmm = new MailMergeMessage("Subject for {Continent}", text);
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text);
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
 
             var mimeMessage = mmm.GetMimeMessage(so);
-            var (emailPart, continentPart) = so;
+            var (_, continentPart) = so;
 
             Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
             Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", continentPart["Continent"])));
@@ -249,7 +251,8 @@ namespace MailMergeLib.Tests
                 recipients.Add(new Recipient() { Email = $"recipient-{i}@example.com", Name = $"Name of {i}" });
             }
 
-            var mmm = new MailMergeMessage("Get MimeMessages Test", string.Empty, "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
+            using var mmm = new MailMergeMessage("Get MimeMessages Test", string.Empty,
+                "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
             mmm.ConvertHtmlToPlainText();
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
@@ -257,9 +260,13 @@ namespace MailMergeLib.Tests
             var cnt = 0;
             foreach (var mimeMessage in mmm.GetMimeMessages<Recipient>(recipients))
             {
-                Assert.IsTrue(mimeMessage.TextBody == string.Format($"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})"));
-                Assert.IsTrue(mimeMessage.HtmlBody.Contains(string.Format($"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})")));
-                Assert.IsTrue(mimeMessage.To.ToString().Contains(recipients[cnt].Name) && mimeMessage.To.ToString().Contains(recipients[cnt].Email));
+                Assert.IsTrue(mimeMessage.TextBody ==
+                              string.Format(
+                                  $"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})"));
+                Assert.IsTrue(mimeMessage.HtmlBody.Contains(string.Format(
+                    $"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})")));
+                Assert.IsTrue(mimeMessage.To.ToString().Contains(recipients[cnt].Name) &&
+                              mimeMessage.To.ToString().Contains(recipients[cnt].Email));
                 MailMergeMessage.DisposeFileStreams(mimeMessage);
                 cnt++;
 
@@ -287,7 +294,7 @@ namespace MailMergeLib.Tests
     }
 ]
 ");
-            var mmm = new MailMergeMessage("Get MimeMessages JSON Test", string.Empty, "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
+            using var mmm = new MailMergeMessage("Get MimeMessages JSON Test", string.Empty, "<html><head></head><body>This is the plain text part for {Name} ({Email})</body></html>");
             mmm.ConvertHtmlToPlainText();
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));

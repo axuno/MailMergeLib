@@ -21,15 +21,24 @@
     <PackageLicenseUrl></PackageLicenseUrl>
     <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
     <PackageReleaseNotes>* Encryption of Credential in Settings can now be disabled. Breaking change: disabled is the default.
+
 * SMTP settings can now be read from app.config/web.config
+
 * Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows
+
 * Classes in namespace 'MailMergLib.SmartFormatMail' were obsolete and are now removed.
-* Updated versions of dependencies</PackageReleaseNotes>
-    <PackageTags>smtp mime mail email merge template netcore netstandard net45 c#</PackageTags>
+
+* Updated string parser to SmartFormat.Net v2.5
+
+* Updated versions of other dependencies
+
+* Dropped support of .NetFramework 4.5 (same as MailKit package)
+</PackageReleaseNotes>
+    <PackageTags>smtp mime mail email merge template netcore netstandard net46 c#</PackageTags>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RootNamespace>MailMergeLib</RootNamespace>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>GitHub</RepositoryType>
   </PropertyGroup>

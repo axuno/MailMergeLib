@@ -41,13 +41,16 @@ namespace MailMergeLib.Tests
 
             var mmm = new MailMergeMessage();
             mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseSensitive;
+            mmm.Config.SmartFormatterConfig.FormatErrorAction =
+                mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
 
             var smf = mmm.SmartFormatter;
             Assert.AreEqual(dataItem.Email, smf.Format("{Email}", dataItem));
             Assert.AreNotEqual(dataItem.Email, smf.Format("{EmAiL}", dataItem));
             // The following is the same as smf.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive
             mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-            Assert.AreEqual(dataItem.Email, smf.Format("{EmAiL}", dataItem));
+            var actual = smf.Format("{EmAiL}", dataItem);
+            Assert.AreEqual(dataItem.Email, actual);
         }
 
 
