@@ -39,7 +39,7 @@
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
 ### 5. Supported Frameworks
-* .Net Framework 4.5+
+* .Net Framework 4.6+
 * .Net Core
 
 ### Get started
