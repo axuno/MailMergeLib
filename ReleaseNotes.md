@@ -1,19 +1,20 @@
-# Upcoming 5.7.0.0
-* Encryption of Credential in Settings can now be disabled. Breaking change: disabled is the default.
-* SMTP settings can now be read from app.config/web.config
-* Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows
+ # 5.7.0.0
+* Encryption of Credential in Settings can now be disabled. **Breaking change**: disabled is the default. To enable, set ```Settings.CryptoEnabled = true```.
+* SMTP settings can now be read from web.config as well as app.config
+* Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows. Linux tests run on Ubuntu.
 * Classes in namespace 'MailMergLib.SmartFormatMail' were obsolete and are now removed.
-* Updated string parser to [SmartFormat.Net v2.5](https://github.com/axuno/SmartFormat)
-  * **Sources**
-  * *New:* Added ```ValueTupleSource``` for ```ValueTuple```s
-  * *Changed:* ```SmartObjects``` and ```SmartObjectsSource``` are depreciated in favor of ```ValueTupleSource```
+* Updated string parser/formatter to **[SmartFormat.Net v2.5](https://github.com/axuno/SmartFormat)**
+  * **Data Sources**
+    * *New:* Added ```ValueTupleSource``` for ```ValueTuple```s
+    * *Changed:* ```SmartObjects``` and ```SmartObjectsSource``` are depreciated in favor of ```ValueTupleSource```
   * **Settings**
-  * *Breaking Change:* Internal string comparisons (i.e. for placeholder names) are no more culture-specific, but ```Ordinal``` or ```OrdinalIgnoreCase``` respectively. See discussion [under this issue](https://github.com/axuno/SmartFormat/issues/122).
-  * *Breaking Change:* Default ```ErrorAction``` is now ```ThrowError``` for parser and formatter, instead of ```Ignore```
+    * *Breaking Change:* Internal string comparisons (i.e. for placeholder names) are no more culture-specific, but ```Ordinal``` or ```OrdinalIgnoreCase``` respectively. See discussion [under this issue](https://github.com/axuno/SmartFormat/issues/122).
+    * *Breaking Change:* Default ```ErrorAction``` is now ```ThrowError``` for parser and formatter, instead of ```Ignore```
   * **Other**
-  * *Changed:* Removed all members which were flagged obsolete since more than a year.
+    * *Changed:* Removed all members which were flagged obsolete since more than a year.
 * Updated versions of other dependencies
-* Dropped support of .NetFramework 4.5 (same as MailKit/MimeKit packages). Minimum now is 4.6
+* Dropped support of .NetFramework 4.5 (same as with MailKit/MimeKit packages). Minimum now is **4.6**.
+* Dropped support of NetStandard1.6 (as announced)
 
 # 5.6.1.0
 * Reverted back to v5.5.0 behavior: MessageConfig.FileBaseDirectory must be a full path only before the MailMergeMessage is processed (not already, when the property is set).
