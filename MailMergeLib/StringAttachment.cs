@@ -61,13 +61,13 @@ namespace MailMergeLib
         /// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
         public override bool Equals(object sa)
         {
-            if (ReferenceEquals(null, sa)) return false;
+            if (sa is null) return false;
             if (ReferenceEquals(this, sa)) return true;
             if (sa.GetType() != this.GetType()) return false;
             return Equals((StringAttachment) sa);
         }
 
-        protected bool Equals(StringAttachment sa)
+        private bool Equals(StringAttachment sa)
         {
             return string.Equals(Content, sa.Content) && string.Equals(DisplayName, sa.DisplayName) && string.Equals(MimeType, sa.MimeType);
         }

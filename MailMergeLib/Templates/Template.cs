@@ -36,7 +36,7 @@ namespace MailMergeLib.Templates
             DefaultKey = defaultKey;
         }
 
-        protected void TextOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        private void TextOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             // call the setter to verify the current value can still be set after changing the collection
             DefaultKey = DefaultKey;
@@ -156,11 +156,20 @@ namespace MailMergeLib.Templates
             return Equals((Template)obj);
         }
 
+        /// <summary>
+        /// Determines whether this instance is equal to another.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         protected bool Equals(Template other)
         {
             return string.Equals(Name, other.Name) && string.Equals(Key, other.Key) && string.Equals(DefaultKey, other.DefaultKey) && Equals(Text, other.Text);
         }
 
+        /// <summary>
+        /// The hash function.
+        /// </summary>
+        /// <returns>Returns the Hashcode.</returns>
         public override int GetHashCode()
         {
             unchecked

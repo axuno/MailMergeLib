@@ -13,7 +13,7 @@
   * **Other**
   * *Changed:* Removed all members which were flagged obsolete since more than a year.
 * Updated versions of other dependencies
-* Dropped support of .NetFramework 4.5 (same as MailKit/MimeKit packages)
+* Dropped support of .NetFramework 4.5 (same as MailKit/MimeKit packages). Minimum now is 4.6
 
 # 5.6.1.0
 * Reverted back to v5.5.0 behavior: MessageConfig.FileBaseDirectory must be a full path only before the MailMergeMessage is processed (not already, when the property is set).

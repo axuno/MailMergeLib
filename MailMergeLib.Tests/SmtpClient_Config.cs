@@ -20,7 +20,7 @@ namespace MailMergeLib.Tests
         [TestCase(SmtpDeliveryMethod.Network, true)]
         [TestCase(SmtpDeliveryMethod.PickupDirectoryFromIis, true)]
         [TestCase(SmtpDeliveryMethod.SpecifiedPickupDirectory, true)]
-        [Ignore("Read_SmtpConfig_From_ConfigFile")]
+        //[Ignore("Read_SmtpConfig_From_ConfigFile")]
         public void Read_SmtpConfig_From_ConfigFile(SmtpDeliveryMethod smtpDeliveryMethod, bool enableSsl)
         {
             var smtpConfig = new SmtpClientConfig();
@@ -107,10 +107,10 @@ namespace MailMergeLib.Tests
         [Test]
         public void Message_Output_PickupDirectoryFromIis()
         {
-            var smtpConfig = new SmtpClientConfig
-            {
-                MessageOutput = MessageOutput.PickupDirectoryFromIis
-            };
+            // var smtpConfig = new SmtpClientConfig
+            // {
+            //    MessageOutput = MessageOutput.PickupDirectoryFromIis
+            // };
             // May throw for many reasons:
             // https://torontoprogrammer.ca/2011/04/fixing-the-cannot-get-iis-pickup-directory-error-in-asp-net/
             // Assert.DoesNotThrow(() => { var x = smtpConfig.MailOutputDirectory; });

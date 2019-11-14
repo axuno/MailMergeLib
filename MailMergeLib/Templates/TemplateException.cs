@@ -7,6 +7,14 @@ namespace MailMergeLib.Templates
     /// </summary>
     public class TemplateException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="part"></param>
+        /// <param name="parts"></param>
+        /// <param name="template"></param>
+        /// <param name="templates"></param>
         public TemplateException(string message, Part part, Parts parts, Template template, Templates templates) : base (message)
         {
             Part = part;

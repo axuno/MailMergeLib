@@ -3,7 +3,7 @@
 //
 // Author: Jeffrey Stedfast <jestedfa@microsoft.com>
 //
-// Copyright (c) 2013-2017 Jeffrey Stedfast
+// Copyright (c) 2013-2019 Jeffrey Stedfast
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -153,9 +153,8 @@ namespace MailMergeLib
 
         static bool SkipDomain(string text, ref int index, bool allowTopLevelDomains, bool allowInternational)
         {
-            SubDomainType type;
 
-            if (!SkipSubDomain(text, ref index, allowInternational, out type))
+            if (!SkipSubDomain(text, ref index, allowInternational, out SubDomainType type))
                 return false;
 
             if (index < text.Length && text[index] == '.')

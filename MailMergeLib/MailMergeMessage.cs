@@ -639,13 +639,13 @@ namespace MailMergeLib
             {
                 _badVariableNames.Clear();
                 _parseExceptions.Clear();
-#if NETFRAMEWORK || NETSTANDARD2_0
+
                 // convert DataRow to Dictionary<string, object>
                 if (dataItem is DataRow row)
                 {
                     dataItem = row.Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c]);
                 }
-#endif
+
                 var mimeMessage = new MimeMessage();
                 AddSubjectToMailMessage(mimeMessage, dataItem);
                 AddAddressesToMailMessage(mimeMessage, dataItem);
@@ -961,6 +961,11 @@ namespace MailMergeLib
 
         #region *** Equality ***
 
+        /// <summary>
+        /// Compares the MailMergeMessage with an other instance of MailMergeMessage for equality.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>Returns true, if both instances are equal, else false.</returns>
         public override bool Equals(object obj)
         {
             if (obj is null) return false;
@@ -992,24 +997,24 @@ namespace MailMergeLib
                    Config.Equals(mmm.Config);
         }
 
-        protected bool Equals(HeaderList hl1, HeaderList hl2)
+        private bool Equals(HeaderList hl1, HeaderList hl2)
         {
             var hl1Dict = hl1.ToDictionary(header => header.Id, header => header.Value);
             var h21Dict = hl2.ToDictionary(header => header.Id, header => header.Value);
 
-            // not any enty missing in hl1Dict, nor in the other list
+            // not any entry missing in hl1Dict, nor in the other list
             return !hl1Dict.Except(h21Dict).Union(h21Dict.Except(hl1Dict)).Any();
         }
 
-        protected bool Equals(HashSet<FileAttachment> fl1, HashSet<FileAttachment> fl2)
+        private bool Equals(HashSet<FileAttachment> fl1, HashSet<FileAttachment> fl2)
         {
-            // not any enty missing in fl1, nor in the other list
+            // not any entry missing in fl1, nor in the other list
             return !fl1.Except(fl2).Union(fl2.Except(fl1)).Any();
         }
 
-        protected bool Equals(HashSet<StringAttachment> sa1, HashSet<StringAttachment> sa2)
+        private bool Equals(HashSet<StringAttachment> sa1, HashSet<StringAttachment> sa2)
         {
-            // not any enty missing in sa11, nor in the other list
+            // not any entry missing in sa11, nor in the other list
             return !sa1.Except(sa2).Union(sa2.Except(sa1)).Any();
         }
 

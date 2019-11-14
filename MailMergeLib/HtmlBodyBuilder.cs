@@ -116,8 +116,8 @@ namespace MailMergeLib
             // as described in RFC2387
             // Some older clients may need Inline Attachments instead of LinkedResources:
             // RFC2183: 2.1 The Inline Disposition Type
-            // A bodypart should be marked `inline' if it is intended to be displayed automatically upon display of the message. Inline
-            // bodyparts should be presented in the order in which they occur, subject to the normal semantics of multipart messages.
+            // A body part should be marked `inline' if it is intended to be displayed automatically upon display of the message. Inline
+            // body parts should be presented in the order in which they occur, subject to the normal semantics of multipart messages.
             foreach (var ia in InlineAtt)
             {
                 try

@@ -952,7 +952,6 @@ namespace MailMergeLib
             _disposed = true;
         }
 
-#endregion
-
+        #endregion
     }
 }

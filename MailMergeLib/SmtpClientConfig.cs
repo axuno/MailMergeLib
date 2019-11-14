@@ -134,7 +134,7 @@ namespace MailMergeLib
         /// <example>
         /// Add a certificate using a PFX file (i.e. a PKCS#12 archive bag):
         /// ClientCertificates.Add(new X509Certificate2("path_to_cert_file.pfx", "optional password"));
-        /// Add a certificate using a cerificate file in PEM format:
+        /// Add a certificate using a certificate file in PEM format:
         /// ClientCertificates.Add(X509Certificate.CreateFromCertFile("path_to_cert_file.pem"));
         /// </example>
         [YAXDontSerialize]
@@ -147,8 +147,8 @@ namespace MailMergeLib
         public System.Net.Security.RemoteCertificateValidationCallback ServerCertificateValidationCallback { get; set; }
 
         /// <summary>
-        /// Set authentification details for logging into an SMTP server.
-        /// Set NetworkCredential to null if no authentification is required.
+        /// Set authentication details for logging into an SMTP server.
+        /// Set NetworkCredential to null if no authentication is required.
         /// </summary>
         /// <remarks>Used during SmtpClient connect.</remarks>
         /// <remarks>Will be serialized with attribute yaxlib:realtype="MailMergeLib.Credential" if assigned to an instance of MailMergeLib.Credential.</remarks>
@@ -164,22 +164,18 @@ namespace MailMergeLib
         {
             get
             {
-                switch (MessageOutput)
+                return MessageOutput switch
                 {
-                    case MessageOutput.None:
-                    case MessageOutput.SmtpServer:
-                        return null;
-                    case MessageOutput.Directory:
-                        return _mailOutputDirectory ?? System.IO.Path.GetTempPath();
+                    MessageOutput.None => null,
+                    MessageOutput.SmtpServer => null,
+                    MessageOutput.Directory => (_mailOutputDirectory ?? System.IO.Path.GetTempPath()),
 #if NETFRAMEWORK
-                    case MessageOutput.PickupDirectoryFromIis:
-                        return GetPickDirectoryFromIis();
+                    MessageOutput.PickupDirectoryFromIis => GetPickDirectoryFromIis(),
 #endif
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
-            set { _mailOutputDirectory = value; }
+            set => _mailOutputDirectory = value;
         }
 
         /// <summary>

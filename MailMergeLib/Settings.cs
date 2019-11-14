@@ -65,15 +65,12 @@ namespace MailMergeLib
         /// Write MailMergeLib settings to a file.
         /// </summary>
         /// <param name="filename"></param>
+        /// <param name="encoding"></param>
         public void Serialize(string filename, Encoding encoding = null)
         {
-            using (var fs = new FileStream(filename, FileMode.Create))
-            {
-                using (var sr = new StreamWriter(fs, encoding ?? Encoding.UTF8))
-                {
-                    Serialize(sr, false);
-                }
-            }
+            using var fs = new FileStream(filename, FileMode.Create);
+            using var sr = new StreamWriter(fs, encoding ?? Encoding.UTF8);
+            Serialize(sr, false);
         }
 
         /// <summary>
@@ -102,7 +99,8 @@ namespace MailMergeLib
         /// <param name="encoding"></param>
         public static Settings Deserialize(Stream stream, Encoding encoding)
         {
-            return SerializationFactory.Deserialize<Settings>(new StreamReader(stream, encoding), true);
+            using var sr = new StreamReader(stream, encoding);
+            return SerializationFactory.Deserialize<Settings>(sr, true);
         }
 
         /// <summary>

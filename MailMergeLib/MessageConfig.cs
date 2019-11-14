@@ -169,7 +169,7 @@ namespace MailMergeLib
 
         private bool Equals(MailboxAddress addr, MailboxAddress otherAddr)
         {
-            if (ReferenceEquals(null, addr) && ReferenceEquals(null, otherAddr)) return true;
+            if (addr is null && otherAddr is null) return true;
             if (ReferenceEquals(addr, otherAddr)) return true;
             if (otherAddr.GetType() != addr?.GetType()) return false;
             return addr.ToString() == otherAddr.ToString();
@@ -177,7 +177,7 @@ namespace MailMergeLib
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((MessageConfig)obj);

@@ -120,6 +120,7 @@ namespace MailMergeLib.MessageStore
         /// Write message store to a file.
         /// </summary>
         /// <param name="filename"></param>
+        /// <param name="encoding"></param>
         public void Serialize(string filename, Encoding encoding)
         {
             SerializationFactory.Serialize(this, filename, encoding);
@@ -169,7 +170,7 @@ namespace MailMergeLib.MessageStore
 
         #region *** Equality ***
 
-        protected bool Equals(FileMessageStore other)
+        private bool Equals(FileMessageStore other)
         {
             if (other == null) return false;
             return !SearchFolders.Except(other.SearchFolders).Union(other.SearchFolders.Except(SearchFolders)).Any() ||
@@ -183,7 +184,7 @@ namespace MailMergeLib.MessageStore
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((FileMessageStore) obj);

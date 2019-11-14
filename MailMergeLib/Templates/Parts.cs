@@ -46,20 +46,29 @@ namespace MailMergeLib.Templates
         /// </summary>
         /// <param name="other"></param>
         /// <returns>Returns true, if both instances are equal, else false.</returns>
-        protected bool Equals(Parts other)
+        private bool Equals(Parts other)
         {
             // not any entry missing in this, nor in the other list
             return !this.Except(other).Union(other.Except(this)).Any();
         }
 
+        /// <summary>
+        /// Compares this instance with an other instance of Parts for equality.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>Returns true, if both instances are equal, else false.</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((Parts) obj);
         }
 
+        /// <summary>
+        /// Determines the hash code of this instance.
+        /// </summary>
+        /// <returns>Returns the hash code of this instance.</returns>
         public override int GetHashCode()
         {
             unchecked

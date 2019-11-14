@@ -78,20 +78,29 @@ namespace MailMergeLib
 
         #region *** Equality ***
 
-        protected bool Equals(SmartFormatterConfig other)
+        private bool Equals(SmartFormatterConfig other)
         {
             return ParseErrorAction == other.ParseErrorAction && FormatErrorAction == other.FormatErrorAction &&
                    CaseSensitivity == other.CaseSensitivity;
         }
 
+        /// <summary>
+        /// Determines whether this instance is equal to another instance.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>Returns true, if both SmartFormatterConfigs are equal, else false.</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((SmartFormatterConfig) obj);
         }
 
+        /// <summary>
+        /// The HashCode for the SmartFormatterConfig.
+        /// </summary>
+        /// <returns>Returns the HashCode for the SmartFormatterConfig.</returns>
         public override int GetHashCode()
         {
             unchecked
