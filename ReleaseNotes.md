@@ -1,4 +1,4 @@
- # 5.7.0.0
+ # 5.7.0.0 and 5.7.0.1
 * Encryption of Credential in Settings can now be disabled. **Breaking change**: disabled is the default. To enable, set ```Settings.CryptoEnabled = true```.
 * SMTP settings can now be read from web.config as well as app.config
 * Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows. Linux tests run on Ubuntu.
@@ -13,8 +13,10 @@
   * **Other**
     * *Changed:* Removed all members which were flagged obsolete since more than a year.
 * Updated versions of other dependencies
-* Dropped support of .NetFramework 4.5 (same as with MailKit/MimeKit packages). Minimum now is **4.6**.
+* Dropped support of .NetFramework 4.5 (because of dependency to AngleSharp package). Minimum now is **4.6**.
 * Dropped support of NetStandard1.6 (as announced)
+ 
+**Note**: v5.7.0.0 referenced MailKit/MimeKit 2.4.0 assemblies, which were not strongly signed for .NetFramework 4.6 in the NuGet packages
 
 # 5.6.1.0
 * Reverted back to v5.5.0 behavior: MessageConfig.FileBaseDirectory must be a full path only before the MailMergeMessage is processed (not already, when the property is set).
