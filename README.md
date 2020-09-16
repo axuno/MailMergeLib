@@ -6,7 +6,7 @@
 | Platform  | Build Status | Tests | Code Coverage  |
 |-----------|--------------|-------|----------------|
 | Windows   | [![Build status](https://ci.appveyor.com/api/projects/status/9gpm43038riwlbu2/branch/master?svg=true)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/master)  | ![AppVeyor tests (compact)](https://img.shields.io/appveyor/tests/axuno/mailmergelib?compact_message) | [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib) |
-| Linux/Mac | [![Build Status](https://travis-ci.org/axuno/MailMergeLib.svg)](https://travis-ci.org/axuno/MailMergeLib) | ![AppVeyor tests (compact)](https://img.shields.io/appveyor/tests/axuno/mailmergelib?compact_message) | [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib) |
+| Linux/Mac | [![Build Status](https://travis-ci.com/axuno/MailMergeLib.svg)](https://travis-ci.com/axuno/MailMergeLib) | ![AppVeyor tests (compact)](https://img.shields.io/appveyor/tests/axuno/mailmergelib?compact_message) | [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/master/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib) |
 
 ```MailMergeLib``` version 5 is an SMTP mail client library which provides comfortable mail merge capabilities. ```MailMergeLib``` is written in C# and comes with the following features:
 
