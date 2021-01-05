@@ -8,5 +8,5 @@ script:
  - cd ..
  - dotnet restore
  - dotnet test MailMergeLib.Tests --framework netcoreapp3.1 --configuration DEBUG --test-adapter-path:. /p:AltCoverXmlReport=/home/travis/build/axuno/MailMergeLib/coverage.xml /p:AltCover=true /p:AltCoverStrongNameKey="/home/travis/build/axuno/MailMergeLib/MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
- - bash <(curl -s https://codecov.io/bash) -f /home/travis/build/axuno/MailMergeLib/coverage.netcoreapp2.0.xml -n netcoreapp2.0linux
+ - bash <(curl -s https://codecov.io/bash) -f /home/travis/build/axuno/MailMergeLib/coverage.netcoreapp3.1.xml -n netcoreapp3.1linux
 
