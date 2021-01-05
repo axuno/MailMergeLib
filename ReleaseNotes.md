@@ -1,4 +1,10 @@
- # 5.7.0.0 and 5.7.0.1
+# 5.7.1
+* Added support for NET5.0
+* MailMergeLib.Tests is now ```NetCore3.1```
+* Formatting (parse and format variables) can be switched off with ```MailMergeLib.EnableFormatter = false ```. Default is ```true```
+* Enabled SourceLink
+
+# 5.7.0.0 and 5.7.0.1
 * Encryption of Credential in Settings can now be disabled. **Breaking change**: disabled is the default. To enable, set ```Settings.CryptoEnabled = true```.
 * SMTP settings can now be read from web.config as well as app.config
 * Path checks (e.g. inline images, attachments) now respect Linux and MacOsX platform rules beside Windows. Linux tests run on Ubuntu.
