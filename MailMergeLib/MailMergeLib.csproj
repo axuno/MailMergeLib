@@ -69,15 +69,14 @@ https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleas
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <OutputPath>bin\Release\</OutputPath>
+        <DocumentationFile>bin\Release\MailMergeLib.xml</DocumentationFile>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <Deterministic>true</Deterministic>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <!-- Include symbol files (*.pdb) in the built .nupkg -->
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
 </Project>
