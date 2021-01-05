@@ -309,5 +309,28 @@ namespace MailMergeLib.Tests
                 cnt++;
             }
         }
+
+        [Test]
+        public void Disabled_Formatter_Should_Maintain_Variable_Placeholders()
+        {
+            var anonymous = new { Email = "test@example.com" };
+            const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
+            var so = (anonymous, new Dictionary<string, string> { { "Continent", "Europe" } });
+
+            using var mmm = new MailMergeMessage("Subject for {Continent}", text)
+            {
+                EnableFormatter = false
+            };
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
+            mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}","to@example.com"));
+
+            var mimeMessage = mmm.GetMimeMessage(so);
+            var (_, continentPart) = so;
+
+            Assert.IsTrue(mimeMessage.Subject.Contains("Subject for {Continent}"));
+            Assert.IsTrue(mimeMessage.To.ToString().Contains("{Name}"));
+            Assert.IsTrue(mimeMessage.TextBody.Contains(text));
+            MailMergeMessage.DisposeFileStreams(mimeMessage);
+        }
     }
 }

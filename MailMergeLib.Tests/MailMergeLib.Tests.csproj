@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
-    <Copyright>© 2007-2019 by axuno gGmbH</Copyright>
+    <Copyright>© 2007-2021 by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
     <Authors>axuno gGmbH</Authors>
-    <Version>5.7.0.0</Version>
-    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+    <Version>5.7.1.0</Version>
+    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants)</DefineConstants>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <AssemblyName>MailMergeLib.Tests</AssemblyName>
@@ -15,7 +15,6 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>MailMergeLib.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
     <Company>axuno gGmbH</Company>
     <IsTestProject>true</IsTestProject>
     <LangVersion>8</LangVersion>
@@ -35,13 +34,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
-    <PackageReference Include="netDumbster" Version="2.0.0.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="netDumbster" Version="2.0.0.7" />
     <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 

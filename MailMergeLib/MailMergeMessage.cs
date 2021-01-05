@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,6 @@ using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
 using YAXLib;
-#if NETFRAMEWORK || NETSTANDARD2_0
-using System.Data;
-#endif
 
 namespace MailMergeLib
 {
@@ -177,6 +175,12 @@ namespace MailMergeLib
 
         #region *** Content properties ***
 
+        /// <summary>
+        /// If <see langword="true"/>, the formatter (for replacing variables) is enabled, else formatting is off.
+        /// This is useful, if none of the content properties contains variables, but still the <see cref="MailMergeSender"/> shall be used.
+        /// </summary>
+        public bool EnableFormatter { get; set; } = true;
+        
         /// <summary>
         /// Gets or sets the mail message subject.
         /// </summary>
@@ -345,6 +349,8 @@ namespace MailMergeLib
         /// </remarks>
         internal string SearchAndReplaceVars(string text, object dataItem)
         {
+            if (!EnableFormatter) return text;
+            
             if (text == null) return null;
             SmartFormatter.SetConfig(Config?.SmartFormatterConfig); // make sure we use the latest settings
             try
@@ -363,7 +369,7 @@ namespace MailMergeLib
 
         /// <summary>
         /// Replaces all variables in the text with their corresponding values.
-        /// Filenames may contain backslashes which may not be interpreted as literals.
+        /// File names may contain backslashes which may not be interpreted as literals.
         /// That's why "ConvertCharacterStringLiterals" must be false in this method.
         /// Uses new instances of <see cref="MailSmartFormatter"/> and <see cref="SmartFormatterConfig"/>.
         /// </summary>
@@ -378,6 +384,8 @@ namespace MailMergeLib
         /// </remarks>
         internal string SearchAndReplaceVarsInFilename(string text, object dataItem)
         {
+            if (!EnableFormatter) return text;
+            
             if (text == null) return null;
             try
             {
