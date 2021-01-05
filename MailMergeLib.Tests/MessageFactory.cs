@@ -19,12 +19,6 @@ namespace MailMergeLib.Tests
         public const string PdfFile = "Sample.pdf";
         public const string Subject = "Logfile for {Date:yyyy-MM-dd}";
         public const string MyContentId = "my.content.id";
-        public string PathRelativeToCodebase {
-            get{
-                char slash = Path.DirectorySeparatorChar;
-                return $"..{slash}..{slash}TestFiles{slash}";
-            }
-        } 
 
         public static MailMergeMessage GetHtmlMailWithInlineAndOtherAttachments()
         {

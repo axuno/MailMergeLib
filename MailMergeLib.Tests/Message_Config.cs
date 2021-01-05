@@ -94,7 +94,7 @@ namespace MailMergeLib.Tests
             mmm.Config.FileBaseDirectory = Path.GetTempPath();
 
             var hbb = new HtmlBodyBuilder(mmm, (object) null);
-            Assert.AreEqual(new Uri(mmm.Config.FileBaseDirectory), hbb.DocBaseUri);
+            Assert.AreEqual( new Uri(mmm.Config.FileBaseDirectory), hbb.DocBaseUri);
         }
 
         [Test]

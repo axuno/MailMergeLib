@@ -1,16 +1,24 @@
 ﻿using System.IO;
+using System.Runtime;
 
 namespace MailMergeLib.Tests
 {
     internal static class TestFileFolders
     {
-        public static string PathRelativeToCodebase {
-            get{
-                char slash = Path.DirectorySeparatorChar;
-                return $"..{slash}..{slash}..{slash}TestFiles{slash}";
+        private static string Get_TestFiles_Path_From_CodeBase()
+        {
+            var codeBaseDir = Helper.GetCodeBaseDirectory();
+            var di = new DirectoryInfo(codeBaseDir);
+            while (di.Parent != null)
+            {
+                di = di.Parent;
+                var testFileDirectory = Path.Combine(di.FullName, "TestFiles" + Path.DirectorySeparatorChar);
+                if (Directory.Exists(testFileDirectory)) return testFileDirectory;
             }
+
+            return di.Root.FullName;
         }
 
-        public static string FilesAbsPath = Path.GetFullPath(Path.Combine(Helper.GetCodeBaseDirectory(), PathRelativeToCodebase));
+        public static string FilesAbsPath = Get_TestFiles_Path_From_CodeBase();
     }
 }
