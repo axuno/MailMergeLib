@@ -4,11 +4,10 @@ build_script:
 - ps: dotnet restore --verbosity quiet
 - ps: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release
 test_script:
-- cmd: >-
-    cd MailMergeLib.Tests
-    nuget install Appveyor.TestLogger
-    dotnet add package AltCover
-    cd ..
-    dotnet test --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.Tests /p:AltCoverXmlReport="..\coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="C:\projects\mailmergelib\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
-    nuget install codecov -excludeversion
-    .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.netcoreapp3.1.xml" -n netcoreapp3.1win
+- cmd: cd MailMergeLib.Tests
+- cmd: nuget install Appveyor.TestLogger
+- cmd: dotnet add package AltCover
+- cmd: cd ..
+- cmd: dotnet test --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.Tests /p:AltCoverXmlReport="..\coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="C:\projects\mailmergelib\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+- cmd: nuget install codecov -excludeversion
+- cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.netcoreapp3.1.xml" -n netcoreapp3.1win
