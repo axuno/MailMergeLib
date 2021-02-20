@@ -10,7 +10,7 @@ namespace MailMergeLib
         /// </summary>
         None,
         /// <summary>
-        /// Send messages through an SMTP server
+        /// Send messages through an SMTP server.
         /// </summary>
         SmtpServer,
         /// <summary>
