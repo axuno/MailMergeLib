@@ -1,13 +1,11 @@
-version: 1.0.{build}
+version: 5.7.1.{build}
 image: Visual Studio 2019
 build_script:
 - ps: dotnet restore --verbosity quiet
+- ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
 - ps: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release
 test_script:
-- cmd: cd MailMergeLib.Tests
 - cmd: nuget install Appveyor.TestLogger
-- cmd: dotnet add package AltCover
-- cmd: cd ..
-- cmd: dotnet test --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.Tests /p:AltCoverXmlReport="..\coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="C:\projects\mailmergelib\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+- cmd: dotnet test --no-build --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
 - cmd: nuget install codecov -excludeversion
 - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.netcoreapp3.1.xml" -n netcoreapp3.1win
