@@ -1,9 +1,0 @@
-language: csharp
-solution: MailMergeLib.sln
-mono: none
-dotnet: 3.1.300
-script:
- - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
- - dotnet restore
- - dotnet test MailMergeLib.Tests --framework netcoreapp3.1 --configuration RELEASE --test-adapter-path:. /p:AltCoverXmlReport=/home/travis/build/axuno/MailMergeLib/coverage.xml /p:AltCover=true /p:AltCoverStrongNameKey="/home/travis/build/axuno/MailMergeLib/MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
- - bash <(curl -s https://codecov.io/bash) -f /home/travis/build/axuno/MailMergeLib/coverage.xml -n netcoreapp3.1linux
