@@ -40,7 +40,8 @@
 
 ### 5. Supported Frameworks
 * .Net Framework 4.6+
-* .Net Core
+* .Net Standard 2.1
+* .Net 5.0
 
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/) Install the NuGet package
