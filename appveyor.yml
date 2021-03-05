@@ -39,4 +39,4 @@ for:
     test_script:
       - nuget install Appveyor.TestLogger
       - dotnet test --no-build --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
-      - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.netcoreapp3.1.xml" -n netcoreapp3.1linux
+      - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.netcoreapp3.1.xml -n netcoreapp3.1linux
