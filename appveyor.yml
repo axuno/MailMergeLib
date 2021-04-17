@@ -18,6 +18,7 @@ for:
       # default is: core.autocrlf input
       - git config --global core.autocrlf true
     build_script:
+      - ps: cd $env:APPVEYOR_BUILD_FOLDER\Src
       - ps: dotnet --version
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
@@ -32,6 +33,7 @@ for:
       only:
         - job_name: linux
     build_script:
+      - cd $APPVEYOR_BUILD_FOLDER/Src
       - dotnet --version
       - dotnet restore --verbosity quiet
       - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
