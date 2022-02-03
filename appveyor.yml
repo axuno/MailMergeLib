@@ -1,4 +1,4 @@
-version: 5.7.1.{build}
+version: 5.7.2.{build}
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
@@ -39,6 +39,5 @@ for:
       - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
       - dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
-      - nuget install Appveyor.TestLogger
       - dotnet test --no-build --framework netcoreapp3.1 MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.netcoreapp3.1.xml -n netcoreapp3.1linux
