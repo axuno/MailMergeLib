@@ -983,6 +983,14 @@ namespace MailMergeLib
             return Equals((MailMergeMessage)obj);
         }
 
+        /// <inheritdoc/>
+        public override int GetHashCode() {
+            unchecked
+            {
+                return Serialize().GetHashCode();
+            }
+        }
+
         /// <summary>
         /// Compares the MailMergeMessage with an other instance of MailMergeMessage for equality.
         /// </summary>

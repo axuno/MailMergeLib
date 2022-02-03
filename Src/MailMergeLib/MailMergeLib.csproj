@@ -64,14 +64,8 @@ https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleas
     <PackageReference Include="YAXLib" Version="3.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.Configuration" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Configuration">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Configuration.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
