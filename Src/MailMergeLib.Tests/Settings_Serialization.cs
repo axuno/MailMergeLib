@@ -164,7 +164,7 @@ namespace MailMergeLib.Tests
             {
                 // An exception is thrown because username / password are saved as plain text,
                 // while with encryption enabled, both should be encrypted.
-                Assert.Throws<YAXLib.YAXPropertyCannotBeAssignedTo>(() =>
+                Assert.Throws<YAXLib.Exceptions.YAXPropertyCannotBeAssignedTo>(() =>
                     Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null));
             }
         }

@@ -1,7 +1,8 @@
 using System;
 using System.Text;
 using MimeKit;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib
 {

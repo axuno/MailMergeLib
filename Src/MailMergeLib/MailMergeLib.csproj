@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
-    <Copyright>© 2007-2021 by axuno gGmbH</Copyright>
+	<CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>© 2007-$(CurrentYear) by axuno gGmbH</Copyright>
     <AssemblyTitle>MailMergeLib</AssemblyTitle>
-    <Version>5.7.1.0</Version>
-    <AssemblyVersion>5.7.1.0</AssemblyVersion>
-    <FileVersion>5.7.1.0</FileVersion>
+    <Version>5.7.2.0</Version>
+    <AssemblyVersion>5.7.2.0</AssemblyVersion>
+    <FileVersion>5.7.2.0</FileVersion>
     <Authors>axuno gGmbH</Authors>
-    <TargetFrameworks>netstandard2.1;net46;net50</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net461;net50</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>MailMergeLib</AssemblyName>
@@ -51,20 +52,26 @@ https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleas
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.13.0" />
-    <PackageReference Include="MailKit" Version="2.4.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+    <PackageReference Include="AngleSharp" Version="0.16.1" />
+    <PackageReference Include="MailKit" Version="3.1.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MimeKit" Version="2.4.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="SmartFormat.NET" Version="2.5.0" />
-    <PackageReference Include="YAXLib" Version="2.15.0" />
+    <PackageReference Include="MimeKit" Version="3.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="SmartFormat.NET" Version="2.7.2" />
+    <PackageReference Include="YAXLib" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Configuration.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

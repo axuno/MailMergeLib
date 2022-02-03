@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using System.Linq;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib.Templates
 {

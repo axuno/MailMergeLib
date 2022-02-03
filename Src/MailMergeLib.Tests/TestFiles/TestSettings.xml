@@ -40,9 +40,9 @@
     <CharacterEncoding>utf-32</CharacterEncoding>
     <CultureInfo>de-DE</CultureInfo>
     <FileBaseDirectory>C:\Path-to-Base-Dir</FileBaseDirectory>
-    <IgnoreIllegalRecipientAddresses>False</IgnoreIllegalRecipientAddresses>
-    <IgnoreMissingInlineAttachments>True</IgnoreMissingInlineAttachments>
-    <IgnoreMissingFileAttachments>True</IgnoreMissingFileAttachments>
+    <IgnoreIllegalRecipientAddresses>false</IgnoreIllegalRecipientAddresses>
+    <IgnoreMissingInlineAttachments>true</IgnoreMissingInlineAttachments>
+    <IgnoreMissingFileAttachments>true</IgnoreMissingFileAttachments>
     <Priority>Urgent</Priority>
     <StandardFromAddress>"sender name" &lt;sender@example.com&gt;</StandardFromAddress>
     <Organization>axuno gGmbH</Organization>
@@ -51,7 +51,7 @@
       <ParseErrorAction>MaintainTokens</ParseErrorAction>
       <FormatErrorAction>OutputErrorInResult</FormatErrorAction>
       <CaseSensitivity>CaseInsensitive</CaseSensitivity>
-      <ConvertCharacterStringLiterals>True</ConvertCharacterStringLiterals>
+      <ConvertCharacterStringLiterals>true</ConvertCharacterStringLiterals>
     </SmartFormatterConfig>
   </Message>
 </MailMergeLibSettings>

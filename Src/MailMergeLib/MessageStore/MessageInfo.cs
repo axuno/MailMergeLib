@@ -1,5 +1,6 @@
 ﻿using MailMergeLib.Serialization;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib.MessageStore
 {

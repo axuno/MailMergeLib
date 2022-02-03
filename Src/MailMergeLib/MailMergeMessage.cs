@@ -9,7 +9,8 @@ using MailMergeLib.Serialization;
 using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib
 {

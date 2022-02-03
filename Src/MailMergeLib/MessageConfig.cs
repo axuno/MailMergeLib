@@ -3,7 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using MimeKit;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib
 {

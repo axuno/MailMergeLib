@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
@@ -19,6 +21,7 @@ namespace MailMergeLib.Tests
     {
         private static readonly object _locker = new object();
         private static SimpleSmtpServer _server;
+        private int? _simpleSmtpServerPort;
         private readonly Random _rnd = new Random();
         private Settings _settings = new Settings();
 
@@ -39,11 +42,11 @@ namespace MailMergeLib.Tests
                 {"Date", DateTime.Now}
             };
 
-            var mmm = new MailMergeMessage("Mailsubject sent on {Date}", "{MessageText}")
+            using var mmm = new MailMergeMessage("Mailsubject sent on {Date}", "{MessageText}")
                 {Config = _settings.MessageConfig};
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
 
-            var mms = new MailMergeSender() {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
 
             mms.OnAfterSend += onAfterSend;
             mms.OnSmtpConnected += onSmtpConnected;
@@ -51,17 +54,16 @@ namespace MailMergeLib.Tests
             mms.OnSendFailure += onSendFailure;
 
             mms.Send(mmm, (object) data);
-            mms.Dispose();
         }
 
         [Test]
         public void TryToSendWhenSenderIsBusy()
         {
-            var mmm = new MailMergeMessage("Subject", "plain text");
+            using var mmm = new MailMergeMessage("Subject", "plain text");
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name 2", "test2@example.com"));
 
-            var mms = new MailMergeSender
+            using var mms = new MailMergeSender
             {
                 IsBusy = true
             };
@@ -76,14 +78,12 @@ namespace MailMergeLib.Tests
                 await mms.SendAsync(mmm, new Dictionary<string, string>()));
 
             mms.IsBusy = false;
-            mmm.Dispose();
-            mms.Dispose();
         }
 
         [Test]
         public void TryToSendWithNullMessage()
         {
-            var mms = new MailMergeSender();
+            using var mms = new MailMergeSender();
 
             // single mail
             Assert.Throws<ArgumentNullException>(() => mms.Send(null, new object()));
@@ -93,31 +93,27 @@ namespace MailMergeLib.Tests
             Assert.Throws<ArgumentNullException>(() => mms.Send(null, new Dictionary<string, string>()));
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await mms.SendAsync(null, new Dictionary<string, string>()));
-            mms.Dispose();
         }
 
         [Test]
         public void TryToSendWithNullAsEnumerable()
         {
-            var mms = new MailMergeSender();
-            var mmm = new MailMergeMessage(); // no need to fully prepare for this test
+            using var mms = new MailMergeSender();
+            using var mmm = new MailMergeMessage(); // no need to fully prepare for this test
 
             Assert.Throws<ArgumentNullException>(() => mms.Send(null, (Dictionary<string, string>) null));
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await mms.SendAsync(mmm, (Dictionary<string, string>) null));
-
-            mms.Dispose();
-            mmm.Dispose();
         }
 
         [Test]
         public void CancelSendOperationWithDelay()
         {
-            var mmm = new MailMergeMessage("Cancel with delay", "plain text");
+            using var mmm = new MailMergeMessage("Cancel with delay", "plain text");
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
 
-            var mms = new MailMergeSender
+            using var mms = new MailMergeSender
             {
                 Config = _settings.SenderConfig
             };
@@ -130,19 +126,16 @@ namespace MailMergeLib.Tests
             mms.SendCancel(500);
             Assert.ThrowsAsync<TaskCanceledException>(() => mms.SendAsync(mmm, anyData));
             Assert.AreEqual(0, _server.ReceivedEmailCount);
-
-            mmm.Dispose();
-            mms.Dispose();
         }
 
         [Test]
         public async Task CancelSendOperation()
         {
-            var mmm = new MailMergeMessage("Cancel immediately", "plain text");
+            using var mmm = new MailMergeMessage("Cancel immediately", "plain text");
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "Test name", "test@example.com"));
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "Test name 2", "test2@example.com"));
 
-            var mms = new MailMergeSender {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
             mms.Config.MaxNumOfSmtpClients = 1;
             mms.Config.SmtpClientConfig[0].MessageOutput = MessageOutput.SmtpServer;
             mms.Config.SmtpClientConfig[0].DelayBetweenMessages = 2000;
@@ -159,9 +152,6 @@ namespace MailMergeLib.Tests
             Assert.Throws<AggregateException>(() => { Task.WaitAll(tasks); });
 
             Assert.AreEqual(0, _server.ReceivedEmailCount);
-
-            mms.Dispose();
-            mmm.Dispose();
         }
 
         [Test]
@@ -256,7 +246,6 @@ namespace MailMergeLib.Tests
 
         }
 
-        [Test]
         [TestCase("", false)]
         [TestCase("{CauseParseFailure", true)]
         [TestCase("{CauseMissingVariableFailure}", true)]
@@ -267,7 +256,7 @@ namespace MailMergeLib.Tests
             var actualEvents = new ConcurrentStack<string>();
             var expectedEvents = new ConcurrentStack<string>();
 
-            var mms = new MailMergeSender {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
             mms.Config.MaxNumOfSmtpClients = 1;
 
             // Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
@@ -299,7 +288,7 @@ namespace MailMergeLib.Tests
 
             var recipient = new Recipient {Email = $"recipient@example.com", Name = $"Name of recipient"};
 
-            var mmm = new MailMergeMessage("Event tests" + somePlaceholder,
+            using var mmm = new MailMergeMessage("Event tests" + somePlaceholder,
                 "This is the plain text part for {Name} ({Email})") {Config = _settings.MessageConfig};
 
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
@@ -378,12 +367,8 @@ namespace MailMergeLib.Tests
             }
 
             #endregion
-
-            mms.Dispose();
-            mmm.Dispose();
         }
 
-        [Test]
         [TestCase("", false)]
         [TestCase("{CauseParseFailure", true)]
         [TestCase("{CauseMissingVariableFailure}", true)]
@@ -394,7 +379,7 @@ namespace MailMergeLib.Tests
             var actualEvents = new ConcurrentStack<string>();
             var expectedEvents = new ConcurrentStack<string>();
 
-            var mms = new MailMergeSender {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
             mms.Config.MaxNumOfSmtpClients = 1;
 
             // Event raising before merging starts
@@ -443,7 +428,7 @@ namespace MailMergeLib.Tests
                 recipients.Add(new Recipient {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
             }
 
-            var mmm = new MailMergeMessage("Event tests" + somePlaceholder,
+            using var mmm = new MailMergeMessage("Event tests" + somePlaceholder,
                 "This is the plain text part for {Name} ({Email})") {Config = _settings.MessageConfig};
 
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
@@ -525,12 +510,8 @@ namespace MailMergeLib.Tests
 
             #endregion
 
-            mms.Dispose();
-            mmm.Dispose();
-
         }
 
-        [Test]
         [TestCase(true, true)] // setting for setMimeMessageToNull is irrelevant
         [TestCase(false, false)] // no exception is fine ONLY if MimeMessage is not null
         [TestCase(false, true)] // no exception with null for MimeMessage must throw exception
@@ -541,7 +522,7 @@ namespace MailMergeLib.Tests
             const string theFormatError = "{causeFormatError}";
             const string plainText = theFormatError + "This is the plain text part for {Name} ({Email})";
 
-            var mms = new MailMergeSender {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
             mms.Config.MaxNumOfSmtpClients = 1;
 
             // Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
@@ -578,7 +559,7 @@ namespace MailMergeLib.Tests
                 recipients.Add(new Recipient {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
             }
 
-            var mmm = new MailMergeMessage("Message failure", plainText) {Config = _settings.MessageConfig};
+            using var mmm = new MailMergeMessage("Message failure", plainText) {Config = _settings.MessageConfig};
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
 
             #endregion
@@ -764,9 +745,6 @@ namespace MailMergeLib.Tests
             }
 
             #endregion
-
-            mms.Dispose();
-            mmm.Dispose();
         }
 
         [TestCase(10)]
@@ -782,16 +760,16 @@ namespace MailMergeLib.Tests
                 recipients.Add(new Recipient {Email = $"recipient-{i}@example.com", Name = $"Name of {i}"});
             }
 
-            var mmm = new MailMergeMessage("Async/Sync email test", "This is the plain text part for {Name} ({Email})")
+            using var mmm = new MailMergeMessage("Async/Sync email test", "This is the plain text part for {Name} ({Email})")
                 {Config = _settings.MessageConfig};
             mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Name}", "{Email}"));
-            var mms = new MailMergeSender {Config = _settings.SenderConfig};
+            using var mms = new MailMergeSender {Config = _settings.SenderConfig};
 
             mms.Config.MaxNumOfSmtpClients = 10;
             var sw = new Stopwatch();
 
             sw.Start();
-            mms.Send(mmm, recipients);
+            await mms.SendAsync(mmm, recipients);
             sw.Stop();
             Console.WriteLine($"Time to send {recipients.Count} messages sync: {sw.ElapsedMilliseconds} milliseconds.");
             Console.WriteLine();
@@ -803,7 +781,7 @@ namespace MailMergeLib.Tests
 
             sw.Start();
 
-            int numOfSmtpClientsUsed = 0;
+            var numOfSmtpClientsUsed = 0;
             mms.OnMergeComplete += (s, args) => { numOfSmtpClientsUsed = args.NumOfSmtpClientsUsed; };
 
             await mms.SendAsync(mmm, recipients);
@@ -817,9 +795,6 @@ namespace MailMergeLib.Tests
 
             Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
             Assert.IsFalse(mms.IsBusy);
-
-            mms.Dispose();
-            mmm.Dispose();
         }
 
         #region *** Test setup ***
@@ -836,13 +811,31 @@ namespace MailMergeLib.Tests
             _server.Stop();
         }
 
+        /// <summary>
+        /// Initialize with port zero.
+        /// In this case, the system will select a random free port
+        /// from the dynamic port range.
+        /// We can get the number of this port from the LocalEndpoint property.
+        /// </summary>
+        /// <returns>The first free TCP port found.</returns>
+        private static int GetFreeTcpPort()
+        {
+            var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            var freePort = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return freePort;
+        }
+
         [SetUp]
         public void SetUp()
         {
             _server.ClearReceivedEmail();
             _server.Stop();
-            _server.Dispose();
-            _server = SimpleSmtpServer.Start(_rnd.Next(50000, 60000));
+
+            _simpleSmtpServerPort ??= GetFreeTcpPort();
+
+            _server = SimpleSmtpServer.Start(_simpleSmtpServerPort.Value);
             _settings = GetSettings();
         }
 
