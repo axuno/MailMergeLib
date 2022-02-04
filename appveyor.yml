@@ -1,4 +1,4 @@
-version: 5.7.2.{build}
+version: 5.8.0.{build}
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
