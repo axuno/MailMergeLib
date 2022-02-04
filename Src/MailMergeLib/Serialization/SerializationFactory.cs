@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 using YAXLib;
+using YAXLib.Enums;
+using YAXLib.Options;
 
 namespace MailMergeLib.Serialization
 {
@@ -27,8 +29,14 @@ namespace MailMergeLib.Serialization
         /// <returns>Returns a pre-configured YAXSerializer.</returns>
         internal static YAXSerializer GetStandardSerializer (Type classType)
         {
-            return new YAXSerializer(classType, YAXExceptionHandlingPolicies.ThrowErrorsOnly, YAXExceptionTypes.Error,
-                YAXSerializationOptions.SerializeNullObjects) {MaxRecursion = 50};
+            return new YAXSerializer(classType,
+                new SerializerOptions
+                {
+                    ExceptionHandlingPolicies = YAXExceptionHandlingPolicies.ThrowErrorsOnly,
+                    ExceptionBehavior = YAXExceptionTypes.Error,
+                    MaxRecursion = 50,
+                    SerializationOptions = YAXSerializationOptions.SerializeNullObjects
+                });
         }
         
         /// <summary>

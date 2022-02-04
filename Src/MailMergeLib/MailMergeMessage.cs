@@ -9,7 +9,8 @@ using MailMergeLib.Serialization;
 using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib
 {
@@ -980,6 +981,14 @@ namespace MailMergeLib
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((MailMergeMessage)obj);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode() {
+            unchecked
+            {
+                return Serialize().GetHashCode();
+            }
         }
 
         /// <summary>

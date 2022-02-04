@@ -6,7 +6,8 @@ using MailKit.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using MailMergeLib.Serialization;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 #if NETFRAMEWORK
 using System.Configuration;
 using System.Net.Configuration;

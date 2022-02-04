@@ -39,9 +39,8 @@
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
 ### 5. Supported Frameworks
-* .Net Framework 4.6+
-* .Net Standard 2.1
-* .Net 5.0
+* .Net Framework 4.6.1 and later
+* .Net Standard 2.1 and later
 
 ### Get started
 [![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/) Install the NuGet package
@@ -49,7 +48,3 @@
 [![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/MailMergeLib/wiki)
 Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
 
-### History
-MailMergeLib was introduced back in 2007 on [CodeProject](http://www.codeproject.com/Articles/19546/MailMergeLib-A-NET-Mail-Client-Library). The last version published there is 4.03. It is based on ```System.Net.Mail```. For anyone still using ```System.Net.Mail```, Jeffrey Stedfast's [Code Review](http://jeffreystedfast.blogspot.de/2015/03/code-review-microsofts-systemnetmail.html) might be interesting, although he describes issues more polite than they actually are (especially in terms of RFC violations).
-
-MailMergeLib 5 published on GitHub is a major rewrite, and it is not backwards compatible to prior releases. There is, however, a migration guide included in the ```MailMergeLib``` Wiki. 

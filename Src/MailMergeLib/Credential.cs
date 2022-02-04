@@ -1,6 +1,7 @@
 using System;
 using System.Net;
-using YAXLib;
+using YAXLib.Attributes;
+using YAXLib.Enums;
 
 namespace MailMergeLib
 {

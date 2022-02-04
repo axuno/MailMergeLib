@@ -1,9 +1,9 @@
-version: 5.7.1.{build}
+version: 5.8.0.{build}
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
   - job_name: linux
     appveyor_build_worker_image: Ubuntu
 matrix:
@@ -22,12 +22,18 @@ for:
       - ps: dotnet --version
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
-      - ps: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
+      - ps: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /nowarn:CS1591,CS0618
+      - ps: dotnet pack MailMergeLib.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=$env:APPVEYOR_BUILD_FOLDER/artifacts /p:ContinuousIntegrationBuild=true
     test_script:
       - cmd: nuget install Appveyor.TestLogger
       - cmd: dotnet test --no-build --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.netcoreapp3.1.xml" -n netcoreapp3.1win
+    artifacts:
+      - path: 'artifacts\*.nupkg'
+        type: NuGetPackage
+      - path: 'artifacts\*.snupkg'
+        type: NuGetPackage
   -
     matrix:
       only:
@@ -39,6 +45,5 @@ for:
       - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
       - dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
-      - nuget install Appveyor.TestLogger
-      - dotnet test --no-build --framework netcoreapp3.1 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      - dotnet test --no-build --framework netcoreapp3.1 MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.netcoreapp3.1.xml -n netcoreapp3.1linux

@@ -2,6 +2,7 @@ using System;
 using System.Xml.Linq;
 using MailMergeLib.Templates;
 using YAXLib;
+using YAXLib.Exceptions;
 
 namespace MailMergeLib.Serialization
 {

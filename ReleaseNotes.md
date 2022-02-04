@@ -1,6 +1,14 @@
+# 5.8.0
+
+* Updated dependencies to latest versions
+  * Fixed compatibility issues with updated dependencies (specifically `MailKit`, `MimeKit` and `YAXLib` with new major versions).
+  * Now referencing updated [SmartFormat.Net v2.7.2](https://github.com/axuno/SmartFormat) for formatting.
+  * No impact on `MailMergeLib` public API.
+* Supported frameworks
+  * .Net Framework: 4.6.1 and later
+  * NetStandard: 2.1 and later
+
 # 5.7.1
-* Added support for NET5.0
-* MailMergeLib.Tests is now ```NetCore3.1```
 * Formatting (parse and format variables) can be switched off with ```MailMergeLib.EnableFormatter = false ```. Default is ```true```
 * Enabled SourceLink
 

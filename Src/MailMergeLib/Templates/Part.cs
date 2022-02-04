@@ -1,5 +1,5 @@
 ﻿using MailMergeLib.Serialization;
-using YAXLib;
+using YAXLib.Attributes;
 
 namespace MailMergeLib.Templates
 {

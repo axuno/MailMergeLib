@@ -76,13 +76,13 @@ namespace MailMergeLib.Tests
             return Task.CompletedTask;
         }
 
-        public override Task SendAsync(FormatOptions options, MimeMessage message,
+        public override Task<string> SendAsync(FormatOptions options, MimeMessage message,
             CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); 
         }
 
-        public override Task SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        public override Task<string> SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
             CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
         {
             throw new NotImplementedException();
@@ -162,16 +162,18 @@ namespace MailMergeLib.Tests
             return base.GetDeliveryStatusNotifications(message, mailbox);
         }
 
-        public override void Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        public override string Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
             ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;
+            return string.Empty;
         }
 
-        public override void Send(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        public override string Send(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
             CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;
+            return string.Empty;
         }
 
         /*
@@ -184,32 +186,34 @@ namespace MailMergeLib.Tests
         public override bool IsAuthenticated { get; }
         */
 
-        public override void Send(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        public override string Send(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
             ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;  // in use
+            return string.Empty;
         }
 
-        public override Task SendAsync(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        public override Task<string> SendAsync(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
             ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;
 
-            return Task.CompletedTask;
+            return Task.FromResult(string.Empty);
         }
 
-        public override void Send(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        public override string Send(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
             CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;
+            return string.Empty;
         }
 
-        public override Task SendAsync(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        public override Task<string> SendAsync(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
             CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
         {
             if (SendException != null) throw SendException;
 
-            return Task.CompletedTask;
+            return Task.FromResult(string.Empty);
         }
 
         protected override void OnMessageSent(MessageSentEventArgs e)
