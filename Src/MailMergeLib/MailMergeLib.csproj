@@ -1,72 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
-	<CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
-    <Copyright>© 2007-$(CurrentYear) by axuno gGmbH</Copyright>
-    <AssemblyTitle>MailMergeLib</AssemblyTitle>
-    <Version>5.7.2.0</Version>
-    <AssemblyVersion>5.7.2.0</AssemblyVersion>
-    <FileVersion>5.7.2.0</FileVersion>
-    <Authors>axuno gGmbH</Authors>
-    <TargetFrameworks>netstandard2.1;net461;net50</TargetFrameworks>
-    <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>MailMergeLib</AssemblyName>
-    <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>MailMergeLib</PackageId>
-    <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/axuno/MailMergeLib/raw/master/MailMergeLib_64x64.png</PackageIconUrl>
-    <PackageLicenseUrl></PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
-    <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
+    <PropertyGroup>
+        <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
+        <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+        <Copyright>© 2007-$(CurrentYear) by axuno gGmbH</Copyright>
+        <AssemblyTitle>MailMergeLib</AssemblyTitle>
+        <Version>5.7.2.0</Version>
+        <AssemblyVersion>5.7.2.0</AssemblyVersion>
+        <FileVersion>5.7.2.0</FileVersion>
+        <Authors>axuno gGmbH</Authors>
+        <TargetFrameworks>netstandard2.1;net461;net50</TargetFrameworks>
+        <DefineConstants>TRACE;DEBUG;RELEASE</DefineConstants>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>MailMergeLib</AssemblyName>
+        <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <PackageId>MailMergeLib</PackageId>
+        <PackageProjectUrl>https://github.com/axuno/MailMergeLib</PackageProjectUrl>
+        <PackageIcon>MailMergeLib_64x64.png</PackageIcon>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/axuno/MailMergeLib</RepositoryUrl>
+        <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleaseNotes>
-    <PackageTags>smtp mime mail email merge template netcore netstandard netframework net50 c#</PackageTags>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RootNamespace>MailMergeLib</RootNamespace>
-    <LangVersion>latest</LangVersion>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryType>Git</RepositoryType>
-  </PropertyGroup>
+        <PackageTags>smtp mime mail email merge template netcore netstandard netframework net50 c#</PackageTags>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <RootNamespace>MailMergeLib</RootNamespace>
+        <LangVersion>latest</LangVersion>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>Git</RepositoryType>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>false</Optimize>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>3</WarningLevel>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-        <!--
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <!--
             Create PublicKey file: sn -p d:MailMergeLib.snk d:MailMergeLib.snk.PublicKey
             Create PublicKey:      sn -tp d:Mailmergelib.snk.PublicKey
         -->
-        <_Parameter1>MailMergeLib.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007d73450c58a30b94409ec6a1ad78af1337bae462b82c80aeda1e0501506db459cd074beb94cb342a3491687e75e0143e6fce3bfa5cc3221b29017e0f4e5b116d0b135405dad460283413f75e63c6db3b1b074a16d780f013433a7b7883e9760079b6d5a41d5d9a3cff80a3b1e42b1d057c94533c978a625c3a0a933cac9ecda9</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+            <_Parameter1>MailMergeLib.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007d73450c58a30b94409ec6a1ad78af1337bae462b82c80aeda1e0501506db459cd074beb94cb342a3491687e75e0143e6fce3bfa5cc3221b29017e0f4e5b116d0b135405dad460283413f75e63c6db3b1b074a16d780f013433a7b7883e9760079b6d5a41d5d9a3cff80a3b1e42b1d057c94533c978a625c3a0a933cac9ecda9</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.16.1" />
-    <PackageReference Include="MailKit" Version="3.1.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MimeKit" Version="3.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SmartFormat.NET" Version="2.7.2" />
-    <PackageReference Include="YAXLib" Version="3.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AngleSharp" Version="0.16.1" />
+        <PackageReference Include="MailKit" Version="3.1.1" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MimeKit" Version="3.1.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="SmartFormat.NET" Version="2.7.2" />
+        <PackageReference Include="YAXLib" Version="3.0.1" />
+    </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+        <Reference Include="System.Configuration" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../../MailMergeLib_64x64.png" Pack="true" Visible="false" PackagePath="/" />
+    </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <OutputPath>bin\Release\</OutputPath>
