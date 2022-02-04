@@ -24,7 +24,7 @@
         <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleaseNotes>
         <PackageTags>smtp mime mail email merge template netcore netstandard netframework net50 c#</PackageTags>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <RootNamespace>MailMergeLib</RootNamespace>
         <LangVersion>latest</LangVersion>
