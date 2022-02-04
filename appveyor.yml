@@ -3,7 +3,7 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
   - job_name: linux
     appveyor_build_worker_image: Ubuntu
 matrix:
