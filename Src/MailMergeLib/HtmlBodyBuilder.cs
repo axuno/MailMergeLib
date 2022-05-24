@@ -180,7 +180,10 @@ namespace MailMergeLib
             {
                 var img = (IHtmlImageElement)element;
                 var currSrc = img.Attributes["src"]?.Value?.Trim();
-                if (currSrc == null) continue;
+                if (currSrc == null || currSrc.StartsWith("data:image", StringComparison.OrdinalIgnoreCase)) 
+                {
+                    continue;
+                }
 
                 // replace any placeholders with variables
                 currSrc = _mailMergeMessage.SearchAndReplaceVars(currSrc, _dataItem);
@@ -189,8 +192,7 @@ namespace MailMergeLib
 
                 // img src is not a local file (e.g. starting with "http" or is embedded base64 image), or manually included cid reference
                 // so we just save the value with placeholders replaced
-                if (string.IsNullOrEmpty(currSrc) || (currSrcUri.Scheme != UriScheme.File) ||
-                    currSrc.StartsWith("data:image", StringComparison.OrdinalIgnoreCase) || currSrc.StartsWith("cid:", StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrEmpty(currSrc) || (currSrcUri.Scheme != UriScheme.File) || currSrc.StartsWith("cid:", StringComparison.OrdinalIgnoreCase)) {
                 {
                     // leave img.Attributes["src"].Value as it is
                     continue;
