@@ -61,5 +61,32 @@ namespace MailMergeLib.Tests
             var html = hbb.GetBodyPart();
             Assert.IsTrue(!html.ToString().Contains(subjectToSet));
         }
+
+        [Test]
+        public void EmbeddedDataImage_ShouldNotBeTouched()
+        {
+            var image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKAQMAAABPHKYJAAAABGdBTUEAALGPC/xhBQAAAAZQTFRFBPl7AAAAx+zuaAAAAAd0SU1FB9MEFwMzHmwS680AAAALSURBVBjTY2DABAAAFAABQpvU+wAAAABJRU5ErkJggg==";
+            var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
+            var mmm = new MailMergeMessage("", "plain text",
+                $"<html><body>{imageTag}</body></html>");
+            var hbb = new HtmlBodyBuilder(mmm, (object) null);
+            var html = hbb.GetBodyPart();
+            Assert.That(html.ToString(), Does.Contain(imageTag));
+        }
+
+        [Test]
+        public void LargeEmbeddedDataImage_ShouldNotThrow()
+        {
+            // Exceeding Uri size of 0xFFF0 would throw an UriFormatException,
+            // if the embedded image was processed with new Uri(...)
+            
+            // Note: No need to be valid Base64 here:
+            var image = "data:image/png;base64," + new string('a', 0xFFF0 + 1);
+            var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
+            var mmm = new MailMergeMessage("", "plain text",
+                $"<html><body>{imageTag}</body></html>");
+            var hbb = new HtmlBodyBuilder(mmm, (object) null);
+            Assert.That(code: () => hbb.GetBodyPart(), Throws.Nothing);
+        }
     }
 }
