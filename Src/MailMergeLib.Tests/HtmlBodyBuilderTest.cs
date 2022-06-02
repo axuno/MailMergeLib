@@ -65,7 +65,7 @@ namespace MailMergeLib.Tests
         [Test]
         public void EmbeddedDataImage_ShouldNotBeTouched()
         {
-            var image = "data:image/png;base64,\r\niVBORw0KGgoAAAANSUhEUgAAAAEAAAAKAQMAAABPHKYJAAAABGdBTUEAALGPC/xhBQAAAAZQTFRFB\r\nPl7AAAAx+zuaAAAAAd0SU1FB9MEFwMzHmwS680AAAALSURBVBjTY2DABAAAFAABQpvU+wAAAABJRU\r\n5ErkJggg==";
+            var image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKAQMAAABPHKYJAAAABGdBTUEAALGPC/xhBQAAAAZQTFRFBPl7AAAAx+zuaAAAAAd0SU1FB9MEFwMzHmwS680AAAALSURBVBjTY2DABAAAFAABQpvU+wAAAABJRU5ErkJggg==";
             var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
             var mmm = new MailMergeMessage("", "plain text",
                 $"<html><body>{imageTag}</body></html>");
@@ -81,7 +81,7 @@ namespace MailMergeLib.Tests
             // if the embedded image was processed with new Uri(...)
             
             // Note: No need to be valid Base64 here:
-            var image = "data:image/png;base64,\r\n" + new string('a', 0xFFF0 + 1);
+            var image = "data:image/png;base64," + new string('a', 0xFFF0 + 1);
             var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
             var mmm = new MailMergeMessage("", "plain text",
                 $"<html><body>{imageTag}</body></html>");
