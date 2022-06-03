@@ -54,10 +54,10 @@ https://github.com/axuno/MailMergeLib/blob/master/ReleaseNotes.md</PackageReleas
 
     <ItemGroup>
         <PackageReference Include="AngleSharp" Version="0.16.1" />
-        <PackageReference Include="MailKit" Version="3.1.1" />
-        <PackageReference Include="MimeKit" Version="3.1.1" />
-        <PackageReference Include="SmartFormat.NET" Version="2.7.2" />
-        <PackageReference Include="YAXLib" Version="3.0.1" />
+        <PackageReference Include="MailKit" Version="(3.0,4.0)" />
+        <PackageReference Include="MimeKit" Version="(3.0,4.0)" />
+        <PackageReference Include="SmartFormat.NET" Version="[2.5.0,2.7.2]" />
+        <PackageReference Include="YAXLib" Version="(3.0,4.0)" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,4 +1,4 @@
-version: 5.8.1.{build}
+version: 5.8.0.{build} # Only change for mayor versions (e.g. 6.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
@@ -22,8 +22,15 @@ for:
       - ps: dotnet --version
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
-      - ps: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /nowarn:CS1591,CS0618
-      - ps: dotnet pack MailMergeLib.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=$env:APPVEYOR_BUILD_FOLDER/artifacts /p:ContinuousIntegrationBuild=true
+      - ps: |
+          $version = "5.8.1"
+          $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
+
+          if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+              $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
+          }
+          dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile /nowarn:CS1591,CS0618
+          dotnet pack MailMergeLib.sln --verbosity minimal --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=$env:APPVEYOR_BUILD_FOLDER/artifacts /p:ContinuousIntegrationBuild=true
     test_script:
       - cmd: nuget install Appveyor.TestLogger
       - cmd: dotnet test --no-build --framework net6.0 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
