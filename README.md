@@ -50,4 +50,4 @@
 [![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/) Install the NuGet package
 
 [![Docs](https://img.shields.io/badge/docs-up%20to%20date-brightgreen.svg)](https://github.com/axuno/MailMergeLib/wiki)
-Have a look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
+Have a closer look at the [MailMergeLib Wiki](https://github.com/axuno/MailMergeLib/wiki)
