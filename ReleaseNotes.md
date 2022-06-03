@@ -1,6 +1,6 @@
 # 5.8.1
 
-* Fixed: Large embedded images could throw `UriFormatException`
+* Fixed: Large embedded images could throw `UriFormatException` (thanks to [PhnXnhP](https://github.com/PhnXnhP))
 * Package references: Set version range of compatible dependencies for `MailKit`, `MimeKit`, `SmartFormat.NET`, `YAXLib`
 
 # 5.8.0
