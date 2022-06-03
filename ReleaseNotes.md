@@ -1,3 +1,7 @@
+# 5.8.2
+
+* Package references: Set highest major version of compatible dependencies for `MailKit`, `MimeKit`, `SmartFormat.NET`, `YAXLib`
+
 # 5.8.1
 
 * Fixed: Large embedded images could throw `UriFormatException` (thanks to [PhnXnhP](https://github.com/PhnXnhP))
