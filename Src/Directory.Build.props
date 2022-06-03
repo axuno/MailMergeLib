@@ -1,0 +1,22 @@
+<Project>
+
+    <PropertyGroup>
+        <Product>MailMergeLib</Product>
+        <Company>axuno gGmbH</Company>
+        <Authors>axuno gGmbH, project maintainers and contributors.</Authors>
+        <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+        <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
+        <RepositoryUrl>https://github.com/axuno/MailMergeLib.git</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <Version>5.8.1</Version>
+        <FileVersion>5.8.1</FileVersion>
+        <AssemblyVersion>5.8.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
+        <LangVersion>latest</LangVersion>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisMode>Default</AnalysisMode>
+        <AnalysisModeSecurity>All</AnalysisModeSecurity>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <Features>strict</Features>
+    </PropertyGroup>
+
+</Project>
