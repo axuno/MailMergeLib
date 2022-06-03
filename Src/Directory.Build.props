@@ -8,8 +8,8 @@
         <Copyright>Copyright 2011-$(CurrentYear) SmartFormat Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/MailMergeLib.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>5.8.1</Version>
-        <FileVersion>5.8.1</FileVersion>
+        <Version>5.8.2</Version>
+        <FileVersion>5.8.2</FileVersion>
         <AssemblyVersion>5.8.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
