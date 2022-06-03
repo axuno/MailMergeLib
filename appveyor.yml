@@ -8,6 +8,10 @@ environment:
     appveyor_build_worker_image: Ubuntu
 matrix:
   fast_finish: true
+only_commits:
+  files:
+    - appveyor.yml
+    - Src/**/*
 
 for:
   -
