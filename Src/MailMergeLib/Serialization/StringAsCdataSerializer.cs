@@ -3,38 +3,37 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using YAXLib;
 
-namespace MailMergeLib.Serialization
+namespace MailMergeLib.Serialization;
+
+internal class StringAsCdataSerializer : ICustomSerializer<string>
 {
-    internal class StringAsCdataSerializer : ICustomSerializer<string>
+    public void SerializeToAttribute(string objectToSerialize, XAttribute attrToFill)
     {
-        public void SerializeToAttribute(string objectToSerialize, XAttribute attrToFill)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
-        public void SerializeToElement(string objectToSerialize, XElement elemToFill)
-        {
-            elemToFill.Add(new XCData(objectToSerialize ?? string.Empty));
-        }
+    public void SerializeToElement(string objectToSerialize, XElement elemToFill)
+    {
+        elemToFill.Add(new XCData(objectToSerialize ?? string.Empty));
+    }
 
-        public string SerializeToValue(string objectToSerialize)
-        {
-            throw new NotImplementedException();
-        }
+    public string SerializeToValue(string objectToSerialize)
+    {
+        throw new NotImplementedException();
+    }
 
-        public string DeserializeFromAttribute(XAttribute attrib)
-        {
-            throw new NotImplementedException();
-        }
+    public string DeserializeFromAttribute(XAttribute attrib)
+    {
+        throw new NotImplementedException();
+    }
 
-        public string DeserializeFromElement(XElement element)
-        {
-            return element.Value;
-        }
+    public string DeserializeFromElement(XElement element)
+    {
+        return element.Value;
+    }
 
-        public string DeserializeFromValue(string value)
-        {
-            throw new NotImplementedException();
-        }
+    public string DeserializeFromValue(string value)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Description>Test project for MailMergeLib</Description>
-    <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
-    <TargetFrameworks>net6.0;net461</TargetFrameworks>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <AssemblyName>MailMergeLib.Tests</AssemblyName>
-    <AssemblyOriginatorKeyFile>../MailMergeLib/MailMergeLib.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>Test project for MailMergeLib</Description>
+        <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
+        <TargetFrameworks>net6.0;net461</TargetFrameworks>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <AssemblyName>MailMergeLib.Tests</AssemblyName>
+        <AssemblyOriginatorKeyFile>../MailMergeLib/MailMergeLib.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <IsTestProject>true</IsTestProject>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <ErrorReport>prompt</ErrorReport>
