@@ -1,46 +1,45 @@
 ﻿using System;
 
-namespace MailMergeLib.Templates
+namespace MailMergeLib.Templates;
+
+/// <summary>
+/// Represents errors that occur during changing the <see cref="Templates"/> object graph programmatically, including during deserialization.
+/// </summary>
+public class TemplateException : Exception
 {
     /// <summary>
-    /// Represents errors that occur during changing the <see cref="Templates"/> object graph programmatically, including during deserialization.
+    /// CTOR.
     /// </summary>
-    public class TemplateException : Exception
+    /// <param name="message"></param>
+    /// <param name="part"></param>
+    /// <param name="parts"></param>
+    /// <param name="template"></param>
+    /// <param name="templates"></param>
+    public TemplateException(string message, Part part, Parts parts, Template template, Templates templates) : base (message)
     {
-        /// <summary>
-        /// CTOR.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="part"></param>
-        /// <param name="parts"></param>
-        /// <param name="template"></param>
-        /// <param name="templates"></param>
-        public TemplateException(string message, Part part, Parts parts, Template template, Templates templates) : base (message)
-        {
-            Part = part;
-            Parts = parts;
-            Template = template;
-            Templates = templates;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Part"/> causing the exception, if not null.
-        /// </summary>
-        public Part Part { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="Parts"/> causing the exception, if not null.
-        /// </summary>
-        public Parts Parts { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="Template"/> causing the exception, if not null.
-        /// </summary>
-        public Template Template { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="Templates"/> causing the exception, if not null.
-        /// </summary>
-        public Templates Templates { get; private set; }
+        Part = part;
+        Parts = parts;
+        Template = template;
+        Templates = templates;
     }
+
+    /// <summary>
+    /// Gets the <see cref="Part"/> causing the exception, if not null.
+    /// </summary>
+    public Part Part { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="Parts"/> causing the exception, if not null.
+    /// </summary>
+    public Parts Parts { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="Template"/> causing the exception, if not null.
+    /// </summary>
+    public Template Template { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="Templates"/> causing the exception, if not null.
+    /// </summary>
+    public Templates Templates { get; private set; }
 }

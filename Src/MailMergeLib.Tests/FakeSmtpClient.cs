@@ -11,229 +11,228 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 
-namespace MailMergeLib.Tests
+namespace MailMergeLib.Tests;
+
+/// <inheritdoc />
+public class FakeSmtpClient : SmtpClient
 {
-    /// <inheritdoc />
-    public class FakeSmtpClient : SmtpClient
+    public FakeSmtpClient()
     {
-        public FakeSmtpClient()
-        {
-            // force the SmtpClient to "authenticate"
-            var prop = typeof(SmtpClient).GetField("capabilities", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            prop?.SetValue(this, SmtpCapabilities.Authentication);
-        }
+        // force the SmtpClient to "authenticate"
+        var prop = typeof(SmtpClient).GetField("capabilities", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        prop?.SetValue(this, SmtpCapabilities.Authentication);
+    }
 
-        public Exception AuthenticateException { get; set; } = null;
-        public Exception ConnectException { get; set; } = null;
-        public Exception SendException { get; set; } = null;
+    public Exception AuthenticateException { get; set; } = null;
+    public Exception ConnectException { get; set; } = null;
+    public Exception SendException { get; set; } = null;
 
-        public override Task AuthenticateAsync(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (AuthenticateException != null) throw AuthenticateException;
+    public override Task AuthenticateAsync(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (AuthenticateException != null) throw AuthenticateException;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public override Task AuthenticateAsync(Encoding encoding, ICredentials credentials,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (AuthenticateException != null) throw AuthenticateException;
+    public override Task AuthenticateAsync(Encoding encoding, ICredentials credentials,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (AuthenticateException != null) throw AuthenticateException;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public override Task ConnectAsync(string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException;
+    public override Task ConnectAsync(string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public override Task ConnectAsync(Socket socket, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException;
+    public override Task ConnectAsync(Socket socket, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public override Task ConnectAsync(Stream stream, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException;
+    public override Task ConnectAsync(Stream stream, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public override Task DisconnectAsync(bool quit, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return Task.CompletedTask;
-        }
+    public override Task DisconnectAsync(bool quit, CancellationToken cancellationToken = new CancellationToken())
+    {
+        return Task.CompletedTask;
+    }
 
-        public override Task NoOpAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return Task.CompletedTask;
-        }
+    public override Task NoOpAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        return Task.CompletedTask;
+    }
 
-        public override Task<string> SendAsync(FormatOptions options, MimeMessage message,
-            CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
-        {
-            throw new NotImplementedException(); 
-        }
+    public override Task<string> SendAsync(FormatOptions options, MimeMessage message,
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+    {
+        throw new NotImplementedException(); 
+    }
 
-        public override Task<string> SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-            CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
-        {
-            throw new NotImplementedException();
-        }
+    public override Task<string> SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+    {
+        throw new NotImplementedException();
+    }
 
-        protected override void OnNoRecipientsAccepted(MimeMessage message)
-        {
-            base.OnNoRecipientsAccepted(message);
-        }
+    protected override void OnNoRecipientsAccepted(MimeMessage message)
+    {
+        base.OnNoRecipientsAccepted(message);
+    }
 
-        public override void Authenticate(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (AuthenticateException != null) throw AuthenticateException;
-        }
+    public override void Authenticate(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (AuthenticateException != null) throw AuthenticateException;
+    }
 
-        public override void Authenticate(Encoding encoding, ICredentials credentials,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (AuthenticateException != null) throw AuthenticateException; // in use
-        }
+    public override void Authenticate(Encoding encoding, ICredentials credentials,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (AuthenticateException != null) throw AuthenticateException; // in use
+    }
 
-        public override void Connect(string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException; // in use
-        }
+    public override void Connect(string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException; // in use
+    }
 
-        public override void Connect(Socket socket, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException;
-        }
+    public override void Connect(Socket socket, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException;
+    }
 
-        public override void Connect(Stream stream, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
-            CancellationToken cancellationToken = new CancellationToken())
-        {
-            if (ConnectException != null) throw ConnectException;
-        }
+    public override void Connect(Stream stream, string host, int port = 0, SecureSocketOptions options = SecureSocketOptions.Auto,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        if (ConnectException != null) throw ConnectException;
+    }
 
-        public override void Disconnect(bool quit, CancellationToken cancellationToken = new CancellationToken())
-        {
-            return;
-        }
+    public override void Disconnect(bool quit, CancellationToken cancellationToken = new CancellationToken())
+    {
+        return;
+    }
 
-        public override void NoOp(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return;
-        }
+    public override void NoOp(CancellationToken cancellationToken = new CancellationToken())
+    {
+        return;
+    }
 
-        protected override void OnSenderAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-        {
-            base.OnSenderAccepted(message, mailbox, response);
-        }
+    protected override void OnSenderAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
+    {
+        base.OnSenderAccepted(message, mailbox, response);
+    }
 
-        protected override void OnSenderNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-        {
-            base.OnSenderNotAccepted(message, mailbox, response);
-        }
+    protected override void OnSenderNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
+    {
+        base.OnSenderNotAccepted(message, mailbox, response);
+    }
 
-        protected override string GetEnvelopeId(MimeMessage message)
-        {
-            return base.GetEnvelopeId(message);
-        }
+    protected override string GetEnvelopeId(MimeMessage message)
+    {
+        return base.GetEnvelopeId(message);
+    }
 
-        protected override void OnRecipientAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-        {
-            base.OnRecipientAccepted(message, mailbox, response);
-        }
+    protected override void OnRecipientAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
+    {
+        base.OnRecipientAccepted(message, mailbox, response);
+    }
 
-        protected override void OnRecipientNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-        {
-            base.OnRecipientNotAccepted(message, mailbox, response);
-        }
+    protected override void OnRecipientNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
+    {
+        base.OnRecipientNotAccepted(message, mailbox, response);
+    }
 
-        protected override DeliveryStatusNotification? GetDeliveryStatusNotifications(MimeMessage message, MailboxAddress mailbox)
-        {
-            return base.GetDeliveryStatusNotifications(message, mailbox);
-        }
+    protected override DeliveryStatusNotification? GetDeliveryStatusNotifications(MimeMessage message, MailboxAddress mailbox)
+    {
+        return base.GetDeliveryStatusNotifications(message, mailbox);
+    }
 
-        public override string Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-            ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;
-            return string.Empty;
-        }
+    public override string Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;
+        return string.Empty;
+    }
 
-        public override string Send(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-            CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;
-            return string.Empty;
-        }
+    public override string Send(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;
+        return string.Empty;
+    }
 
-        /*
-        public override object SyncRoot { get; }
-        protected override string Protocol { get; }
-        public override HashSet<string> AuthenticationMechanisms { get; }
-        public override int Timeout { get; set; }
-        public override bool IsConnected { get; }
-        public override bool IsSecure { get; }
-        public override bool IsAuthenticated { get; }
-        */
+    /*
+    public override object SyncRoot { get; }
+    protected override string Protocol { get; }
+    public override HashSet<string> AuthenticationMechanisms { get; }
+    public override int Timeout { get; set; }
+    public override bool IsConnected { get; }
+    public override bool IsSecure { get; }
+    public override bool IsAuthenticated { get; }
+    */
 
-        public override string Send(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-            ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;  // in use
-            return string.Empty;
-        }
+    public override string Send(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;  // in use
+        return string.Empty;
+    }
 
-        public override Task<string> SendAsync(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-            ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;
+    public override Task<string> SendAsync(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
+        ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;
 
-            return Task.FromResult(string.Empty);
-        }
+        return Task.FromResult(string.Empty);
+    }
 
-        public override string Send(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-            CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;
-            return string.Empty;
-        }
+    public override string Send(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;
+        return string.Empty;
+    }
 
-        public override Task<string> SendAsync(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-            CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
-        {
-            if (SendException != null) throw SendException;
+    public override Task<string> SendAsync(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+    {
+        if (SendException != null) throw SendException;
 
-            return Task.FromResult(string.Empty);
-        }
+        return Task.FromResult(string.Empty);
+    }
 
-        protected override void OnMessageSent(MessageSentEventArgs e)
-        {
-            base.OnMessageSent(e);
-        }
+    protected override void OnMessageSent(MessageSentEventArgs e)
+    {
+        base.OnMessageSent(e);
+    }
 
-        protected override void OnConnected(string host, int port, SecureSocketOptions options)
-        {
-            base.OnConnected(host, port, options);
-        }
+    protected override void OnConnected(string host, int port, SecureSocketOptions options)
+    {
+        base.OnConnected(host, port, options);
+    }
 
-        protected override void OnDisconnected(string host, int port, SecureSocketOptions options, bool requested)
-        {
-            base.OnDisconnected(host, port, options, requested);
-        }
+    protected override void OnDisconnected(string host, int port, SecureSocketOptions options, bool requested)
+    {
+        base.OnDisconnected(host, port, options, requested);
+    }
 
-        protected override void OnAuthenticated(string message)
-        {
-            base.OnAuthenticated(message);
-        }
+    protected override void OnAuthenticated(string message)
+    {
+        base.OnAuthenticated(message);
     }
 }
