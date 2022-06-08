@@ -44,6 +44,13 @@ internal class Helper
         return 0;
     }
 
+    /// <summary>
+    /// The method will select the first free port after and
+    /// including the given <see paramref="startPort"/>.
+    /// </summary>
+    /// <returns>The first free TCP port found.</returns>
+    /// <exception cref="InvalidCastException">If no free port could be found.</exception>
+
     internal static int GetFreeTcpPort(int startPort = 1) 
     {
         for (var i = startPort; i <= Char.MaxValue; i++)

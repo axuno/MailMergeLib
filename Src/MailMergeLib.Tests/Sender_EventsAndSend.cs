@@ -798,25 +798,11 @@ public class Sender_EventsAndSend
     [OneTimeSetUp]
     public void FixtureSetUp()
     {
-        _server = SimpleSmtpServer.Start(GetFreeTcpPort());
     }
 
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        _server?.Stop();
-    }
-
-    /// <summary>
-    /// Initialize with port zero.
-    /// In this case, the system will select a random free port
-    /// from the dynamic port range.
-    /// We can get the number of this port from the LocalEndpoint property.
-    /// </summary>
-    /// <returns>The first free TCP port found.</returns>
-    private static int GetFreeTcpPort(int startPort = 1)
-    {
-        return Helper.GetFreeTcpPort(startPort);
     }
 
     [SetUp]
@@ -825,7 +811,8 @@ public class Sender_EventsAndSend
         _server?.ClearReceivedEmail();
         _server?.Stop();
 
-        _server = SimpleSmtpServer.Start(GetFreeTcpPort());
+        // Server frequently hangs, if not initialized before each test
+        _server = SimpleSmtpServer.Start(Helper.GetFreeTcpPort());
         _settings = GetSettings();
     }
 
