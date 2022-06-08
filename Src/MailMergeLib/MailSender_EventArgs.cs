@@ -9,14 +9,14 @@ namespace MailMergeLib;
 public class MailSenderAfterSendEventArgs : EventArgs
 {
     public readonly bool Cancelled;
-    public readonly Exception Error;
+    public readonly Exception? Error;
     public readonly SmtpClientConfig SmtpClientConfig;
     public readonly MimeMessage MimeMessage;
     public readonly DateTime StartTime;
     public readonly DateTime EndTime;
 
     internal MailSenderAfterSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mailMergeMessage, DateTime startTime, DateTime endTime,
-        Exception error, bool cancelled)
+        Exception? error, bool cancelled)
     {
         Error = error;
         Cancelled = cancelled;
@@ -33,12 +33,12 @@ public class MailSenderAfterSendEventArgs : EventArgs
 public class MailSenderBeforeSendEventArgs : EventArgs
 {
     public readonly bool Cancelled;
-    public readonly Exception Error;
+    public readonly Exception? Error;
     public readonly SmtpClientConfig SmtpClientConfig;
     public readonly MimeMessage MimeMessage;
     public readonly DateTime StartTime;
 
-    internal MailSenderBeforeSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mimeMessage, DateTime startTime, Exception error,
+    internal MailSenderBeforeSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mimeMessage, DateTime startTime, Exception? error,
         bool cancelled)
     {
         Error = error;
@@ -145,12 +145,12 @@ public class MailMessageFailureEventArgs : EventArgs
     /// <summary>
     /// The data item which was used to build the <see cref="MimeMessage"/>.
     /// </summary>
-    public readonly object DataSource;
+    public readonly object? DataSource;
     /// <summary>
     /// The <see cref="MimeMessage"/> which could be built until any errors occurred.
     /// The delegate may modify the mime message by resolving any errors and return the new <see cref="MimeMessage"/>.
     /// </summary>
-    public MimeMessage MimeMessage;
+    public MimeMessage? MimeMessage;
     /// <summary>
     /// The value returned to the <see cref="MailMergeMessage"/> build process to determine
     /// whether a <see cref="MailMergeLib.MailMergeMessage.MailMergeMessageException"/> should be thrown.
@@ -158,7 +158,7 @@ public class MailMessageFailureEventArgs : EventArgs
     /// </summary>
     public bool ThrowException;
 
-    internal MailMessageFailureEventArgs(Exception error, MailMergeMessage mailMergeMessage, object dataSource, MimeMessage mimeMessage = null, bool throwException = true)
+    internal MailMessageFailureEventArgs(Exception error, MailMergeMessage mailMergeMessage, object? dataSource, MimeMessage? mimeMessage = null, bool throwException = true)
     {
         Error = error;
         MailMergeMessage = mailMergeMessage;

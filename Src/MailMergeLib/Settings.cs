@@ -67,7 +67,7 @@ public class Settings
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public void Serialize(string filename, Encoding encoding = null)
+    public void Serialize(string filename, Encoding? encoding = null)
     {
         using var fs = new FileStream(filename, FileMode.Create);
         using var sr = new StreamWriter(fs, encoding ?? Encoding.UTF8);

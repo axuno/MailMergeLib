@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using MailMergeLib.Templates;
+using MimeKit;
 using NUnit.Framework;
 
 namespace MailMergeLib.Tests;

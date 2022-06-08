@@ -13,7 +13,7 @@ partial class MailMergeMessage
     /// </summary>
     public class AddressException : Exception
     {
-        public AddressException(string message, HashSet<string> badAddress, Exception innerException)
+        public AddressException(string message, HashSet<string> badAddress, Exception? innerException)
             : base(message, innerException)
         {
             BadAddress = badAddress;
@@ -31,7 +31,7 @@ partial class MailMergeMessage
     /// </summary>
     public class AttachmentException : Exception
     {
-        public AttachmentException(string message, HashSet<string> badAttachment, Exception innerException)
+        public AttachmentException(string message, HashSet<string> badAttachment, Exception? innerException)
             : base(message, innerException)
         {
             BadAttachment = badAttachment;
@@ -49,7 +49,7 @@ partial class MailMergeMessage
     /// </summary>
     public class EmtpyContentException : Exception
     {
-        public EmtpyContentException(string message, Exception innerException)
+        public EmtpyContentException(string message, Exception? innerException)
             : base(message, innerException)
         {
         }
@@ -64,15 +64,15 @@ partial class MailMergeMessage
     /// </summary>
     public class MailMergeMessageException : AggregateException
     {
-        public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage mimeMessage)
+        public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage? mimeMessage)
             : base(message, exceptions)
         {
             MimeMessage = mimeMessage;
         }
 
-        public AggregateException Exception { get; }
+        public AggregateException? Exception { get; }
 
-        public MimeMessage MimeMessage { get; }
+        public MimeMessage? MimeMessage { get; }
     }
 
     #endregion
@@ -84,7 +84,7 @@ partial class MailMergeMessage
     /// </summary>
     public class VariableException : Exception
     {
-        public VariableException(string message, HashSet<string> missingVariable, Exception innerException)
+        public VariableException(string message, HashSet<string> missingVariable, Exception? innerException)
             : base(message, innerException)
         {
             MissingVariable = missingVariable;

@@ -23,9 +23,9 @@ public class FakeSmtpClient : SmtpClient
         prop?.SetValue(this, SmtpCapabilities.Authentication);
     }
 
-    public Exception AuthenticateException { get; set; } = null;
-    public Exception ConnectException { get; set; } = null;
-    public Exception SendException { get; set; } = null;
+    public Exception? AuthenticateException { get; set; } = null;
+    public Exception? ConnectException { get; set; } = null;
+    public Exception? SendException { get; set; } = null;
 
     public override Task AuthenticateAsync(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
     {
@@ -77,13 +77,13 @@ public class FakeSmtpClient : SmtpClient
     }
 
     public override Task<string> SendAsync(FormatOptions options, MimeMessage message,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
     {
         throw new NotImplementedException(); 
     }
 
     public override Task<string> SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
     {
         throw new NotImplementedException();
     }
@@ -163,14 +163,14 @@ public class FakeSmtpClient : SmtpClient
     }
 
     public override string Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-        ITransferProgress progress = null)
+        ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;
         return string.Empty;
     }
 
     public override string Send(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;
         return string.Empty;
@@ -187,14 +187,14 @@ public class FakeSmtpClient : SmtpClient
     */
 
     public override string Send(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-        ITransferProgress progress = null)
+        ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;  // in use
         return string.Empty;
     }
 
     public override Task<string> SendAsync(MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
-        ITransferProgress progress = null)
+        ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;
 
@@ -202,14 +202,14 @@ public class FakeSmtpClient : SmtpClient
     }
 
     public override string Send(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;
         return string.Empty;
     }
 
     public override Task<string> SendAsync(MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress progress = null)
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
     {
         if (SendException != null) throw SendException;
 

@@ -74,7 +74,7 @@ public class SmartFormatterConfig
     /// <summary>
     /// Event raising when the <see cref="SmartFormatterConfig"/> configuration has changed.
     /// </summary>
-    public event Action<SmartFormatterConfig> OnConfigChanged;
+    public event Action<SmartFormatterConfig>? OnConfigChanged;
 
     #region *** Equality ***
 

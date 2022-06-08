@@ -110,14 +110,10 @@ class Message_Templates
         });
         Assert.Throws<TemplateException>(() => t.Key = "This-is-definitely-an-illegal-Key-not-existing-in-any-Part");
 
-        Assert.False(t.Equals(null));
-        Assert.True(t.Equals(t));
         Assert.False(t.Equals(new object()));
 
         // Equality with null members
-        t.Name = t.Key = t.DefaultKey = null;
-        Assert.False(t.Equals(null));
-        Assert.True(t.Equals(t));
+        t.Key = t.DefaultKey = null;
         Assert.False(t.Equals(new object()));
     }
 }

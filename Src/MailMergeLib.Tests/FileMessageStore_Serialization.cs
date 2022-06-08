@@ -64,8 +64,6 @@ public class FileMessageStore_Serialization
         Assert.True(fms.Equals(restoredFms));
 
         Assert.AreEqual(fms.GetHashCode(), restoredFms.GetHashCode());
-        Assert.False(fms.Equals(null));
-        Assert.True(fms.Equals(fms));
         Assert.False(fms.Equals(new object()));
     }
 }

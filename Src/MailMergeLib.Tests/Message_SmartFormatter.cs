@@ -58,7 +58,7 @@ public class Message_SmartFormatter
     public void DataTypeTests()
     {
         // ******** Initialize ********
-        string result;
+        string? result;
         string expected;
         object dataItem;
         var culture = CultureInfo.GetCultureInfo("en-US");
@@ -171,7 +171,7 @@ public class Message_SmartFormatter
         catch (MailMergeMessage.MailMergeMessageException ex)
         {
             // will throw because of incomplete mail addresses, but Subject should contain placeholders replaced with content
-            result = ex.MimeMessage.Subject;
+            result = ex.MimeMessage?.Subject;
         }
             
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");

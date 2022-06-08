@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Text;
 using MimeKit;
@@ -121,7 +120,7 @@ public class MessageConfig
     /// </summary>
     [YAXSerializableField]
     [YAXSerializeAs("StandardFromAddress")]
-    private string StandardFromAddressText
+    private string? StandardFromAddressText
     {
         get => StandardFromAddress?.ToString();
         set => StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value) : null;
@@ -130,19 +129,19 @@ public class MessageConfig
     /// <summary>
     /// The standard mailbox address which will be used as one of the "from" addresses.
     /// </summary>
-    public MailboxAddress StandardFromAddress { get; set; }
+    public MailboxAddress? StandardFromAddress { get; set; }
 
     /// <summary>
     /// The organization header of a mail message.
     /// </summary>
     [YAXSerializableField]
-    public string Organization { get; set; }
+    public string? Organization { get; set; }
 
     /// <summary>
     /// Gets or sets the "x-mailer" header value to be used.
     /// </summary>
     [YAXSerializableField]
-    public string Xmailer { get; set; }
+    public string? Xmailer { get; set; }
 
     /// <summary>
     /// SmartFormatter configuration for parsing and formatting errors.
@@ -168,12 +167,12 @@ public class MessageConfig
                SmartFormatterConfig.Equals(other.SmartFormatterConfig);
     }
 
-    private bool Equals(MailboxAddress addr, MailboxAddress otherAddr)
+    private bool Equals(MailboxAddress? addr, MailboxAddress? otherAddr)
     {
         if (addr is null && otherAddr is null) return true;
         if (ReferenceEquals(addr, otherAddr)) return true;
-        if (otherAddr.GetType() != addr?.GetType()) return false;
-        return addr.ToString() == otherAddr.ToString();
+        if (otherAddr?.GetType() != addr?.GetType()) return false;
+        return addr?.ToString() == otherAddr?.ToString();
     }
 
     public override bool Equals(object obj)

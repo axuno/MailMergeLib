@@ -16,10 +16,10 @@ internal class Helper
     /// <returns></returns>
     public static string GetCodeBaseDirectory()
     {
-        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
+        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath)!;
     }
 
-    internal static int Compare(Stream a, Stream b)
+    internal static int Compare(Stream? a, Stream? b)
     {
         if (a == null && b == null) return 0;
 

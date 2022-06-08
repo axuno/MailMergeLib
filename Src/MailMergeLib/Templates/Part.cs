@@ -12,7 +12,7 @@ namespace MailMergeLib.Templates;
 [YAXCustomSerializer(typeof(PartSerializer))]
 public class Part
 {
-    private string _value;
+    private string _value = string.Empty;
 
     /// <summary>
     /// Initialize an instance of a part.
@@ -30,13 +30,13 @@ public class Part
     {
         Type = type;
         Key = key;
-        _value = value ?? string.Empty;
+        _value = value;
     }
 
     /// <summary>
     /// Gets the key of a part.
     /// </summary>
-    public string Key { get; private set; }
+    public string Key { get; private set; } = string.Empty;
 
     /// <summary>
     /// Gets the <see cref="PartType"/> of a part.
@@ -51,7 +51,7 @@ public class Part
     public string Value
     {
         get => _value;
-        private set => _value = value ?? string.Empty;
+        private set => _value = value;
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class Part
     /// </summary>
     /// <param name="obj"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

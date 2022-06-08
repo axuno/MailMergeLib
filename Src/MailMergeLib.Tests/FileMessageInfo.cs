@@ -23,8 +23,8 @@ public class FileMessageInfo
     [Test]
     public void CompareNullFileMessageInfo()
     {
-        var info = new MailMergeLib.MessageStore.FileMessageInfo { Id = 1, Category = null, Comments = null, Description = "No description", Data = "Some data hint", MessageEncoding = null, MessageFile = null };
-        var otherInfo = new MailMergeLib.MessageStore.FileMessageInfo { Id = 1, Category = null, Comments = null, Description = "No description", Data = "Some data hint", MessageEncoding = null, MessageFile = null };
+        var info = new MailMergeLib.MessageStore.FileMessageInfo { Id = 1, Category = null, Comments = null, Description = "No description", Data = "Some data hint", MessageEncoding = null!, MessageFile = null! };
+        var otherInfo = new MailMergeLib.MessageStore.FileMessageInfo { Id = 1, Category = null, Comments = null, Description = "No description", Data = "Some data hint", MessageEncoding = null!, MessageFile = null! };
 
         Assert.AreEqual(info, otherInfo);
         Assert.IsFalse(info.Equals(null));

@@ -58,8 +58,8 @@ namespace MailMergeLib.Tests
             Assert.AreEqual(credentialSet, smtpConfig.NetworkCredential != null);
             if (credentialSet)
             {
-                Assert.AreEqual(username, ((Credential) smtpConfig.NetworkCredential)?.Username);
-                Assert.AreEqual(password, ((Credential) smtpConfig.NetworkCredential)?.Password);
+                Assert.AreEqual(username, ((Credential?) smtpConfig.NetworkCredential)?.Username);
+                Assert.AreEqual(password, ((Credential?) smtpConfig.NetworkCredential)?.Password);
             }
         }
 
@@ -133,7 +133,6 @@ namespace MailMergeLib.Tests
             var sc2 = new SmtpClientConfig();
 
             Assert.IsTrue(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(null));
             Assert.IsFalse(sc1.Equals(new object()));
         }
 
@@ -144,7 +143,6 @@ namespace MailMergeLib.Tests
             var sc2 = new SmtpClientConfig { SmtpPort = 12345 };
 
             Assert.IsFalse(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(null));
             Assert.IsFalse(sc1.Equals(new object()));
         }
     }

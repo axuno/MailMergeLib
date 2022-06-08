@@ -16,7 +16,7 @@ namespace MailMergeLib;
 public class MailMergeSender : IDisposable
 {
     private bool _disposed;
-    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     /// <summary>
     /// CTOR
@@ -25,7 +25,6 @@ public class MailMergeSender : IDisposable
     {
         IsBusy = false;
         GetInitializedSmtpClientDelegate = GetInitializedSmtpClient;
-        RenewCancellationTokenSource();
     }
 
     /// <summary>
@@ -130,7 +129,7 @@ public class MailMergeSender : IDisposable
                     await Task.Delay(smtpConfigForTask[taskNo].DelayBetweenMessages, _cancellationTokenSource.Token).ConfigureAwait(false);
 
                     var localDataItem = dataItem;  // no modified enclosure
-                    MimeMessage mimeMessage = null;
+                    MimeMessage? mimeMessage = null;
                     try
                     {
                         mimeMessage = await Task.Run(() => mailMergeMessage.GetMimeMessage(localDataItem), _cancellationTokenSource.Token).ConfigureAwait(false);
@@ -231,7 +230,7 @@ public class MailMergeSender : IDisposable
             {
                 var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
                 using var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig);
-                MimeMessage mimeMessage = null;
+                MimeMessage? mimeMessage = null;
                 try
                 {
                     mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
@@ -288,7 +287,7 @@ public class MailMergeSender : IDisposable
     internal async Task SendMimeMessageAsync(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
     {
         var startTime = DateTime.Now;
-        Exception sendException;
+        Exception? sendException;
 
         // the client can rely on the sequence of events: OnBeforeSend, OnSendFailure (if any), OnAfterSend
         OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(config, mimeMsg, startTime, null, _cancellationTokenSource.Token.IsCancellationRequested));
@@ -521,7 +520,7 @@ public class MailMergeSender : IDisposable
                 OnMergeProgress?.Invoke(this,
                     new MailSenderMergeProgressEventArgs(startTime, numOfRecords, sentMsgCount, 0));
 
-                MimeMessage mimeMessage = null;
+                MimeMessage? mimeMessage = null;
                 try
                 {
                     mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
@@ -612,7 +611,7 @@ public class MailMergeSender : IDisposable
         {
             var smtpClientConfig = Config.SmtpClientConfig[0]; // use the standard configuration
             using var smtpClient = GetInitializedSmtpClientDelegate(smtpClientConfig);
-            MimeMessage mimeMessage = null;
+            MimeMessage? mimeMessage = null;
             try
             {
                 mimeMessage = mailMergeMessage.GetMimeMessage(dataItem);
@@ -666,7 +665,7 @@ public class MailMergeSender : IDisposable
     internal void SendMimeMessage(SmtpClient smtpClient, MimeMessage mimeMsg, SmtpClientConfig config)
     {
         var startTime = DateTime.Now;
-        Exception sendException;
+        Exception? sendException;
 
         // the client can rely on the sequence of events: OnBeforeSend, OnSendFailure (if any), OnAfterSend
         OnBeforeSend?.Invoke(smtpClient, new MailSenderBeforeSendEventArgs(config, mimeMsg, startTime, null, _cancellationTokenSource.Token.IsCancellationRequested));
@@ -838,52 +837,52 @@ public class MailMergeSender : IDisposable
     /// <summary>
     /// Event raising when getting the merged MimeMessage of the MailMergeMessage has failed.
     /// </summary>
-    public event EventHandler<MailMessageFailureEventArgs> OnMessageFailure;
+    public event EventHandler<MailMessageFailureEventArgs>? OnMessageFailure;
 
     /// <summary>
     /// Event raising before sending a mail message.
     /// </summary>
-    public event EventHandler<MailSenderBeforeSendEventArgs> OnBeforeSend;
+    public event EventHandler<MailSenderBeforeSendEventArgs>? OnBeforeSend;
 
     /// <summary>
     /// Event raising right after the <see cref="SmtpClient"/>'s connection to the server is up (but not yet authenticated).
     /// </summary>
-    public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpConnected;
+    public event EventHandler<MailSenderSmtpClientEventArgs>? OnSmtpConnected;
 
     /// <summary>
     /// Event raising after the <see cref="SmtpClient"/> has authenticated on the server.
     /// </summary>
-    public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpAuthenticated;
+    public event EventHandler<MailSenderSmtpClientEventArgs>? OnSmtpAuthenticated;
 
     /// <summary>
     /// Event raising after the <see cref="SmtpClient"/> has disconnected from the server.
     /// </summary>
-    public event EventHandler<MailSenderSmtpClientEventArgs> OnSmtpDisconnected;
+    public event EventHandler<MailSenderSmtpClientEventArgs>? OnSmtpDisconnected;
 
     /// <summary>
     /// Event raising after sending a mail message.
     /// </summary>
-    public event EventHandler<MailSenderAfterSendEventArgs> OnAfterSend;
+    public event EventHandler<MailSenderAfterSendEventArgs>? OnAfterSend;
 
     /// <summary>
     /// Event raising, if an error occurs when sending a mail message.
     /// </summary>
-    public event EventHandler<MailSenderSendFailureEventArgs> OnSendFailure;
+    public event EventHandler<MailSenderSendFailureEventArgs>? OnSendFailure;
 
     /// <summary>
     /// Event raising before starting with mail merge.
     /// </summary>
-    public event EventHandler<MailSenderMergeBeginEventArgs> OnMergeBegin;
+    public event EventHandler<MailSenderMergeBeginEventArgs>? OnMergeBegin;
 
     /// <summary>
     /// Event raising during mail merge progress, i.e. after each message sent.
     /// </summary>
-    public event EventHandler<MailSenderMergeProgressEventArgs> OnMergeProgress;
+    public event EventHandler<MailSenderMergeProgressEventArgs>? OnMergeProgress;
 
     /// <summary>
     /// Event raising after completing mail merge.
     /// </summary>
-    public event EventHandler<MailSenderMergeCompleteEventArgs> OnMergeComplete;
+    public event EventHandler<MailSenderMergeCompleteEventArgs>? OnMergeComplete;
 
     /// <summary>
     /// The settings for a MailMergeSender.

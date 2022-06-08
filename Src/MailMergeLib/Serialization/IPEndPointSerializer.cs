@@ -9,7 +9,7 @@ namespace MailMergeLib.Serialization;
 /// <summary>
 /// Serializer for <see cref="IPEndPoint"/> objects.
 /// </summary>
-internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
+internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint?>
 {
     public void SerializeToAttribute(IPEndPoint objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
     {
