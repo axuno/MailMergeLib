@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
@@ -19,11 +17,9 @@ namespace MailMergeLib.Tests;
 [TestFixture]
 public class Sender_EventsAndSend
 {
-    private static readonly object _locker = new object();
+    private static readonly object _locker = new();
     private static SimpleSmtpServer? _server;
-    private int? _simpleSmtpServerPort;
-    private readonly Random _rnd = new Random();
-    private Settings _settings = new Settings();
+    private Settings _settings = new();
 
     public Sender_EventsAndSend()
     {
@@ -802,7 +798,7 @@ public class Sender_EventsAndSend
     [OneTimeSetUp]
     public void FixtureSetUp()
     {
-        _server = SimpleSmtpServer.Start(_rnd.Next(50000, 60000));
+        _server = SimpleSmtpServer.Start(GetFreeTcpPort());
     }
 
     [OneTimeTearDown]
@@ -818,13 +814,9 @@ public class Sender_EventsAndSend
     /// We can get the number of this port from the LocalEndpoint property.
     /// </summary>
     /// <returns>The first free TCP port found.</returns>
-    private static int GetFreeTcpPort()
+    private static int GetFreeTcpPort(int startPort = 1)
     {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-        var freePort = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return freePort;
+        return Helper.GetFreeTcpPort(startPort);
     }
 
     [SetUp]
@@ -833,9 +825,7 @@ public class Sender_EventsAndSend
         _server?.ClearReceivedEmail();
         _server?.Stop();
 
-        _simpleSmtpServerPort ??= GetFreeTcpPort();
-
-        _server = SimpleSmtpServer.Start(_simpleSmtpServerPort.Value);
+        _server = SimpleSmtpServer.Start(GetFreeTcpPort());
         _settings = GetSettings();
     }
 
@@ -862,23 +852,23 @@ public class Sender_EventsAndSend
 
                 SmtpClientConfig = new[]
                 {
-                    new SmtpClientConfig()
+                    new SmtpClientConfig
                     {
                         MessageOutput = MessageOutput.SmtpServer,
                         SmtpHost = "localhost",
                         SmtpPort = (int)_server?.Configuration.Port!,
                         NetworkCredential = new Credential("user", "pwd"), // not used for netDumbster
-                        SecureSocketOptions = SecureSocketOptions.None,
+                        SecureSocketOptions = SecureSocketOptions.Auto,
                         Name = "Standard",
                         MaxFailures = 3,
                         DelayBetweenMessages = 0,
                         ClientDomain = "mail.mailmergelib.net"
                     },
-                    new SmtpClientConfig()
+                    new SmtpClientConfig
                     {
                         MessageOutput = MessageOutput.SmtpServer,
                         SmtpHost = "localhost",
-                        SmtpPort = (int)_server.Configuration.Port!,
+                        SmtpPort = _server.Configuration.Port,
                         NetworkCredential = new Credential("user", "pwd"), // not used for netDumbster
                         SecureSocketOptions = SecureSocketOptions.None,
                         Name = "Backup",

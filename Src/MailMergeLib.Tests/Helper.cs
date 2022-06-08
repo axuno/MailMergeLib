@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Reflection;
 
 namespace MailMergeLib.Tests;
@@ -39,5 +42,23 @@ internal class Helper
             if (diff != 0) return diff;
         }
         return 0;
+    }
+
+    internal static int GetFreeTcpPort(int startPort = 1) 
+    {
+        for (var i = startPort; i <= Char.MaxValue; i++)
+        {
+            if (IsFreePort(i)) return i;
+        }
+
+        throw new InvalidOperationException("No free TCP port found");
+    }
+
+    private static bool IsFreePort(int port)
+    {
+        var properties = IPGlobalProperties.GetIPGlobalProperties();
+        var listeners = properties.GetActiveTcpListeners();
+        var openPorts = listeners.Select(item => item.Port).ToArray<int>();
+        return openPorts.All(openPort => openPort != port);
     }
 }

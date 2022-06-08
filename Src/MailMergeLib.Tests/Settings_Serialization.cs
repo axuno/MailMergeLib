@@ -65,7 +65,7 @@ public class Settings_Serialization
                         DelayBetweenMessages = 543,
                         SecureSocketOptions = SecureSocketOptions.StartTlsWhenAvailable,
                         LocalEndPoint = new IPEndPoint(12345, 123),
-                        SslProtocols = SslProtocols.Tls12,
+                        SslProtocols = SslProtocols.None, // allow operating system to choose
                         ClientDomain = "TestDomain",
                         MailOutputDirectory = "Path-to-folder",
                         Timeout = 4321
