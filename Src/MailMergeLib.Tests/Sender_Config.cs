@@ -12,7 +12,6 @@ public class Sender_Config
         var sc2 = new SenderConfig();
 
         Assert.IsTrue(sc1.Equals(sc2));
-        Assert.IsFalse(sc1.Equals(null));
         Assert.IsFalse(sc1.Equals(new object()));
     }
 
@@ -23,7 +22,6 @@ public class Sender_Config
         var sc2 = new SenderConfig {MaxNumOfSmtpClients = 99999 };
 
         Assert.IsFalse(sc1.Equals(sc2));
-        Assert.IsFalse(sc1.Equals(null));
         Assert.IsFalse(sc1.Equals(new object()));
     }
 }

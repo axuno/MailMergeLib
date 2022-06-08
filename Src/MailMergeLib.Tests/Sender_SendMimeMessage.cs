@@ -18,7 +18,7 @@ public class Sender_SendMimeMessage
     {
         var sender = GetMailMergeSender();
         var msg = GetMimeMessage();
-        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential()};
+        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty)};
         sender.Config.SmtpClientConfig[0] = config;
 
         Exception exception;
@@ -55,7 +55,7 @@ public class Sender_SendMimeMessage
     {
         var sender = GetMailMergeSender();
         var msg = GetMimeMessage();
-        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential() };
+        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 
         Exception exception;
@@ -101,7 +101,7 @@ public class Sender_SendMimeMessage
     {
         var sender = GetMailMergeSender();
         var msg = GetMimeMessage();
-        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential() };
+        var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 
         Exception exception;

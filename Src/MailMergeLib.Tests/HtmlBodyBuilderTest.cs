@@ -13,7 +13,7 @@ public class HtmlBodyBuilderTest
     {
         var mmm = new MailMergeMessage("subject", "plain text",
             "<html><head><base href=\"\" /></head><body></body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         Assert.Throws<UriFormatException>(() => hbb.DocBaseUri = baseUri);
     }
 
@@ -26,7 +26,7 @@ public class HtmlBodyBuilderTest
     {
         var mmm = new MailMergeMessage("subject", "plain text",
             "<html><head><base href=\"\" /></head><body></body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         Assert.DoesNotThrow(() => hbb.DocBaseUri = baseUri);
     }
 
@@ -35,7 +35,7 @@ public class HtmlBodyBuilderTest
     {
         var mmm = new MailMergeMessage("subject_to_set", "plain text",
             "<html><head><script>var x='x';</script><script>var y='y';</script></head><body>some body</body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
         Assert.IsTrue(html.ToString().Contains("some body"));
         Assert.IsTrue(!html.ToString().Contains("script"));
@@ -47,7 +47,7 @@ public class HtmlBodyBuilderTest
         var subjectToSet = "subject_to_set";
         var mmm = new MailMergeMessage(subjectToSet, "plain text",
             "<html><head><title>abc</title></head><body></body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
         Assert.IsTrue(html.ToString().Contains(subjectToSet));
     }
@@ -57,7 +57,7 @@ public class HtmlBodyBuilderTest
     {
         var subjectToSet = "subject_to_set";
         var mmm = new MailMergeMessage(subjectToSet, "plain text", "<html><head></head><body></body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
         Assert.IsTrue(!html.ToString().Contains(subjectToSet));
     }
@@ -69,7 +69,7 @@ public class HtmlBodyBuilderTest
         var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
         var mmm = new MailMergeMessage("", "plain text",
             $"<html><body>{imageTag}</body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
         Assert.That(html.ToString(), Does.Contain(imageTag));
     }
@@ -85,7 +85,7 @@ public class HtmlBodyBuilderTest
         var imageTag = $"<img width=\"10\" height=\"10\" alt=\"1Pixel\" src=\"{image}\">";
         var mmm = new MailMergeMessage("", "plain text",
             $"<html><body>{imageTag}</body></html>");
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         Assert.That(code: () => hbb.GetBodyPart(), Throws.Nothing);
     }
 }
