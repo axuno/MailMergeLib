@@ -22,8 +22,8 @@ internal class HtmlBodyBuilder : BodyBuilderBase
 {
     private readonly MailMergeMessage _mailMergeMessage;
     private readonly IHtmlDocument _htmlDocument;
-    private Uri _docBaseUri;
-    private readonly object _dataItem;
+    private Uri _docBaseUri = new(string.Concat(UriScheme.File, UriScheme.SchemeDelimiter));
+    private readonly object? _dataItem;
     private readonly string _defaultDocBaseUri = new Uri(string.Concat(UriScheme.File, UriScheme.SchemeDelimiter)).ToString();
 
     /// <summary>
@@ -31,7 +31,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     /// </summary>
     /// <param name="mailMergeMessage">The parent MailMergeMessage, where HtmlBodyBuilder processes HtmlText and Subject properties.</param>
     /// <param name="dataItem"></param>
-    public HtmlBodyBuilder(MailMergeMessage mailMergeMessage, object dataItem)
+    public HtmlBodyBuilder(MailMergeMessage mailMergeMessage, object? dataItem)
     {
         DocBaseUri = mailMergeMessage.Config.FileBaseDirectory;
         _mailMergeMessage = mailMergeMessage;
@@ -70,7 +70,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
         // set the HTML title tag from email subject
         if (_htmlDocument.All.FirstOrDefault(m => m is IHtmlTitleElement) is IHtmlTitleElement titleEle)
         {
-            titleEle.Text = _mailMergeMessage.SearchAndReplaceVars(_mailMergeMessage.Subject, _dataItem);
+            titleEle.Text = _mailMergeMessage.SearchAndReplaceVars(_mailMergeMessage.Subject, _dataItem) ?? string.Empty;
         }
 
         // read the <base href="..."> tag in order to find the embedded image files later on
@@ -91,7 +91,9 @@ internal class HtmlBodyBuilder : BodyBuilderBase
 
         // replace placeholders only in the HTML Body, because e.g. 
         // in the header there may be CSS definitions with curly brace which collide with SmartFormat {placeholders}
-        _htmlDocument.Body.InnerHtml = _mailMergeMessage.SearchAndReplaceVars(_htmlDocument.Body.InnerHtml, _dataItem);
+        if (_htmlDocument.Body != null)
+            _htmlDocument.Body.InnerHtml =
+                _mailMergeMessage.SearchAndReplaceVars(_htmlDocument.Body.InnerHtml, _dataItem) ?? string.Empty;
 
         var htmlTextPart = new TextPart("html")
         {
@@ -195,7 +197,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
             }
 
             // replace any placeholders with variables
-            srcAttrValue = _mailMergeMessage.SearchAndReplaceVars(srcAttrValue, _dataItem);
+            srcAttrValue = _mailMergeMessage.SearchAndReplaceVars(srcAttrValue, _dataItem) ?? string.Empty;
 
             // Note: if srcAttrValue is a rooted path, _docBaseUrl will be ignored
             var srcUri = new Uri(_docBaseUri, srcAttrValue);
@@ -212,25 +214,29 @@ internal class HtmlBodyBuilder : BodyBuilderBase
             var filename = _mailMergeMessage.SearchAndReplaceVarsInFilename(srcUri.LocalPath, _dataItem);
             try
             {
-                if (!fileList.ContainsKey(filename))
+                if (filename != null)
                 {
-                    var fileInfo = new FileInfo(filename);
-                    var contentType = MimeTypes.GetMimeType(filename);
-                    var cid = MimeUtils.GenerateMessageId();
-                    InlineAtt.Add(new FileAttachment(fileInfo.FullName, MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
-                    srcAttr.Value = MakeCid("cid:", cid, fileInfo.Extension);
-                    fileList.Add(fileInfo.FullName, cid);
-                }
-                else
-                {
-                    var cidForExistingFile = fileList[filename];
-                    var fileInfo = new FileInfo(filename);
-                    srcAttr.Value = MakeCid("cid:", cidForExistingFile, fileInfo.Extension);
+                    if (!fileList.ContainsKey(filename))
+                    {
+                        var fileInfo = new FileInfo(filename);
+                        var contentType = MimeTypes.GetMimeType(filename);
+                        var cid = MimeUtils.GenerateMessageId();
+                        InlineAtt.Add(new FileAttachment(fileInfo.FullName,
+                            MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
+                        srcAttr.Value = MakeCid("cid:", cid, fileInfo.Extension);
+                        fileList.Add(fileInfo.FullName, cid);
+                    }
+                    else
+                    {
+                        var cidForExistingFile = fileList[filename];
+                        var fileInfo = new FileInfo(filename);
+                        srcAttr.Value = MakeCid("cid:", cidForExistingFile, fileInfo.Extension);
+                    }
                 }
             }
             catch
             {
-                BadInlineFiles.Add(filename);
+                BadInlineFiles.Add(filename ?? "(null)");
                 continue;
             }
         }

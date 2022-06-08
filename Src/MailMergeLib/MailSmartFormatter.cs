@@ -1,7 +1,6 @@
 ﻿using SmartFormat;
 using SmartFormat.Core.Extensions;
 using SmartFormat.Extensions;
-using SmartFormatMail = SmartFormat;
 
 namespace MailMergeLib;
 
@@ -56,15 +55,13 @@ public class MailSmartFormatter : SmartFormatter
     /// <param name="config"></param>
     internal MailSmartFormatter(SmartFormatterConfig config) : this()
     {
-        if (config == null) return;
-            
         SetConfig(config);
     }
 
     /// <summary>
     /// Gets or sets the <see cref="TemplateFormatter"/> where the templates can be registered later on.
     /// </summary>
-    internal TemplateFormatter Templates { get; set; }
+    internal TemplateFormatter? Templates { get; set; }
 
     internal void SetConfig(SmartFormatterConfig sfConfig)
     {

@@ -126,8 +126,7 @@ public class Message_Html
         Assert.IsTrue(mmm.StreamAttachments.Count == 1);
         mmm.StreamAttachments.Clear();
         Assert.IsTrue(mmm.StreamAttachments.Count == 0);
-        mmm.StreamAttachments = null;
-        Assert.IsTrue(mmm.StreamAttachments != null && mmm.StreamAttachments.Count == 0);
+
         mmm.StreamAttachments = streamAttachments;
         Assert.IsTrue(mmm.StreamAttachments.Count == 2);
     }
@@ -291,7 +290,7 @@ public class Message_Html
     [TestCase("{Name} {SenderAddr}", "John test@specimen.com")]
     [TestCase("{Name {SenderAddr}", "{Name {SenderAddr}")] // parsing error
     [TestCase("{NotExisting}", "{NotExisting}")] // formatting error
-    [TestCase(null, null)]
+    [TestCase("", "")]
     public void SearchAndReplace(string text, string expected)
     {
         var dataItem = new
@@ -310,7 +309,7 @@ public class Message_Html
     [TestCase("{Name} {SenderAddr}", "John test@specimen.com")]
     [TestCase("{Name {SenderAddr}", "{Name {SenderAddr}")] // parsing error
     [TestCase("{NotExisting}", "{NotExisting}")] // formatting error
-    [TestCase(null, null)]
+    [TestCase("", "")]
     public void SearchAndReplaceFilename(string text, string expected)
     {
         var dataItem = new

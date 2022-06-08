@@ -9,7 +9,10 @@ public class StringAttachment
     /// Creates a new string attachment for a <see cref="MailMergeMessage"/>
     /// </summary>
     public StringAttachment()
-    {}
+    {
+        DisplayName = Content = string.Empty;
+        MimeType = MimeKit.MimeTypes.GetMimeType( "application/octet-stream");
+    }
 
     /// <summary>
     /// Creates a new string attachment for a <see cref="MailMergeMessage"/>

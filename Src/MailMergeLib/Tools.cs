@@ -43,10 +43,10 @@ public static class Tools
     /// <returns>
     /// A rooted path.
     /// </returns>
-    public static string MakeFullPath(string basename, string filename)
+    public static string MakeFullPath(string basename, string? filename)
     {
         basename = basename.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-        filename = filename.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        filename = filename?.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
         if (! string.IsNullOrEmpty(filename))
         {
@@ -55,7 +55,7 @@ public static class Tools
                 filename = Path.GetFullPath(Path.Combine(basename, filename));
             }
         }
-        return filename;
+        return filename ?? basename;
     }
 
     /// <summary>

@@ -16,7 +16,7 @@
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
 https://github.com/axuno/MailMergeLib/blob/main/ReleaseNotes.md</PackageReleaseNotes>
-        <Nullable>disable</Nullable>
+        <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <PackageTags>smtp mime mail email merge template netcore netstandard netframework c#</PackageTags>
         <RepositoryType>Git</RepositoryType>

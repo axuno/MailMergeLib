@@ -54,9 +54,12 @@ public enum MailAddressType
 public class MailMergeAddressCollection : Collection<MailMergeAddress>
 {
     /// <summary>
-    /// Property <c>MailMergeMessage</c> must be set after creating the instance!
+    /// Property <c>MailMergeMessage</c> will be initialized as 'empty'.
     /// </summary>
-    internal MailMergeAddressCollection() {}
+    internal MailMergeAddressCollection()
+    {
+        MailMergeMessage = new();
+    }
 
     /// <summary>
     /// Constructor.
@@ -116,7 +119,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// <returns>The string representation of the collection of mailbox addresses</returns>
     public string ToString(MailAddressType addrType, object dataItem)
     {
-        return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(MailMergeMessage, dataItem).ToString()));
+        return string.Join(", ", Get(addrType).Select(at => at?.GetMailAddress(MailMergeMessage, dataItem)?.ToString()));
     }
 
     #region *** Equality ***

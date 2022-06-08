@@ -21,21 +21,21 @@ public class MessageInfo : IMessageInfo
     /// </summary>
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string Category { get; set; }
+    public string? Category { get; set; }
 
     /// <summary>
     /// Description for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Comments for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string Comments { get; set; }
+    public string? Comments { get; set; }
 
     /// <summary>
     /// Data hint for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
@@ -43,7 +43,7 @@ public class MessageInfo : IMessageInfo
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
-    public string Data { get; set; }
+    public string? Data { get; set; }
 
     #region *** Equality ***
 

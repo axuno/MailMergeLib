@@ -1,5 +1,4 @@
 using System.IO;
-using System.Text;
 using System.Xml;
 
 namespace MailMergeLib.MessageStore;
@@ -19,29 +18,29 @@ public abstract class MessageInfoBase : IMessageInfo
     /// <summary>
     /// The category of the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    public string Category { get; set; }
+    public string? Category { get; set; }
 
     /// <summary>
     /// Description for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Comments for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    public string Comments { get; set; }
+    public string? Comments { get; set; }
 
     /// <summary>
     /// Data hint for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    public string Data { get; set; }
+    public string? Data { get; set; }
 
     /// <summary>
     /// Determines whether the specified <see cref="MessageInfoBase"/> is equal to the current.
     /// </summary>
     /// <param name="other"></param>
     /// <returns>bool</returns>
-    public bool Equals(IMessageInfo other)
+    public bool Equals(IMessageInfo? other)
     {
         if (other == null) return false;
         return Id == other.Id && Category == other.Category && Description == other.Description && Comments == other.Comments && Data == other.Data;
@@ -127,7 +126,7 @@ public abstract class MessageInfoBase : IMessageInfo
     private static IMessageInfo ReadInfo(XmlReader xmlReader)
     {
         // ReSharper disable once InconsistentNaming
-        MessageInfo Info = null;
+        MessageInfo? Info = null;
         while (xmlReader.ReadToFollowing(nameof(Info)) && xmlReader.Depth == 1)
         {
             if (Info != null)
