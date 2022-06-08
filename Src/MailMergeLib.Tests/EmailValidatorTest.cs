@@ -171,6 +171,6 @@ public class EmailValidatorTest
     [Test]
     public void TestThrowsExceptionIfNull()
     {
-        Assert.Throws<ArgumentNullException>(() => EmailValidator.Validate(null, true, true), "Null Address");
+        Assert.Throws<ArgumentNullException>(() => EmailValidator.Validate(null!, true, true), "Null Address");
     }
 }

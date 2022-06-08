@@ -69,7 +69,7 @@ public class Message_Config
     [TestCase("noFullPath", null)]
     [TestCase("..\\..\\relativePath", null, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
     [TestCase("../../relativePath", null, IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
-    public void HtmlBodyBuilderDocBaseUri_vs_MessageConfig_FileBaseDirectory(string path, string expected)
+    public void HtmlBodyBuilderDocBaseUri_vs_MessageConfig_FileBaseDirectory(string path, string? expected)
     {
         var mmm = new MailMergeMessage("subject", "plain text", "<html><body></body></html>");
         mmm.Config.FileBaseDirectory = path;
@@ -77,11 +77,11 @@ public class Message_Config
         HtmlBodyBuilder hbb;
         if (expected == null)
         {
-            Assert.Throws<UriFormatException>(() => { hbb = new HtmlBodyBuilder(mmm, (object) null); });
+            Assert.Throws<UriFormatException>(() => { hbb = new HtmlBodyBuilder(mmm, null); });
         }
         else
         {
-            hbb = new HtmlBodyBuilder(mmm, (object) null);
+            hbb = new HtmlBodyBuilder(mmm, null);
             Assert.AreEqual(expected, hbb.DocBaseUri);
         }
     }
@@ -93,7 +93,7 @@ public class Message_Config
             "<html><head><base href=\"\" /></head><body></body></html>");
         mmm.Config.FileBaseDirectory = Path.GetTempPath();
 
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         Assert.AreEqual( new Uri(mmm.Config.FileBaseDirectory), hbb.DocBaseUri);
     }
 
@@ -105,7 +105,7 @@ public class Message_Config
             $"<html><head><base href=\"{baseTagHref}\" /></head><body></body></html>");
         mmm.Config.FileBaseDirectory = string.Empty;
 
-        var hbb = new HtmlBodyBuilder(mmm, (object) null);
+        var hbb = new HtmlBodyBuilder(mmm, null);
         hbb.GetBodyPart();
         Assert.AreEqual(baseTagHref, hbb.DocBaseUri);
     }

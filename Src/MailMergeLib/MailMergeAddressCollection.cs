@@ -117,7 +117,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// <param name="addrType"></param>
     /// <param name="dataItem"></param>
     /// <returns>The string representation of the collection of mailbox addresses</returns>
-    public string ToString(MailAddressType addrType, object dataItem)
+    public string ToString(MailAddressType addrType, object? dataItem)
     {
         return string.Join(", ", Get(addrType).Select(at => at?.GetMailAddress(MailMergeMessage, dataItem)?.ToString()));
     }

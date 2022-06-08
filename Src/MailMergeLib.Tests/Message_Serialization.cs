@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using MailMergeLib.Templates;
+using MimeKit;
 using NUnit.Framework;
 
 namespace MailMergeLib.Tests;
@@ -106,9 +108,9 @@ public class Message_Serialization
     public void StringAsCdataSerialilzer()
     {
         var cdata = new MailMergeLib.Serialization.StringAsCdataSerializer();
-        Assert.Throws<NotImplementedException>(() => { cdata.SerializeToAttribute(string.Empty, null); });
+        Assert.Throws<NotImplementedException>(() => { cdata.SerializeToAttribute(string.Empty, new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { cdata.SerializeToValue(string.Empty); });
-        Assert.Throws<NotImplementedException>(() => { cdata.DeserializeFromAttribute(null); });
+        Assert.Throws<NotImplementedException>(() => { cdata.DeserializeFromAttribute(new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { cdata.DeserializeFromValue(string.Empty); });
     }
 
@@ -116,9 +118,9 @@ public class Message_Serialization
     public void IPEndPointSerializer()
     {
         var eps = new MailMergeLib.Serialization.IPEndPointSerializer();
-        Assert.Throws<NotImplementedException>(() => { eps.SerializeToAttribute(null, null); });
+        Assert.Throws<NotImplementedException>(() => { eps.SerializeToAttribute(null, new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { eps.SerializeToValue(null); });
-        Assert.Throws<NotImplementedException>(() => { eps.DeserializeFromAttribute(null); });
+        Assert.Throws<NotImplementedException>(() => { eps.DeserializeFromAttribute(new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { eps.DeserializeFromValue(string.Empty); });
     }
 
@@ -126,9 +128,9 @@ public class Message_Serialization
     public void HeaderListSerializer()
     {
         var hl = new MailMergeLib.Serialization.HeaderListSerializer();
-        Assert.Throws<NotImplementedException>(() => { hl.SerializeToAttribute(null, null); });
-        Assert.Throws<NotImplementedException>(() => { hl.SerializeToValue(null); });
-        Assert.Throws<NotImplementedException>(() => { hl.DeserializeFromAttribute(null); });
+        Assert.Throws<NotImplementedException>(() => { hl.SerializeToAttribute(new HeaderList(), new XAttribute("n", "v")); });
+        Assert.Throws<NotImplementedException>(() => { hl.SerializeToValue(new HeaderList()); });
+        Assert.Throws<NotImplementedException>(() => { hl.DeserializeFromAttribute(new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { hl.DeserializeFromValue(string.Empty); });
     }
 
@@ -136,9 +138,9 @@ public class Message_Serialization
     public void PartSerializer()
     {
         var part = new MailMergeLib.Serialization.PartSerializer();
-        Assert.Throws<NotImplementedException>(() => { part.SerializeToAttribute(null, null); });
-        Assert.Throws<NotImplementedException>(() => { part.SerializeToValue(null); });
-        Assert.Throws<NotImplementedException>(() => { part.DeserializeFromAttribute(null); });
+        Assert.Throws<NotImplementedException>(() => { part.SerializeToAttribute(new Part(), new XAttribute("n", "v")); });
+        Assert.Throws<NotImplementedException>(() => { part.SerializeToValue(new Part()); });
+        Assert.Throws<NotImplementedException>(() => { part.DeserializeFromAttribute(new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { part.DeserializeFromValue(string.Empty); });
     }
 
@@ -146,9 +148,9 @@ public class Message_Serialization
     public void MailMergeAddressesSerializer()
     {
         var mmAddr = new MailMergeLib.Serialization.MailMergeAddressesSerializer();
-        Assert.Throws<NotImplementedException>(() => { mmAddr.SerializeToAttribute(null, null); });
-        Assert.Throws<NotImplementedException>(() => { mmAddr.SerializeToValue(null); });
-        Assert.Throws<NotImplementedException>(() => { mmAddr.DeserializeFromAttribute(null); });
+        Assert.Throws<NotImplementedException>(() => { mmAddr.SerializeToAttribute(new MailMergeAddressCollection(), new XAttribute("n", "v")); });
+        Assert.Throws<NotImplementedException>(() => { mmAddr.SerializeToValue(new MailMergeAddressCollection()); });
+        Assert.Throws<NotImplementedException>(() => { mmAddr.DeserializeFromAttribute(new XAttribute("n", "v")); });
         Assert.Throws<NotImplementedException>(() => { mmAddr.DeserializeFromValue(string.Empty); });
     }
 }

@@ -35,7 +35,6 @@ public class Message_Equality
 
         addrColl2.Add(_addr3);
         Assert.False(addrColl1.Equals(addrColl2));
-        Assert.False(addrColl1.Equals(null));
     }
 
     [TestCase(MailAddressType.To)]
@@ -128,7 +127,6 @@ public class Message_Equality
         mmm3.MailMergeAddresses.RemoveAt(0);
         Assert.IsFalse(mmm1.Equals(mmm3));
 
-        Assert.IsFalse(mmm1.Equals(default(object)));
         Assert.IsTrue(mmm1.Equals(mmm1));
         Assert.IsFalse(mmm1.Equals(new object()));
     }

@@ -250,7 +250,7 @@ public static class Tools
     /// <remarks>
     /// The ContentIds and Boundaries of a MimeMessage will change each time the message is written, so the size may differ for a few bytes.
     /// </remarks>
-    public static long CalcMessageSize(MimeMessage msg)
+    public static long CalcMessageSize(MimeMessage? msg)
     {
         return msg?.ToString().Length ?? 0;
     }
@@ -264,7 +264,7 @@ public static class Tools
     /// </remarks>
     /// <param name="encoding"></param>
     /// <returns></returns>
-    internal static string GetMimeCharset(Encoding encoding)
+    internal static string GetMimeCharset(Encoding? encoding)
     {
         // This method is part of CharsetUtils.cs of MimeKit
         // Author: Jeffrey Stedfast <jeff@xamarin.com>

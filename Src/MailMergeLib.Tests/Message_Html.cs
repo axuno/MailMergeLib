@@ -153,7 +153,7 @@ public class Message_Html
         mmm.StreamAttachments.Clear();
         mmm.StringAttachments.Clear();
 
-        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text ?? string.Empty));
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(text));
         mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
 
         var msg = mmm.GetMimeMessage(dataItem);
