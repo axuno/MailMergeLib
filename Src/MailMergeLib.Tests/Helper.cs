@@ -52,7 +52,7 @@ internal class Helper
     /// <returns>The first free TCP port found.</returns>
     /// <exception cref="InvalidCastException">If no free port could be found.</exception>
 
-    internal static int GetFreeTcpPort(int startPort = 1) 
+    internal static int GetFreeTcpPort(int startPort = 2000) 
     {
         for (var i = startPort; i <= 0xFFFF; i++)
         {
@@ -78,9 +78,9 @@ internal class Helper
             using var listener = new Socket(IPAddress.Any.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(localEndPoint);
         }
-        catch (Exception e)
+        catch
         {
-            Console.WriteLine($"Error binding port {port}: {e.Message}");
+            // e.g. because of "Permission denied" or other reason
             return false;
         }
 
