@@ -35,12 +35,18 @@ public static class Crypto
             return s;
         
         var buffer = Encoding.GetBytes(s);
+#pragma warning disable CA5350
         using var des = TripleDES.Create();
+#pragma warning restore CA5350
+#pragma warning disable CA5351
         using var md5 = MD5.Create();
+#pragma warning restore CA5351
         des.Key = md5.ComputeHash(Encoding.GetBytes(CryptoKey));
         des.IV = IV;
 
+#pragma warning disable CA5401
         return Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buffer, 0, buffer.Length));
+#pragma warning restore CA5401
     }
 
     /// <summary>
@@ -55,8 +61,12 @@ public static class Crypto
 
         var buffer = Convert.FromBase64String(s);
 
+#pragma warning disable CA5350
         using var des = TripleDES.Create();
+#pragma warning restore CA5350
+#pragma warning disable CA5351
         using var md5 = MD5.Create();
+#pragma warning restore CA5351
         des.Key = md5.ComputeHash(Encoding.GetBytes(CryptoKey));
         des.IV = IV;
 

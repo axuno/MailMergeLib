@@ -27,7 +27,7 @@ public class MailSmartFormatter : SmartFormatter
             (ISource)listFormatter, // ListFormatter MUST be first
             new DictionarySource(this),
             new ValueTupleSource(this),
-            new SmartObjectsSource(this),
+            new ValueTupleSource(this),
             new JsonSource(this),
             //new XmlSource(this),
             new ReflectionSource(this),
