@@ -42,7 +42,7 @@ public class MessageInfo : IMessageInfo
     /// </summary>
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
+    [YAXTextEmbedding(TextEmbedding.CData)]
     public string Data { get; set; }
 
     #region *** Equality ***

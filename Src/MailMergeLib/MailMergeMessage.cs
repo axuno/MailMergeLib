@@ -193,7 +193,7 @@ public partial class MailMergeMessage : IDisposable
     /// Gets or sets the mail message plain text content.
     /// </summary>
     [YAXSerializableField]
-    [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
+    [YAXTextEmbedding(TextEmbedding.CData)]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public string PlainText { get => _plainText; set => _plainText = value ?? string.Empty; }
 
@@ -201,7 +201,7 @@ public partial class MailMergeMessage : IDisposable
     /// Gets or sets the mail message HTML content.
     /// </summary>
     [YAXSerializableField]
-    [YAXCustomSerializer(typeof(StringAsCdataSerializer))]
+    [YAXTextEmbedding(TextEmbedding.CData)]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public string HtmlText { get => _htmlText; set => _htmlText = value ?? string.Empty; }
 

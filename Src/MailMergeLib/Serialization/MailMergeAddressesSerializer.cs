@@ -2,17 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using YAXLib;
+using YAXLib.Customization;
 
 namespace MailMergeLib.Serialization;
 
 internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddressCollection>
 {
-    public void SerializeToAttribute(MailMergeAddressCollection objectToSerialize, XAttribute attrToFill)
+    public void SerializeToAttribute(MailMergeAddressCollection objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public void SerializeToElement(MailMergeAddressCollection objectToSerialize, XElement elemToFill)
+    public void SerializeToElement(MailMergeAddressCollection objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
         var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeAddress));
         foreach (var addr in objectToSerialize)
@@ -21,17 +22,17 @@ internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddress
         }
     }
 
-    public string SerializeToValue(MailMergeAddressCollection objectToSerialize)
+    public string SerializeToValue(MailMergeAddressCollection objectToSerialize, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public MailMergeAddressCollection DeserializeFromAttribute(XAttribute attrib)
+    public MailMergeAddressCollection DeserializeFromAttribute(XAttribute attrib, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public MailMergeAddressCollection DeserializeFromElement(XElement element)
+    public MailMergeAddressCollection DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
         var addrColl = new MailMergeAddressCollection();
         var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeAddressCollection));
@@ -44,7 +45,7 @@ internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddress
         return addrColl;
     }
 
-    public MailMergeAddressCollection DeserializeFromValue(string value)
+    public MailMergeAddressCollection DeserializeFromValue(string value, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }

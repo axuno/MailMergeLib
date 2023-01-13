@@ -16,7 +16,7 @@ internal class Helper
     /// <returns></returns>
     public static string GetCodeBaseDirectory()
     {
-        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
     }
 
     internal static int Compare(Stream a, Stream b)
