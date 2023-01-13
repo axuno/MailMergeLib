@@ -308,7 +308,7 @@ public class Sender_EventsAndSend
             sequenceOfExpectedEvents.Clear();
             sequenceOfExpectedEvents.AddRange(new[]
             {
-                nameof(mms.OnBeforeSend), nameof(mms.OnSmtpConnected),
+                nameof(mms.OnBeforeSend), nameof(mms.OnSmtpConnected), nameof(mms.OnSmtpAuthenticated),
                 nameof(mms.OnAfterSend), nameof(mms.OnSmtpDisconnected)
             });
         }
@@ -449,7 +449,7 @@ public class Sender_EventsAndSend
             sequenceOfExpectedEvents.AddRange(new[]
             {
                 nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnBeforeSend),
-                nameof(mms.OnSmtpConnected),
+                nameof(mms.OnSmtpConnected), nameof(mms.OnSmtpAuthenticated),
                 nameof(mms.OnAfterSend), nameof(mms.OnMergeProgress), nameof(mms.OnSmtpDisconnected),
                 nameof(mms.OnMergeComplete)
             });

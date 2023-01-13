@@ -64,7 +64,7 @@ public class Settings_Serialization
                         DelayBetweenMessages = 543,
                         SecureSocketOptions = SecureSocketOptions.StartTlsWhenAvailable,
                         LocalEndPoint = new IPEndPoint(12345, 123),
-                        SslProtocols = SslProtocols.Tls12,
+                        SslProtocols = SslProtocols.None,
                         ClientDomain = "TestDomain",
                         MailOutputDirectory = "Path-to-folder",
                         Timeout = 4321
@@ -164,8 +164,8 @@ public class Settings_Serialization
         {
             // An exception is thrown because username / password are saved as plain text,
             // while with encryption enabled, both should be encrypted.
-            Assert.Throws<YAXLib.Exceptions.YAXPropertyCannotBeAssignedTo>(() =>
-                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null));
+            Assert.That(() =>
+                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null), Throws.Exception.InstanceOf<YAXLib.Exceptions.YAXBadlyFormedInput>());
         }
     }
 }

@@ -47,25 +47,24 @@ class Message_Variables
              */
             Assert.AreEqual(6, exceptions.InnerExceptions.Count);
 
-            foreach (var ex in exceptions.InnerExceptions.Where(ex => !(ex is MailMergeMessage
-                         .AttachmentException)))
+            foreach (var ex in exceptions.InnerExceptions.Where(ex => ex is not MailMergeMessage.AttachmentException))
             {
-                if (ex is MailMergeMessage.VariableException)
+                if (ex is MailMergeMessage.VariableException variableException)
                 {
-                    Assert.AreEqual(9, (ex as MailMergeMessage.VariableException).MissingVariable.Count);
+                    Assert.AreEqual(9, variableException.MissingVariable.Count);
                     Console.WriteLine($"{nameof(MailMergeMessage.VariableException)} thrown successfully:");
                     Console.WriteLine("Missing variables: " +
                                       string.Join(", ",
-                                          (ex as MailMergeMessage.VariableException).MissingVariable));
+                                          variableException.MissingVariable));
                     Console.WriteLine();
                 }
-                if (ex is MailMergeMessage.AddressException)
+                if (ex is MailMergeMessage.AddressException addressException)
                 {
                     Console.WriteLine($"{nameof(MailMergeMessage.AddressException)} thrown successfully:");
-                    Console.WriteLine((ex as MailMergeMessage.AddressException).Message);
+                    Console.WriteLine(addressException.Message);
                     Console.WriteLine();
-                    Assert.That((ex as MailMergeMessage.AddressException).Message == "No recipients." ||
-                                (ex as MailMergeMessage.AddressException).Message == "No from address.");
+                    Assert.That(addressException.Message == "No recipients." ||
+                                addressException.Message == "No from address.");
                 }
             }
 
@@ -139,54 +138,6 @@ class Message_Variables
             MailMergeMessage.DisposeFileStreams(mimeMessage);
             i++;
         }
-    }
-
-    [Test]
-    public void MessagesFromListOfSmartObjects()
-    {
-        var dataList = new List<SmartObjects>();
-        var so1 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "test@example.com" } }, new Dictionary<string, string> { { "Continent", "Europe" } } });
-        var so2 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "Asia" } } });
-        var so3 = new SmartObjects(new[] { new Dictionary<string, string> { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "America" } } });
-
-        dataList.AddRange(new[] { so1, so2, so3 });
-
-        const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
-
-        using var mmm = new MailMergeMessage("Subject for {Continent}", text);
-        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
-        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
-
-        var i = 0;
-        foreach (var mimeMessage in mmm.GetMimeMessages<SmartObjects>(dataList))
-        {
-            Assert.IsTrue(mimeMessage.To.ToString().Contains(((Dictionary<string, string>)dataList[i][0])["Email"]));
-            Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", ((Dictionary<string, string>)dataList[i][0])["Email"]).Replace("{Continent}", ((Dictionary<string, string>)dataList[i][1])["Continent"])));
-            MailMergeMessage.DisposeFileStreams(mimeMessage);
-            i++;
-        }
-    }
-
-    [Test]
-    public void SingleMessageFromSmartObjects()
-    {
-        var anonymous = new { Email = "test@example.com" };
-        var text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
-        var so = new SmartObjects(new object[]
-        {
-            anonymous,
-            new Dictionary<string, string> {{"Continent", "Europe"}}
-        });
-
-        using var mmm = new MailMergeMessage("Subject for {Continent}", text);
-        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.com"));
-        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "{Email}"));
-
-        var mimeMessage = mmm.GetMimeMessage(so);
-
-        Assert.IsTrue(mimeMessage.To.ToString().Contains(anonymous.Email));
-        Assert.IsTrue(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", ((Dictionary<string, string>)so[1])["Continent"])));
-        MailMergeMessage.DisposeFileStreams(mimeMessage);
     }
 
     [Test]

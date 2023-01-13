@@ -2,6 +2,7 @@
 using System.Net;
 using System.Xml.Linq;
 using YAXLib;
+using YAXLib.Customization;
 
 namespace MailMergeLib.Serialization;
 
@@ -10,12 +11,12 @@ namespace MailMergeLib.Serialization;
 /// </summary>
 internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
 {
-    public void SerializeToAttribute(IPEndPoint objectToSerialize, XAttribute attrToFill)
+    public void SerializeToAttribute(IPEndPoint objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public void SerializeToElement(IPEndPoint objectToSerialize, XElement elemToFill)
+    public void SerializeToElement(IPEndPoint objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
         if (objectToSerialize == null) return;
 
@@ -23,17 +24,17 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
         elemToFill.SetAttributeValue("Port", objectToSerialize.Port.ToString());
     }
 
-    public string SerializeToValue(IPEndPoint objectToSerialize)
+    public string SerializeToValue(IPEndPoint objectToSerialize, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public IPEndPoint DeserializeFromAttribute(XAttribute attrib)
+    public IPEndPoint DeserializeFromAttribute(XAttribute attrib, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public IPEndPoint DeserializeFromElement(XElement element)
+    public IPEndPoint DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
         if (!element.HasAttributes) return null;
 
@@ -46,7 +47,7 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
         return new IPEndPoint(IPAddress.Parse(addr.Value), int.Parse(port.Value));
     }
 
-    public IPEndPoint DeserializeFromValue(string value)
+    public IPEndPoint DeserializeFromValue(string value, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }

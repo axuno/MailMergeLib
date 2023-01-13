@@ -33,7 +33,7 @@
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
 ### Supported Frameworks
-* .Net Framework 4.6.1 and later
+* .Net Framework 4.6.2 and later
 * .Net Standard 2.1 and later
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)

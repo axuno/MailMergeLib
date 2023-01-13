@@ -1,4 +1,4 @@
-version: 5.8.0.{build} # Only change for mayor versions (e.g. 6.0.0)
+version: 5.9.0.{build} # Only change for mayor versions (e.g. 6.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
@@ -27,7 +27,7 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
       - ps: |
-          $version = "5.8.2"
+          $version = "5.9.0"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -37,7 +37,7 @@ for:
           dotnet pack MailMergeLib.sln --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=$env:APPVEYOR_BUILD_FOLDER/artifacts /p:ContinuousIntegrationBuild=true
     test_script:
       - cmd: nuget install Appveyor.TestLogger
-      - cmd: dotnet test --no-build --framework net6.0 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      - cmd: dotnet test --framework net6.0 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
       - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.net6.0.xml" -n net6.0win
     artifacts:
@@ -62,5 +62,5 @@ for:
       - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
       - dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
-      - dotnet test --no-build --framework net6.0 MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      - dotnet test --framework net6.0 MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.net6.0.xml -n net6.0linux
