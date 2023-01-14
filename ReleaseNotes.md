@@ -1,4 +1,4 @@
-# 5.9.0
+# 5.9.1
 
 #### MailMergLib:
 * **Minimum .Net Framework version is 4.6.2**
@@ -7,6 +7,7 @@
   * MailKit 3.4.3
   * MimeKit 3.4.3
   * YAXLib 4.0.0
+  * SmartFormat.NET >=2.7.3 && < 3.0.0
 #### MailMergLib.Tests
 * Update package references
 
