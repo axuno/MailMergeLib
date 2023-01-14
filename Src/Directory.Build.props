@@ -8,8 +8,8 @@
         <Copyright>Copyright 2011-$(CurrentYear) MailMergeLib Project</Copyright>
         <RepositoryUrl>https://github.com/axuno/MailMergeLib.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>5.9.0</Version>
-        <FileVersion>5.9.0</FileVersion>
+        <Version>5.9.1</Version>
+        <FileVersion>5.9.1</FileVersion>
         <AssemblyVersion>5.9.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
