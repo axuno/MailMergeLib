@@ -13,13 +13,16 @@ partial class MailMergeMessage
     /// </summary>
     public class AddressException : Exception
     {
+        /// <summary>
+        /// CTOR
+        /// </summary>
         public AddressException(string message, HashSet<string> badAddress, Exception? innerException)
             : base(message, innerException)
         {
             BadAddress = badAddress;
         }
 
-        public HashSet<string> BadAddress { get; } = new HashSet<string>();
+        public HashSet<string> BadAddress { get; }
     }
 
     #endregion
@@ -37,7 +40,7 @@ partial class MailMergeMessage
             BadAttachment = badAttachment;
         }
 
-        public HashSet<string> BadAttachment { get; } = new HashSet<string>();
+        public HashSet<string> BadAttachment { get; }
     }
 
     #endregion
@@ -49,6 +52,9 @@ partial class MailMergeMessage
     /// </summary>
     public class EmtpyContentException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public EmtpyContentException(string message, Exception? innerException)
             : base(message, innerException)
         {
@@ -64,6 +70,9 @@ partial class MailMergeMessage
     /// </summary>
     public class MailMergeMessageException : AggregateException
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage? mimeMessage)
             : base(message, exceptions)
         {
@@ -84,6 +93,9 @@ partial class MailMergeMessage
     /// </summary>
     public class VariableException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public VariableException(string message, HashSet<string> missingVariable, Exception? innerException)
             : base(message, innerException)
         {
@@ -102,6 +114,9 @@ partial class MailMergeMessage
     /// </summary>
     public class ParseException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public ParseException(string message, Exception innerException)
             : base(message, innerException)
         { }

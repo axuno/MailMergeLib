@@ -8,7 +8,7 @@ namespace MailMergeLib.Tests;
 [TestFixture]
 public class Message_Config
 {
-    private MessageConfig _msgConfig = new MessageConfig();
+    private MessageConfig _msgConfig = new();
 
     [TestCase(" \t", "")]
     [TestCase(" ", "")]

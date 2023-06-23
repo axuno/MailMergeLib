@@ -37,7 +37,7 @@ class Message_Templates
             .First(t => t.Type == PartType.Plain)
             .Value.Replace("{FirstName}", variables["FirstName"])));
 
-        // Neither DefaultKey nore Key of the template are set: gets the first part
+        // Neither DefaultKey nor Key of the template are set: gets the first part
         mmm.Templates[0].DefaultKey = null;
         mmm.Templates[0].Key = null;
         // Remove so that only max. 2 parts for 1 key are left
@@ -76,23 +76,23 @@ class Message_Templates
     [Test]
     public void FileSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> _);
         var templates = mmm.Templates;
         var tempFilename = Path.GetTempFileName();
         templates.Serialize(tempFilename, Encoding.UTF8);
-        Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)));
+        Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)!));
         File.Delete(tempFilename);
     }
 
     [Test]
     public void StreamSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> _);
         var templates = mmm.Templates;
         var stream = new MemoryStream();
         templates.Serialize(stream, Encoding.UTF8);
         stream.Position = 0;
-        var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8);
+        var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8)!;
         Assert.True(templates.Equals(restoredTemplates));
 
         Assert.True(templates.Equals(templates));

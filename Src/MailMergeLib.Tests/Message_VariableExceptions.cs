@@ -106,8 +106,7 @@ class Message_VariableExceptions
     [Test]
     public void Template()
     {
-        Dictionary<string, string> variables;
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         var msg = mmm.GetMimeMessage(variables);
 

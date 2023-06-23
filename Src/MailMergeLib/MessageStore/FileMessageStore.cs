@@ -142,7 +142,7 @@ public class FileMessageStore : IMessageStore
     /// </summary>
     /// <param name="xml"></param>
     /// <returns></returns>
-    public static FileMessageStore Deserialize(string xml)
+    public static FileMessageStore? Deserialize(string xml)
     {
         return SerializationFactory.Deserialize<FileMessageStore>(xml);
     }
@@ -152,7 +152,7 @@ public class FileMessageStore : IMessageStore
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public static FileMessageStore Deserialize(Stream stream, System.Text.Encoding encoding)
+    public static FileMessageStore? Deserialize(Stream stream, System.Text.Encoding encoding)
     {
         return SerializationFactory.Deserialize<FileMessageStore>(stream, encoding);
     }
@@ -162,7 +162,7 @@ public class FileMessageStore : IMessageStore
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static FileMessageStore Deserialize(string filename, System.Text.Encoding encoding)
+    public static FileMessageStore? Deserialize(string filename, System.Text.Encoding encoding)
     {
         return SerializationFactory.Deserialize<FileMessageStore>(filename, encoding);
     }
@@ -171,7 +171,7 @@ public class FileMessageStore : IMessageStore
 
     #region *** Equality ***
 
-    private bool Equals(FileMessageStore other)
+    private bool Equals(FileMessageStore? other)
     {
         if (other == null) return false;
         return !SearchFolders.Except(other.SearchFolders).Union(other.SearchFolders.Except(SearchFolders)).Any() ||
@@ -183,7 +183,7 @@ public class FileMessageStore : IMessageStore
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

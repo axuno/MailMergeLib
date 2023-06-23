@@ -68,13 +68,9 @@ internal class SerializationFactory
     /// <param name="encoding"></param>
     internal static void Serialize<T>(T obj, string filename, Encoding encoding)
     {
-        using (var fs = new FileStream(filename, FileMode.Create))
-        {
-            using (var sr = new StreamWriter(fs, encoding))
-            {
-                Serialize<T>(obj, sr, false);
-            }
-        }
+        using var fs = new FileStream(filename, FileMode.Create);
+        using var sr = new StreamWriter(fs, encoding);
+        Serialize<T>(obj, sr, false);
     }
 
     /// <summary>
@@ -102,10 +98,10 @@ internal class SerializationFactory
     /// </summary>
     /// <param name="xml"></param>
     /// <returns>Returns an instance of T.</returns>
-    internal static T Deserialize<T>(string xml)
+    internal static T? Deserialize<T>(string xml)
     {
-        var serializer = GetStandardSerializer(typeof(T));
-        return (T)serializer.Deserialize(xml);
+        var serializer = GetStandardSerializer(typeof(T?));
+        return (T?)serializer.Deserialize(xml);
     }
 
     /// <summary>
@@ -113,7 +109,7 @@ internal class SerializationFactory
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    internal static T Deserialize<T>(Stream stream, Encoding encoding)
+    internal static T? Deserialize<T>(Stream stream, Encoding encoding)
     {
         return Deserialize<T>(new StreamReader(stream, encoding), true);
     }
@@ -123,15 +119,11 @@ internal class SerializationFactory
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    internal static T Deserialize<T>(string filename, System.Text.Encoding encoding)
+    internal static T? Deserialize<T>(string filename, System.Text.Encoding encoding)
     {
-        using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            using (var sr = new StreamReader(fs, encoding))
-            {
-                return Deserialize<T>(sr, false);
-            }
-        }
+        using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var sr = new StreamReader(fs, encoding);
+        return Deserialize<T>(sr, false);
     }
 
     /// <summary>
@@ -140,12 +132,12 @@ internal class SerializationFactory
     /// <param name="reader"></param>
     /// <returns>Returns a T instance.</returns>
     /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-    internal static T Deserialize<T>(StreamReader reader, bool isStream)
+    internal static T? Deserialize<T>(StreamReader reader, bool isStream)
     {
         var serializer = GetStandardSerializer(typeof(T));
         reader.BaseStream.Position = 0;
         var str = reader.ReadToEnd();
-        var s = (T)serializer.Deserialize(str);
+        var s = (T?)serializer.Deserialize(str);
 
         if (isStream) return s;
 #if NETFRAMEWORK

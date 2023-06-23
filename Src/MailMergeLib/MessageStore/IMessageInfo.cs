@@ -30,5 +30,8 @@ public interface IMessageInfo
     /// </summary>
     string? Data { get; set; }
 
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     bool Equals(IMessageInfo obj);
 }

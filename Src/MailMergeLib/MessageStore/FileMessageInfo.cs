@@ -32,7 +32,7 @@ public class FileMessageInfo : MessageInfoBase
     /// </summary>
     /// <returns>Returns the deserialized object from the <see cref="MessageFile"/>.</returns>
     /// <exception cref="InvalidOperationException">In case <see cref="MessageFile"/> is <see langref="null"/></exception>
-    public override MailMergeMessage LoadMessage()
+    public override MailMergeMessage? LoadMessage()
     {
         if (MessageFile == null) throw new InvalidOperationException($"{nameof(MessageFile)} must not be null");
 

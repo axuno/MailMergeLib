@@ -1,4 +1,5 @@
-﻿using MailMergeLib.Serialization;
+﻿using System;
+using MailMergeLib.Serialization;
 using YAXLib.Attributes;
 using YAXLib.Enums;
 
@@ -43,7 +44,7 @@ public class MessageInfo : IMessageInfo
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     [YAXTextEmbedding(TextEmbedding.CData)]
-    public string Data { get; set; }
+    public string? Data { get; set; }
 
     #region *** Equality ***
 
@@ -65,7 +66,7 @@ public class MessageInfo : IMessageInfo
     /// <returns></returns>
     public override bool Equals(object obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (!(obj is IMessageInfo)) return false;
         return Equals((IMessageInfo)obj);

@@ -54,8 +54,7 @@ public class MailMergeAddress
     {
         AddrType = addrType;
         DisplayNameCharacterEncoding = displayNameCharacterEncoding;
-        MailboxAddress mba;
-        if (MailboxAddress.TryParse(displayNameCharacterEncoding?.GetBytes(fullMailAddress), out mba))
+        if (MailboxAddress.TryParse(displayNameCharacterEncoding?.GetBytes(fullMailAddress), out var mba))
         {
             Address = mba.Address;
             DisplayName = mba.Name;
@@ -135,14 +134,17 @@ public class MailMergeAddress
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != GetType()) return false;
         return Equals((MailMergeAddress) obj);
     }
 
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     protected bool Equals(MailMergeAddress other)
     {
         return AddrType == other.AddrType && string.Equals(Address, other.Address) && string.Equals(DisplayName, other.DisplayName) && Equals(DisplayNameCharacterEncoding, other.DisplayNameCharacterEncoding);

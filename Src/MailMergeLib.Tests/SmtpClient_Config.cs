@@ -85,7 +85,7 @@ namespace MailMergeLib.Tests
         /// If the app doesn't have a .config, it will be created.
         /// </summary>
         /// <param name="newSmtpSettings">The SMTP settings to write to the .config file.</param>
-        private void ChangeSmtpConfigFile(SmtpSection newSmtpSettings)
+        private static void ChangeSmtpConfigFile(SmtpSection newSmtpSettings)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.SectionGroups["system.net"]?.SectionGroups["mailSettings"]?.Sections.Clear();

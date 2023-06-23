@@ -16,8 +16,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_ConnectException(Type connectException)
     {
-        var sender = GetMailMergeSender();
-        var msg = GetMimeMessage();
+        var sender = Sender_SendMimeMessage.GetMailMergeSender();
+        var msg = Sender_SendMimeMessage.GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty)};
         sender.Config.SmtpClientConfig[0] = config;
 
@@ -53,8 +53,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_AuthenticateException(Type authenticateException)
     {
-        var sender = GetMailMergeSender();
-        var msg = GetMimeMessage();
+        var sender = Sender_SendMimeMessage.GetMailMergeSender();
+        var msg = Sender_SendMimeMessage.GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 
@@ -99,8 +99,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_SendException(Type sendException, SmtpErrorCode smtpErrorCode = SmtpErrorCode.UnexpectedStatusCode)
     {
-        var sender = GetMailMergeSender();
-        var msg = GetMimeMessage();
+        var sender = Sender_SendMimeMessage.GetMailMergeSender();
+        var msg = Sender_SendMimeMessage.GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 
@@ -137,13 +137,13 @@ public class Sender_SendMimeMessage
         Assert.ThrowsAsync(sendException, async () => await sender.SendMimeMessageAsync(smtpClient, msg, config));
     }
 
-    private MailMergeSender GetMailMergeSender()
+    private static MailMergeSender GetMailMergeSender()
     {
         var sender = new MailMergeSender {GetInitializedSmtpClientDelegate = config => new FakeSmtpClient()};
         return sender;
     }
 
-    private MimeMessage GetMimeMessage()
+    private static MimeMessage GetMimeMessage()
     {
         var mmm = new MailMergeMessage("subject", "plain text");
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "test@example.org"));

@@ -1,6 +1,5 @@
 ﻿using System;
 using SmartFormat.Core.Parsing;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib;
 
@@ -23,7 +22,7 @@ public class SmartFormatterConfig
         set
         {
             _parseErrorAction = value;
-            OnConfigChanged?.Invoke(this);
+            OnConfigChanged?.Invoke();
         }
     }
 
@@ -36,7 +35,7 @@ public class SmartFormatterConfig
         set
         {
             _formatErrorAction = value;
-            OnConfigChanged?.Invoke(this);
+            OnConfigChanged?.Invoke();
         }
     }
 
@@ -50,7 +49,7 @@ public class SmartFormatterConfig
         set
         {
             _caseSensitivity = value;
-            OnConfigChanged?.Invoke(this);
+            OnConfigChanged?.Invoke();
         }
     }
 
@@ -67,14 +66,14 @@ public class SmartFormatterConfig
         set
         {
             _convertCharacterStringLiterals = value;
-            OnConfigChanged?.Invoke(this);
+            OnConfigChanged?.Invoke();
         }
     }
 
     /// <summary>
     /// Event raising when the <see cref="SmartFormatterConfig"/> configuration has changed.
     /// </summary>
-    public event Action<SmartFormatterConfig>? OnConfigChanged;
+    public event Action? OnConfigChanged;
 
     #region *** Equality ***
 
@@ -89,7 +88,7 @@ public class SmartFormatterConfig
     /// </summary>
     /// <param name="obj"></param>
     /// <returns>Returns true, if both SmartFormatterConfigs are equal, else false.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

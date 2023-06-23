@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Text;
 using MimeKit;
 using YAXLib.Attributes;
@@ -150,6 +151,10 @@ public class MessageConfig
     public SmartFormatterConfig SmartFormatterConfig { get; internal set; } = new SmartFormatterConfig();
 
     #region *** Equality ***
+    
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     protected bool Equals(MessageConfig other)
     {
         return TextTransferEncoding == other.TextTransferEncoding &&
@@ -175,7 +180,8 @@ public class MessageConfig
         return addr?.ToString() == otherAddr?.ToString();
     }
 
-    public override bool Equals(object obj)
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
@@ -183,6 +189,7 @@ public class MessageConfig
         return Equals((MessageConfig)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked

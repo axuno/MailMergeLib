@@ -28,7 +28,7 @@ public class FileMessageStore_Serialization
         foreach (var info in messageInfos)
         {
             // messageInfos come from fast xml scan in MessageInfoBase, Info of the Messsage comes from YAXLib deserialization
-            Assert.AreEqual(info, info.LoadMessage().Info);
+            Assert.AreEqual(info, info.LoadMessage()!.Info);
         }
     }
 
@@ -60,7 +60,7 @@ public class FileMessageStore_Serialization
         var stream = new MemoryStream();
         fms.Serialize(stream, Encoding.UTF8);
         stream.Position = 0;
-        var restoredFms = FileMessageStore.Deserialize(stream, Encoding.UTF8);
+        var restoredFms = FileMessageStore.Deserialize(stream, Encoding.UTF8)!;
         Assert.True(fms.Equals(restoredFms));
 
         Assert.AreEqual(fms.GetHashCode(), restoredFms.GetHashCode());

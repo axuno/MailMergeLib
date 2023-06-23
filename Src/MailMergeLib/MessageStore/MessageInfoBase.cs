@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Xml;
 
@@ -53,7 +54,7 @@ public abstract class MessageInfoBase : IMessageInfo
     /// Method must be overridden in a derived class.
     /// </summary>
     /// <returns>Returns an instance of <see cref="MailMergeMessage"/></returns>
-    public abstract MailMergeMessage LoadMessage();
+    public abstract MailMergeMessage? LoadMessage();
 
     #region *** Equality ***
 
@@ -62,12 +63,12 @@ public abstract class MessageInfoBase : IMessageInfo
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (!(obj is IMessageInfo)) return false;
-        return Equals((IMessageInfo)obj);
+        if (obj is not IMessageInfo info) return false;
+        return Equals(info);
     }
 
     /// <summary>
@@ -101,10 +102,8 @@ public abstract class MessageInfoBase : IMessageInfo
     /// <returns>Return the <see cref="IMessageInfo"/> of a serialized <see cref="MailMergeMessage"/></returns>
     public static IMessageInfo Read(FileSystemInfo fileSystemInfo)
     {
-        using (var xmlReader = XmlReader.Create(fileSystemInfo.FullName))
-        {
-            return ReadInfo(xmlReader);
-        }
+        using var xmlReader = XmlReader.Create(fileSystemInfo.FullName);
+        return ReadInfo(xmlReader);
     }
 
     /// <summary>
@@ -114,13 +113,9 @@ public abstract class MessageInfoBase : IMessageInfo
     /// <returns>Return the <see cref="IMessageInfo"/> of a serialized <see cref="MailMergeMessage"/></returns>
     public static IMessageInfo Read(string xmlString)
     {
-        using (var stringReader = new StringReader(xmlString))
-        {
-            using (var xmlReader = XmlReader.Create(stringReader))
-            {
-                return ReadInfo(xmlReader);
-            }
-        }
+        using var stringReader = new StringReader(xmlString);
+        using var xmlReader = XmlReader.Create(stringReader);
+        return ReadInfo(xmlReader);
     }
 
     private static IMessageInfo ReadInfo(XmlReader xmlReader)

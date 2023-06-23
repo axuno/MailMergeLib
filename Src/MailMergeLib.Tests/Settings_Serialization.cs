@@ -126,7 +126,7 @@ public class Settings_Serialization
         _outSettings.Serialize(outMs, Encoding.UTF8);
         var inSettings = Settings.Deserialize(outMs, Encoding.UTF8);
 
-        Assert.IsTrue(inSettings.SenderConfig.Equals(_outSettings.SenderConfig));
+        Assert.IsTrue(inSettings?.SenderConfig.Equals(_outSettings.SenderConfig));
         outMs.Dispose();
 
         var smtpCredential = (Credential?) _outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
@@ -141,7 +141,7 @@ public class Settings_Serialization
         Settings.CryptoEnabled = cryptoEnabled;
 
         var serialized = _outSettings.Serialize();
-        var restored = Settings.Deserialize(serialized);
+        var restored = Settings.Deserialize(serialized)!;
 
         Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
 
@@ -158,7 +158,7 @@ public class Settings_Serialization
         if (!cryptoEnabled)
         {
             var restored =
-                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8);
+                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8)!;
             Assert.IsTrue(restored.SenderConfig.Equals(_outSettings?.SenderConfig!));
         }
         else
@@ -166,7 +166,7 @@ public class Settings_Serialization
             // An exception is thrown because username / password are saved as plain text,
             // while with encryption enabled, both should be encrypted.
             Assert.That(() =>
-                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null), Throws.Exception.InstanceOf<YAXLib.Exceptions.YAXBadlyFormedInput>());
+                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8), Throws.Exception.InstanceOf<YAXLib.Exceptions.YAXBadlyFormedInput>());
         }
     }
 }

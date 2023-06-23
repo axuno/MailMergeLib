@@ -101,20 +101,16 @@ public class Tools
     [TestCase(false, "abcdeföäü")]
     public void IsSevenBitStream(bool expected, string toTest)
     {
-        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty)))
-        {
-            Assert.AreEqual(expected, MailMergeLib.Tools.IsSevenBit(stream));
-        }
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty));
+        Assert.AreEqual(expected, MailMergeLib.Tools.IsSevenBit(stream));
     }
 
     [Test]
     [TestCase("Some Text")]
     public void StreamToString(string toTest)
     {
-        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty)))
-        {
-            Assert.AreEqual(toTest, MailMergeLib.Tools.Stream2String(stream));
-        }
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty));
+        Assert.AreEqual(toTest, MailMergeLib.Tools.Stream2String(stream));
     }
 
     [Test]

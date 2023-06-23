@@ -45,6 +45,9 @@ public class SenderConfig
 
     #region *** Equality ***
 
+    /// <summary>
+    /// Checks for equality
+    /// </summary>
     protected bool Equals(SenderConfig other)
     {
         if (MaxNumOfSmtpClients != other.MaxNumOfSmtpClients || SmtpClientConfig.Length != other.SmtpClientConfig.Length)
@@ -53,14 +56,16 @@ public class SenderConfig
         return !SmtpClientConfig.Where((t, i) => !t.Equals(other.SmtpClientConfig[i])).Any();
     }
 
-    public override bool Equals(object obj)
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
         return Equals((SenderConfig) obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked

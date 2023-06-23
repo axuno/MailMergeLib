@@ -98,7 +98,7 @@ public class Settings
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public static Settings Deserialize(Stream stream, Encoding encoding)
+    public static Settings? Deserialize(Stream stream, Encoding encoding)
     {
         using var sr = new StreamReader(stream, encoding);
         return SerializationFactory.Deserialize<Settings>(sr, true);
@@ -109,7 +109,7 @@ public class Settings
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static Settings Deserialize(string filename, Encoding encoding)
+    public static Settings? Deserialize(string filename, Encoding encoding)
     {
         return SerializationFactory.Deserialize<Settings>(filename, encoding ?? Encoding.UTF8);
     }
@@ -118,7 +118,7 @@ public class Settings
     /// Read the MailMergeLib settings from an xml string.
     /// </summary>
     /// <returns>Returns the MailMergeLib settings as an xml string.</returns>
-    public static Settings Deserialize(string xml)
+    public static Settings? Deserialize(string xml)
     {
         return SerializationFactory.Deserialize<Settings>(xml);
     }
