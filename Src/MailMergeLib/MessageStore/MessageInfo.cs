@@ -1,6 +1,4 @@
-﻿using System;
-using MailMergeLib.Serialization;
-using YAXLib.Attributes;
+﻿using YAXLib.Attributes;
 using YAXLib.Enums;
 
 namespace MailMergeLib.MessageStore;
@@ -49,11 +47,11 @@ public class MessageInfo : IMessageInfo
     #region *** Equality ***
 
     /// <summary>
-    /// Determines whether the specified <see cref="MessageInfoBase"/> is equal to the current.
+    /// Determines whether the specified <see cref="IMessageInfo"/> is equal to the current.
     /// </summary>
     /// <param name="other"></param>
     /// <returns>bool</returns>
-    public bool Equals(IMessageInfo other)
+    public bool Equals(IMessageInfo? other)
     {
         if (other == null) return false;
         return Id == other.Id && Category == other.Category && Description == other.Description && Comments == other.Comments && Data == other.Data;
@@ -64,7 +62,7 @@ public class MessageInfo : IMessageInfo
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;

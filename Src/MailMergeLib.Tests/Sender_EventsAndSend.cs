@@ -10,7 +10,6 @@ using MailKit.Security;
 using MimeKit;
 using netDumbster.smtp;
 using NUnit.Framework;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 

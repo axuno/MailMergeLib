@@ -696,7 +696,7 @@ public partial class MailMergeMessage : IDisposable
                 exceptions.Add(new AddressException("No from address.", _badMailAddr, null));
             if (string.IsNullOrEmpty(HtmlText) && string.IsNullOrEmpty(PlainText) && string.IsNullOrEmpty(Subject) && !FileAttachments.Any() &&
                 !InlineAttachments.Any() && !StringAttachments.Any() && !StreamAttachments.Any())
-                exceptions.Add(new EmtpyContentException("Message is empty.", null));
+                exceptions.Add(new EmptyContentException("Message is empty.", null));
             if (_badMailAddr.Count > 0)
                 exceptions.Add(
                     new AddressException($"Bad mail address(es): {string.Join(", ", _badMailAddr.ToArray())}",

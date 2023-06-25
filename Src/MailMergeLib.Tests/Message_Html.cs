@@ -6,7 +6,6 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using MimeKit;
 using NUnit.Framework;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 

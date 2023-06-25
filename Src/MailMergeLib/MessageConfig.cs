@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Text;
 using MimeKit;
 using YAXLib.Attributes;
@@ -185,7 +184,7 @@ public class MessageConfig
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((MessageConfig)obj);
     }
 

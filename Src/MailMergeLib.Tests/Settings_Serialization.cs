@@ -8,7 +8,6 @@ using System.Text;
 using MailKit.Security;
 using MimeKit;
 using NUnit.Framework;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 

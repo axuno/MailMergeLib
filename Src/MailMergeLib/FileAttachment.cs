@@ -69,7 +69,7 @@ public class FileAttachment
     {
         if (fa is null) return false;
         if (ReferenceEquals(this, fa)) return true;
-        if (fa.GetType() != this.GetType()) return false;
+        if (fa.GetType() != GetType()) return false;
         return Equals((FileAttachment) fa);
     }
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Mail;
-using System.Reflection;
+﻿using System.Net.Mail;
 using NUnit.Framework;
 #if NETFRAMEWORK
 using System.Configuration;
