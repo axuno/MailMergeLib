@@ -52,7 +52,7 @@ public class Message_Html
         catch (Exception e)
         {
             Assert.IsTrue(e is MailMergeMessage.MailMergeMessageException);
-            Assert.IsTrue(e.InnerException is MailMergeMessage.EmtpyContentException);
+            Assert.IsTrue(e.InnerException is MailMergeMessage.EmptyContentException);
         }
     }
 

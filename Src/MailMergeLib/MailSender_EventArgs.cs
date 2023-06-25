@@ -8,11 +8,29 @@ namespace MailMergeLib;
 /// </summary>
 public class MailSenderAfterSendEventArgs : EventArgs
 {
+    /// <summary>
+    /// Returns <see langword="true"/>, if the operation has cancelled state.
+    /// </summary>
     public readonly bool Cancelled;
+    /// <summary>
+    /// Contains any <see cref="Exception"/> that was thrown.
+    /// </summary>
     public readonly Exception? Error;
+    /// <summary>
+    /// Gets the current <see cref="SmtpClientConfig"/>.
+    /// </summary>
     public readonly SmtpClientConfig SmtpClientConfig;
+    /// <summary>
+    /// Gets the current <see cref="MimeMessage"/>.
+    /// </summary>
     public readonly MimeMessage MimeMessage;
+    /// <summary>
+    /// Gets the <see cref="DateTime"/> when sending has started.
+    /// </summary>
     public readonly DateTime StartTime;
+    /// <summary>
+    /// Gets the <see cref="DateTime"/> when sending was completed.
+    /// </summary>
     public readonly DateTime EndTime;
 
     internal MailSenderAfterSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mailMergeMessage, DateTime startTime, DateTime endTime,
@@ -32,10 +50,25 @@ public class MailSenderAfterSendEventArgs : EventArgs
 /// </summary>
 public class MailSenderBeforeSendEventArgs : EventArgs
 {
+    /// <summary>
+    /// Returns <see langword="true"/>, if the operation has cancelled state.
+    /// </summary>
     public readonly bool Cancelled;
+    /// <summary>
+    /// Contains any <see cref="Exception"/> that was thrown.
+    /// </summary>
     public readonly Exception? Error;
+    /// <summary>
+    /// Gets the current <see cref="SmtpClientConfig"/>.
+    /// </summary>
     public readonly SmtpClientConfig SmtpClientConfig;
+    /// <summary>
+    /// Gets the current <see cref="MimeMessage"/>.
+    /// </summary>
     public readonly MimeMessage MimeMessage;
+    /// <summary>
+    /// Gets the <see cref="DateTime"/> when sending has started.
+    /// </summary>
     public readonly DateTime StartTime;
 
     internal MailSenderBeforeSendEventArgs(SmtpClientConfig smtpConfig, MimeMessage mimeMessage, DateTime startTime, Exception? error,
@@ -54,6 +87,9 @@ public class MailSenderBeforeSendEventArgs : EventArgs
 /// </summary>
 public class MailSenderSmtpClientEventArgs : EventArgs
 {
+    /// <summary>
+    /// Gets the current <see cref="SmtpClientConfig"/>.
+    /// </summary>
     public readonly SmtpClientConfig SmtpClientConfig;
 
     internal MailSenderSmtpClientEventArgs(SmtpClientConfig smtpConfig)
@@ -66,7 +102,13 @@ public class MailSenderSmtpClientEventArgs : EventArgs
 /// </summary>
 public class MailSenderMergeBeginEventArgs : EventArgs
 {
+    /// <summary>
+    /// Gets the <see cref="DateTime"/> when sending was completed.
+    /// </summary>
     public readonly DateTime StartTime;
+    /// <summary>
+    /// Gets current number of total messages sent.
+    /// </summary>
     public readonly int TotalMsg;
 
     internal MailSenderMergeBeginEventArgs(DateTime startTime, int totalMsg)
@@ -81,7 +123,13 @@ public class MailSenderMergeBeginEventArgs : EventArgs
 /// </summary>
 public class MailSenderMergeProgressEventArgs : MailSenderMergeBeginEventArgs
 {
+    /// <summary>
+    /// Gets the number of sent messages.
+    /// </summary>
     public readonly int SentMsg;
+    /// <summary>
+    /// Gets the number of messages that were not sent due to errors.
+    /// </summary>
     public readonly int ErrorMsg;
         
     internal MailSenderMergeProgressEventArgs(DateTime startTime, int totalMsg, int sentMsg, int errorMsg) : base(startTime, totalMsg)
@@ -96,7 +144,13 @@ public class MailSenderMergeProgressEventArgs : MailSenderMergeBeginEventArgs
 /// </summary>
 public class MailSenderMergeCompleteEventArgs : MailSenderMergeProgressEventArgs
 {
+    /// <summary>
+    /// Gets the <see cref="DateTime"/> when sending was completed.
+    /// </summary>
     public readonly DateTime EndTime;
+    /// <summary>
+    /// Gets the number of <see cref="MailKit.Net.Smtp.SmtpClient"/>s that were used for sending.
+    /// </summary>
     public readonly int NumOfSmtpClientsUsed;
 
     internal MailSenderMergeCompleteEventArgs(DateTime startTime, DateTime endTime, int totalMsg, int sentMsg, int errorMsg, int numOfSmtpClientsUsed) : base(startTime, totalMsg, sentMsg, errorMsg)
@@ -111,9 +165,21 @@ public class MailSenderMergeCompleteEventArgs : MailSenderMergeProgressEventArgs
 /// </summary>
 public class MailSenderSendFailureEventArgs : EventArgs
 {
+    /// <summary>
+    /// Contains any <see cref="Exception"/> that was thrown.
+    /// </summary>
     public readonly Exception Error;
+    /// <summary>
+    /// Gets the current number of failures that happened when trying to send the message.
+    /// </summary>
     public readonly int FailureCounter;
+    /// <summary>
+    /// Gets the current <see cref="MimeMessage"/>.
+    /// </summary>
     public readonly MimeMessage MimeMessage;
+    /// <summary>
+    /// Gets the current <see cref="SmtpClientConfig"/>.
+    /// </summary>
     public readonly SmtpClientConfig SmtpClientConfig;
 
     internal MailSenderSendFailureEventArgs(Exception error, int failureCounter, SmtpClientConfig smtpClientConfig,

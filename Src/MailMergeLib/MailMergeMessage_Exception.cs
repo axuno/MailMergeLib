@@ -4,7 +4,7 @@ using MimeKit;
 
 namespace MailMergeLib;
 
-partial class MailMergeMessage
+public partial class MailMergeMessage
 {
     #region Nested type: AddressException
 
@@ -22,6 +22,9 @@ partial class MailMergeMessage
             BadAddress = badAddress;
         }
 
+        /// <summary>
+        /// Gets the bad email address(es) leading to the exception.
+        /// </summary>
         public HashSet<string> BadAddress { get; }
     }
 
@@ -34,12 +37,18 @@ partial class MailMergeMessage
     /// </summary>
     public class AttachmentException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public AttachmentException(string message, HashSet<string> badAttachment, Exception? innerException)
             : base(message, innerException)
         {
             BadAttachment = badAttachment;
         }
 
+        /// <summary>
+        /// Gets the list of bad attachments that caused the exception.
+        /// </summary>
         public HashSet<string> BadAttachment { get; }
     }
 
@@ -50,12 +59,12 @@ partial class MailMergeMessage
     /// <summary>
     /// Mail merge empty content exception.
     /// </summary>
-    public class EmtpyContentException : Exception
+    public class EmptyContentException : Exception
     {
         /// <summary>
         /// CTOR.
         /// </summary>
-        public EmtpyContentException(string message, Exception? innerException)
+        public EmptyContentException(string message, Exception? innerException)
             : base(message, innerException)
         {
         }
@@ -79,8 +88,15 @@ partial class MailMergeMessage
             MimeMessage = mimeMessage;
         }
 
+        /// <summary>
+        /// Gets all exceptions that were thrown when the message was created.
+        /// Check <see cref="AggregateException.InnerExceptions"/> for more details.
+        /// </summary>
         public AggregateException? Exception { get; }
 
+        /// <summary>
+        /// Gets the <see cref="MimeMessage"/> where the exception was thrown.
+        /// </summary>
         public MimeMessage? MimeMessage { get; }
     }
 
@@ -102,6 +118,9 @@ partial class MailMergeMessage
             MissingVariable = missingVariable;
         }
 
+        /// <summary>
+        /// Gets the missing variables that caused the exception.
+        /// </summary>
         public HashSet<string> MissingVariable { get; }
     }
 

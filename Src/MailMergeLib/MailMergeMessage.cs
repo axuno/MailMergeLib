@@ -509,7 +509,7 @@ public partial class MailMergeMessage : IDisposable
 
         SmartFormatter.Templates.Clear();
 
-        foreach (var template in this.Templates)
+        foreach (var template in Templates)
         {
             var parts = template.GetParts();
             var htmlPart = parts.FirstOrDefault(p => p.Type == PartType.Html);
@@ -979,7 +979,7 @@ public partial class MailMergeMessage : IDisposable
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((MailMergeMessage)obj);
     }
 
