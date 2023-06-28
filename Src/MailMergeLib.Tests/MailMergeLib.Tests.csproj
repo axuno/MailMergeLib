@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Description>Test project for MailMergeLib</Description>
         <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
-        <TargetFrameworks>net6.0;net462</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net462;net6.0</TargetFrameworks>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <AssemblyName>MailMergeLib.Tests</AssemblyName>
         <AssemblyOriginatorKeyFile>../MailMergeLib/MailMergeLib.snk</AssemblyOriginatorKeyFile>
@@ -30,7 +30,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="netDumbster" Version="3.0.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />

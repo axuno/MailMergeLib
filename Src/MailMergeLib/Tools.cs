@@ -22,7 +22,7 @@ public static class Tools
     {
         if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
             return false;
-#if NETSTANDARD
+#if NETSTANDARD || NET
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return true;
