@@ -17,9 +17,9 @@
 * HTML text may contain images from local hard disk, which will be automatically inserted as inline attachments.
 * For HTML text  ```MailMergeLib ``` can generate a plain text representation.
 * Attachment sources can be files, streams or strings.
-* The data source for email merge messages to a number of recipients and be any ```IEnumerable``` object as well as ```DataTable```s. The data source for single emails can be any of the following types: ```Dictionary<string,object>```, ```ExpandoObject```, ```DataRow```, any class instances or anonymous types. For class instances it's even allowed to use the name of parameter less methods.
-* Placeholders in the email can be formatted with any of the features known from string.Format by using [SmartFormat.NET](https://github.com/scottrippey/SmartFormat.NET/wiki). SmartFormat is a parser coming close to string.Format's speed, but bringing a lot of additional options like easy pluralization for many languages.
-* Resulting emails are MimeMessages from [MimeKit](https://github.com/jstedfast/MimeKit), an outstanding tool for creating and parsing emails, covering all relevant MIME standards making sure that emails are not qualified as SPAM.
+* The data source for email merge messages to a number of recipients and be any ```IEnumerable``` object as well as ```DataTable```s. The data source for single emails can be any of the following types: ```Dictionary<string,object>```, ```ExpandoObject```, ```DataRow```, any class instance or anonymous types. For class instances it's even allowed to use the name of parameter less methods in placeholders.
+* Placeholders in the email can be formatted much like the features known from `string.Format` by using [SmartFormat.NET](https://github.com/axuno/MailMergeLib/wiki). SmartFormat is a fast and lean string parser and formatter, bringing a lot of additional options like conditional output depending on input data.
+* Resulting emails are MimeMessages from [MimeKit](https://github.com/jstedfast/MimeKit), an outstanding tool for creating and parsing emails, covering all relevant MIME standards.
 * Support for international email address format.
 
 ### Sending email messages
@@ -36,13 +36,13 @@
 
 ### Both
 * Fine grained control over the whole process of email message generation and distribution.
-* Clearly out-performs .NET ```System.Net.Mail```.
 * RFC standards compliant.
 * We aks you not to use ```MailMergeLib``` for sending unsolicited bulk email.
 
 ### Supported Frameworks
 * .Net Framework 4.6.2 and later
-* .Net Standard 2.1 and later
+* .Net Standard 2.1
+* NET 6.0 and later
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)
 
