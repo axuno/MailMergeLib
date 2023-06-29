@@ -32,6 +32,7 @@ public class MessageConfig
     [YAXSerializableField]
     public ContentEncoding BinaryTransferEncoding { get; set; } = ContentEncoding.Base64;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// Character encoding.
     /// Used for serialization. It is the string representation of <see cref="CharacterEncoding"/>.
@@ -43,12 +44,14 @@ public class MessageConfig
         get => CharacterEncoding.WebName;
         set => CharacterEncoding = Encoding.GetEncoding(value);
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// Character encoding.
     /// </summary>
     public Encoding CharacterEncoding { get; set; } = Encoding.UTF8;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// Culture information.
     /// Used for serialization. It is the string representation of <see cref="CultureInfo"/>.
@@ -60,6 +63,7 @@ public class MessageConfig
         get => CultureInfo.Name;
         set => CultureInfo = new CultureInfo(value);
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// Culture information.
@@ -114,6 +118,7 @@ public class MessageConfig
     [YAXSerializableField]
     public MessagePriority Priority { get; set; } = MessagePriority.Normal;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// The standard mailbox address which will be used as one of the "from" addresses.
     /// Used for serialization. It is the string representation of <see cref="StandardFromAddress"/>. 
@@ -125,6 +130,7 @@ public class MessageConfig
         get => StandardFromAddress?.ToString();
         set => StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value) : null;
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// The standard mailbox address which will be used as one of the "from" addresses.
@@ -171,7 +177,7 @@ public class MessageConfig
                SmartFormatterConfig.Equals(other.SmartFormatterConfig);
     }
 
-    private bool Equals(MailboxAddress? addr, MailboxAddress? otherAddr)
+    private static bool Equals(MailboxAddress? addr, MailboxAddress? otherAddr)
     {
         if (addr is null && otherAddr is null) return true;
         if (ReferenceEquals(addr, otherAddr)) return true;
