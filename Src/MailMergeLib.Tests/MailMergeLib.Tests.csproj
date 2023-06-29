@@ -14,6 +14,11 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+        <!-- Microsoft.Extensions.DependencyModel 7.0.0 doesn't support netcoreapp3.1 and has not been tested with it. -->
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>

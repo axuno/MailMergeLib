@@ -130,7 +130,7 @@ class Message_Variables
         var i = 0;
         foreach (var mimeMessage in mmm.GetMimeMessages<DataRow>(tbl.Rows.OfType<DataRow>()))
         {
-            DataRow row = tbl.Rows[i];
+            var row = tbl.Rows[i];
             Assert.IsTrue(mimeMessage.To.ToString().Contains(row["Email"].ToString()!));
             Assert.IsTrue(mimeMessage.TextBody.Contains(text
                 .Replace("{Email}", row["Email"].ToString())

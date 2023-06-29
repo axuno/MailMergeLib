@@ -14,7 +14,7 @@ namespace MailMergeLib;
 /// </example>
 public class MailSmartFormatter : SmartFormatter
 {
-    internal MailSmartFormatter()
+    private MailSmartFormatter(SmartSettings? currentSmartSettings) : base(currentSmartSettings)
     {
         Templates = new TemplateFormatter();
         
@@ -52,7 +52,8 @@ public class MailSmartFormatter : SmartFormatter
     /// Error actions are SmartFormatters defaults.
     /// </summary>
     /// <param name="config"></param>
-    internal MailSmartFormatter(SmartFormatterConfig config) : this()
+    /// <param name="currentSmartSettings"></param>
+    internal MailSmartFormatter(SmartFormatterConfig config, SmartSettings? currentSmartSettings) : this(currentSmartSettings)
     {
         SetConfig(config);
     }

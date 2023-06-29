@@ -65,7 +65,7 @@ public class FileAttachment
     /// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
     /// <param name="fa"></param>
     /// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
-    public override bool Equals(object fa)
+    public override bool Equals(object? fa)
     {
         if (fa is null) return false;
         if (ReferenceEquals(this, fa)) return true;

@@ -92,7 +92,7 @@ public class SmartFormatterConfig
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((SmartFormatterConfig) obj);
     }
 

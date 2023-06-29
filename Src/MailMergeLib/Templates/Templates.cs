@@ -56,14 +56,11 @@ public class Templates : List<Template>
     /// <exception cref="TemplateException"></exception>
     public Template this[string name]
     {
-        get { return Find(k => k.Name == name); }
+        get { return Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this); }
 
         set
         {
-            var tp = Find(k => k.Name == name);
-            if (tp == null)
-                throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
-
+            var tp = Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
             tp.Name = value.Name;
             tp.Text = value.Text;
             tp.DefaultKey = value.DefaultKey;

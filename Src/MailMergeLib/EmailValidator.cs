@@ -128,7 +128,7 @@ public static class EmailValidator
 
     static bool SkipAtom(string text, ref int index, bool allowInternational)
     {
-        int startIndex = index;
+        var startIndex = index;
 
         while (index < text.Length && IsAtom(text[index], allowInternational))
             index++;
@@ -138,7 +138,7 @@ public static class EmailValidator
 
     static bool SkipSubDomain(string text, ref int index, bool allowInternational, out SubDomainType type)
     {
-        int startIndex = index;
+        var startIndex = index;
 
         if (!IsDomainStart(text[index], allowInternational, out type))
             return false;
@@ -154,7 +154,7 @@ public static class EmailValidator
     static bool SkipDomain(string text, ref int index, bool allowTopLevelDomains, bool allowInternational)
     {
 
-        if (!SkipSubDomain(text, ref index, allowInternational, out SubDomainType type))
+        if (!SkipSubDomain(text, ref index, allowInternational, out var type))
             return false;
 
         if (index < text.Length && text[index] == '.')
@@ -184,7 +184,7 @@ public static class EmailValidator
 
     static bool SkipQuoted(string text, ref int index, bool allowInternational)
     {
-        bool escaped = false;
+        var escaped = false;
 
         // skip over leading '"'
         index++;
@@ -221,12 +221,12 @@ public static class EmailValidator
 
     static bool SkipIPv4Literal(string text, ref int index)
     {
-        int groups = 0;
+        var groups = 0;
 
         while (index < text.Length && groups < 4)
         {
-            int startIndex = index;
-            int value = 0;
+            var startIndex = index;
+            var value = 0;
 
             while (index < text.Length && text[index] >= '0' && text[index] <= '9')
             {
@@ -268,12 +268,12 @@ public static class EmailValidator
     //             ; IPv4-address-literal may be present
     static bool SkipIPv6Literal(string text, ref int index)
     {
-        bool compact = false;
-        int colons = 0;
+        var compact = false;
+        var colons = 0;
 
         while (index < text.Length)
         {
-            int startIndex = index;
+            var startIndex = index;
 
             while (index < text.Length && IsHexDigit(text[index]))
                 index++;
@@ -292,7 +292,7 @@ public static class EmailValidator
                 return compact ? colons < 6 : colons == 6;
             }
 
-            int count = index - startIndex;
+            var count = index - startIndex;
             if (count > 4)
                 return false;
 
@@ -346,7 +346,7 @@ public static class EmailValidator
     /// </exception>
     public static bool Validate(string email, bool allowTopLevelDomains = false, bool allowInternational = false)
     {
-        int index = 0;
+        var index = 0;
 
         if (email == null)
             throw new ArgumentNullException(nameof(email));

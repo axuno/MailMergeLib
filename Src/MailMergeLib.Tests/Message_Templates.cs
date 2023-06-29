@@ -13,7 +13,7 @@ class Message_Templates
     [Test]
     public void Template()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         var msg = mmm.GetMimeMessage(variables);
 
@@ -58,7 +58,7 @@ class Message_Templates
     [Test]
     public void Part_in_Template_Changes()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         Assert.Throws<TemplateException>(() => mmm.Templates["This-is-definitely-an-illegal-Key-not-existing-in-any-Part"] = new Template());
             
@@ -76,7 +76,7 @@ class Message_Templates
     [Test]
     public void FileSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> _);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var _);
         var templates = mmm.Templates;
         var tempFilename = Path.GetTempFileName();
         templates.Serialize(tempFilename, Encoding.UTF8);
@@ -87,7 +87,7 @@ class Message_Templates
     [Test]
     public void StreamSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> _);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var _);
         var templates = mmm.Templates;
         var stream = new MemoryStream();
         templates.Serialize(stream, Encoding.UTF8);
@@ -102,7 +102,7 @@ class Message_Templates
     [Test]
     public void TemplateTest()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
         var t = mmm.Templates[0];
         Assert.DoesNotThrow(() =>
         {

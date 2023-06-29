@@ -290,11 +290,11 @@ public class SmtpClientConfig
     /// Excluding those properties which are not serialized:
     /// ClientCertificates, ServerCertificateValidationCallback, NetworkCredential, ProtocolLoggerDelegate
     /// </remarks>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-        if (other.GetType() != this.GetType()) return false;
+        if (other.GetType() != GetType()) return false;
         return Equals((SmtpClientConfig)other);
     }
 

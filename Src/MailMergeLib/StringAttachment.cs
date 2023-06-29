@@ -62,11 +62,11 @@ public class StringAttachment
     /// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
     /// <param name="sa"></param>
     /// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
-    public override bool Equals(object sa)
+    public override bool Equals(object? sa)
     {
         if (sa is null) return false;
         if (ReferenceEquals(this, sa)) return true;
-        if (sa.GetType() != this.GetType()) return false;
+        if (sa.GetType() != GetType()) return false;
         return Equals((StringAttachment) sa);
     }
 

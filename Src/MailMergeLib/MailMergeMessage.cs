@@ -335,7 +335,8 @@ public partial class MailMergeMessage : IDisposable
 
     private MailSmartFormatter GetConfiguredMailSmartFormatter()
     {
-        var smartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig);
+        var currentSmartSettings = SmartFormatter.Settings;
+        var smartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig, currentSmartSettings);
         smartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
         smartFormatter.Parser.OnParsingFailure += (sender, args) => { _parseExceptions.Add(new ParseException(args.Errors.MessageShort, args.Errors)); };
         return smartFormatter;
@@ -855,7 +856,7 @@ public partial class MailMergeMessage : IDisposable
             }
             catch (FormatException)
             {
-                _badMailAddr.Add(mmAddr.ToString());
+                _badMailAddr.Add(mmAddr.ToString()!);
             }
         }
     }

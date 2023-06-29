@@ -29,7 +29,7 @@ public static class Tools
             }
 #endif
         var pathRoot = Path.GetPathRoot(path);
-        if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
+        if (pathRoot is null || pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
             return false;
         return !(pathRoot == path && pathRoot.StartsWith("\\\\") && pathRoot.IndexOf('\\', 2) == -1); // A UNC server name without a share name (e.g "\\NAME") is invalid
     }
@@ -87,7 +87,7 @@ public static class Tools
         var length = Math.Min(fromDirectories.Length, toDirectories.Length);
         var lastCommonRoot = -1;
         // find common root
-        for (int x = 0; x < length; x++)
+        for (var x = 0; x < length; x++)
         {
             if (string.Compare(fromDirectories[x], toDirectories[x], StringComparison.OrdinalIgnoreCase) != 0)
                 break;
@@ -163,7 +163,7 @@ public static class Tools
     /// <returns></returns>
     public static string Stream2String(Stream stream, Encoding encoding)
     {
-        long streamPos = stream.Position;
+        var streamPos = stream.Position;
         stream.Seek(0, SeekOrigin.Begin);
         var bytes = new byte[stream.Length];
         stream.Read(bytes, 0, (int) stream.Length);
@@ -180,8 +180,8 @@ public static class Tools
     public static string WrapLines(string input, int length)
     {
         var result = new StringBuilder();
-        string[] lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-        foreach (string line in lines)
+        var lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+        foreach (var line in lines)
         {
             result.Append(WrapLine(line, length));
         }
@@ -200,7 +200,7 @@ public static class Tools
         while ((input.Length > length))
         {
             //  find the position of the last space before the length
-            int cutPos = input.Substring(0, length).LastIndexOf(" ");
+            var cutPos = input.Substring(0, length).LastIndexOf(" ");
             if ((cutPos == -1))
             {
                 //  need to cut right at length

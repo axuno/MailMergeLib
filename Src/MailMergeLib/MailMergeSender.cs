@@ -73,10 +73,10 @@ public class MailMergeSender : IDisposable
     public async Task SendAsync<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
     {
         if (mailMergeMessage == null)
-            throw new ArgumentNullException($"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
+            throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
 
         if (dataSource == null)
-            throw new ArgumentNullException($"{nameof(dataSource)} is null.");
+            throw new ArgumentNullException(nameof(dataSource),$"{nameof(dataSource)} is null.");
 
         if (IsBusy)
             throw new InvalidOperationException($"{nameof(SendAsync)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
@@ -87,7 +87,7 @@ public class MailMergeSender : IDisposable
 
         var tasksUsed = new HashSet<int>();
 
-        void AfterSend(object obj, MailSenderAfterSendEventArgs args)
+        void AfterSend(object? obj, MailSenderAfterSendEventArgs args)
         {
             if (args.Error == null)
                 Interlocked.Increment(ref sentMsgCount);
@@ -174,7 +174,7 @@ public class MailMergeSender : IDisposable
                 }
 
                 smtpClient.ProtocolLogger?.Dispose();
-                smtpClient.Disconnect(true, _cancellationTokenSource.Token);
+                await smtpClient.DisconnectAsync(true, _cancellationTokenSource.Token);
             }, _cancellationTokenSource.Token);
         }
 
@@ -217,7 +217,7 @@ public class MailMergeSender : IDisposable
     public async Task SendAsync(MailMergeMessage mailMergeMessage, object dataItem)
     {
         if (mailMergeMessage == null)
-            throw new ArgumentNullException($"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
+            throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
 
         if (IsBusy)
             throw new InvalidOperationException($"{nameof(SendAsync)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
@@ -303,7 +303,7 @@ public class MailMergeSender : IDisposable
                 {
                     case MessageOutput.None:
                         break;
-                    case MessageOutput.Directory:
+                    case MessageOutput.Directory when config.MailOutputDirectory != null:
                         await mimeMsg.WriteToAsync(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                         break;
 #if NETFRAMEWORK
@@ -492,10 +492,10 @@ public class MailMergeSender : IDisposable
     public void Send<T>(MailMergeMessage mailMergeMessage, IEnumerable<T> dataSource)
     {
         if (mailMergeMessage == null)
-            throw new ArgumentNullException($"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
+            throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
 
         if (dataSource == null)
-            throw new ArgumentNullException($"{nameof(dataSource)} is null.");
+            throw new ArgumentNullException(nameof(dataSource),$"{nameof(dataSource)} is null.");
 
         if (IsBusy)
             throw new InvalidOperationException($"{nameof(Send)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
@@ -600,7 +600,7 @@ public class MailMergeSender : IDisposable
     public void Send(MailMergeMessage mailMergeMessage, object dataItem)
     {
         if (mailMergeMessage == null)
-            throw new ArgumentNullException($"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
+            throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");
 
         if (IsBusy)
             throw new InvalidOperationException($"{nameof(Send)}: A send operation is pending in this instance of {nameof(MailMergeSender)}.");
@@ -681,7 +681,7 @@ public class MailMergeSender : IDisposable
                 {
                     case MessageOutput.None:
                         break;
-                    case MessageOutput.Directory:
+                    case MessageOutput.Directory when config.MailOutputDirectory != null:
                         mimeMsg.WriteTo(System.IO.Path.Combine(config.MailOutputDirectory, Guid.NewGuid().ToString("N") + mailExt), _cancellationTokenSource.Token);
                         break;
 #if NETFRAMEWORK
