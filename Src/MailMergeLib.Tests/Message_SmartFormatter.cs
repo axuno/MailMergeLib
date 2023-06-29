@@ -62,7 +62,7 @@ public class Message_SmartFormatter
     {
         // ******** Initialize ********
         var culture = CultureInfo.GetCultureInfo("en-US");
-        var smf = new MailSmartFormatter();
+        var smf = new MailSmartFormatter(new SmartFormatterConfig(), new SmartSettings());
         smf.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
         smf.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
         // ******** Class instances ********

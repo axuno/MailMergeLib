@@ -2,6 +2,7 @@
 using System.IO;
 using MailMergeLib.Tests.NUnit;
 using NUnit.Framework;
+using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 
@@ -119,5 +120,18 @@ public class Message_Config
         Assert.AreEqual(mc1.GetHashCode(), mc2.GetHashCode());
         Assert.AreEqual(mc1.GetHashCode(), mc1.GetHashCode());
         Assert.AreEqual(mc2.GetHashCode(), mc2.GetHashCode());
+    }
+
+    [Test]
+    public void SmartFormatterConfig_Change_Retains_Existing_SmartSettings()
+    {
+        var mmm = new MailMergeMessage("subject", "plain text");
+        const char alignmentFillCharacter = '#'; // defaults to blank
+        mmm.SmartFormatter.Settings.Formatter.AlignmentFillCharacter = alignmentFillCharacter;
+        // Change the setting triggers creation of a new SmartFormatter instance
+        mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+
+        // Setting should persist
+        Assert.That(mmm.SmartFormatter.Settings.Formatter.AlignmentFillCharacter, Is.EqualTo(alignmentFillCharacter));
     }
 }

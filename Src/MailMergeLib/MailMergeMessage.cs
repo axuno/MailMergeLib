@@ -9,6 +9,7 @@ using MailMergeLib.Serialization;
 using SmartFormat.Extensions;
 using MailMergeLib.Templates;
 using MimeKit;
+using SmartFormat.Core.Settings;
 using YAXLib.Attributes;
 using YAXLib.Enums;
 
@@ -65,7 +66,7 @@ public partial class MailMergeMessage : IDisposable
     {
         Config.IgnoreIllegalRecipientAddresses = true;
         Config.Priority = MessagePriority.Normal;
-        SmartFormatter = GetConfiguredMailSmartFormatter();
+        SmartFormatter = GetConfiguredMailSmartFormatter(true);
         Config.SmartFormatterConfig.OnConfigChanged += RecreateMailSmartFormatter; // SmartFormatter.SetConfig;
         _mailMergeAddresses = new MailMergeAddressCollection(this);
     }
@@ -333,9 +334,12 @@ public partial class MailMergeMessage : IDisposable
         SmartFormatter = GetConfiguredMailSmartFormatter();
     }
 
-    private MailSmartFormatter GetConfiguredMailSmartFormatter()
+    private MailSmartFormatter GetConfiguredMailSmartFormatter(bool invokedFromConstructor = false)
     {
-        var currentSmartSettings = SmartFormatter.Settings;
+        // Take over SmartSettings from existing SmartFormatter instance
+        var currentSmartSettings = invokedFromConstructor
+            ? new SmartSettings()
+            : SmartFormatter.Settings;
         var smartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig, currentSmartSettings);
         smartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
         smartFormatter.Parser.OnParsingFailure += (sender, args) => { _parseExceptions.Add(new ParseException(args.Errors.MessageShort, args.Errors)); };

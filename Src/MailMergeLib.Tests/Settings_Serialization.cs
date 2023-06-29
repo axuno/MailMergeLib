@@ -158,7 +158,7 @@ public class Settings_Serialization
         {
             var restored =
                 Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8)!;
-            Assert.IsTrue(restored.SenderConfig.Equals(_outSettings?.SenderConfig!));
+            Assert.That(restored.SenderConfig, Is.EqualTo(_outSettings.SenderConfig));
         }
         else
         {
