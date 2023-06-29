@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using MailMergeLib.Templates;
 using NUnit.Framework;
@@ -46,22 +45,22 @@ class Message_VariableExceptions
             foreach (var ex in exceptions.InnerExceptions.Where(ex => !(ex is MailMergeMessage
                          .AttachmentException)))
             {
-                if (ex is MailMergeMessage.VariableException)
+                if (ex is MailMergeMessage.VariableException exception)
                 {
-                    Assert.AreEqual(9, (ex as MailMergeMessage.VariableException).MissingVariable.Count);
+                    Assert.AreEqual(9, exception.MissingVariable.Count);
                     Console.WriteLine($"{nameof(MailMergeMessage.VariableException)} thrown successfully:");
                     Console.WriteLine("Missing variables: " +
                                       string.Join(", ",
-                                          (ex as MailMergeMessage.VariableException).MissingVariable));
+                                          exception.MissingVariable));
                     Console.WriteLine();
                 }
-                if (ex is MailMergeMessage.AddressException)
+                if (ex is MailMergeMessage.AddressException addressException)
                 {
                     Console.WriteLine($"{nameof(MailMergeMessage.AddressException)} thrown successfully:");
-                    Console.WriteLine((ex as MailMergeMessage.AddressException).Message);
+                    Console.WriteLine(addressException.Message);
                     Console.WriteLine();
-                    Assert.That((ex as MailMergeMessage.AddressException).Message == "No recipients." ||
-                                (ex as MailMergeMessage.AddressException).Message == "No from address.");
+                    Assert.That(addressException.Message == "No recipients." ||
+                                addressException.Message == "No from address.");
                 }
             }
 
@@ -73,9 +72,9 @@ class Message_VariableExceptions
             {
                 Console.WriteLine($"{nameof(MailMergeMessage.AttachmentException)} thrown successfully:");
                 Console.WriteLine("Missing files: " +
-                                  string.Join(", ", (ex as MailMergeMessage.AttachmentException).BadAttachment));
+                                  string.Join(", ", (ex as MailMergeMessage.AttachmentException)?.BadAttachment!));
                 Console.WriteLine();
-                Assert.AreEqual(1, (ex as MailMergeMessage.AttachmentException).BadAttachment.Count);
+                Assert.AreEqual(1, (ex as MailMergeMessage.AttachmentException)?.BadAttachment.Count);
             }
         }
 
@@ -106,8 +105,7 @@ class Message_VariableExceptions
     [Test]
     public void Template()
     {
-        Dictionary<string, string> variables;
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         var msg = mmm.GetMimeMessage(variables);
 

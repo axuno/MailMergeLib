@@ -9,7 +9,10 @@ public class FileAttachment
     /// Creates a new file attachment for a <see cref="MailMergeMessage"/>
     /// </summary>
     public FileAttachment()
-    {}
+    {
+        DisplayName = Filename = string.Empty;
+        MimeType = MimeKit.MimeTypes.GetMimeType( "application/octet-stream");
+    }
 
     /// <summary>
     /// Creates a new file attachment for a <see cref="MailMergeMessage"/>
@@ -62,11 +65,11 @@ public class FileAttachment
     /// <remarks>E.g. necessary for HashSet&lt;FileAttachment&gt;.</remarks>
     /// <param name="fa"></param>
     /// <returns>Returns true, if both FileAttachments are equal, else false.</returns>
-    public override bool Equals(object fa)
+    public override bool Equals(object? fa)
     {
         if (fa is null) return false;
         if (ReferenceEquals(this, fa)) return true;
-        if (fa.GetType() != this.GetType()) return false;
+        if (fa.GetType() != GetType()) return false;
         return Equals((FileAttachment) fa);
     }
 

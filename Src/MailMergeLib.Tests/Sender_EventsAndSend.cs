@@ -4,26 +4,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using MailKit.Security;
 using MimeKit;
 using netDumbster.smtp;
 using NUnit.Framework;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 
 [TestFixture]
 public class Sender_EventsAndSend
 {
-    private static readonly object _locker = new object();
-    private static SimpleSmtpServer _server;
-    private int? _simpleSmtpServerPort;
-    private readonly Random _rnd = new Random();
-    private Settings _settings = new Settings();
+    private static readonly object _locker = new();
+    private static SimpleSmtpServer? _server;
+    private Settings _settings = new();
 
     public Sender_EventsAndSend()
     {
@@ -31,10 +26,10 @@ public class Sender_EventsAndSend
         // netDumbster.smtp.Logging.LogManager.GetLogger = type => new netDumbster.smtp.Logging.ConsoleLogger(type);
     }
 
-    private void SendMail(EventHandler<MailSenderAfterSendEventArgs> onAfterSend = null,
-        EventHandler<MailSenderSmtpClientEventArgs> onSmtpConnected = null,
-        EventHandler<MailSenderSmtpClientEventArgs> onSmtpDisconnected = null,
-        EventHandler<MailSenderSendFailureEventArgs> onSendFailure = null)
+    private void SendMail(EventHandler<MailSenderAfterSendEventArgs>? onAfterSend = null,
+        EventHandler<MailSenderSmtpClientEventArgs>? onSmtpConnected = null,
+        EventHandler<MailSenderSmtpClientEventArgs>? onSmtpDisconnected = null,
+        EventHandler<MailSenderSendFailureEventArgs>? onSendFailure = null)
     {
         var data = new Dictionary<string, object>
         {
@@ -86,13 +81,13 @@ public class Sender_EventsAndSend
         using var mms = new MailMergeSender();
 
         // single mail
-        Assert.Throws<ArgumentNullException>(() => mms.Send(null, new object()));
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(null, new object()));
+        Assert.Throws<ArgumentNullException>(() => mms.Send(null!, new object()));
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await mms.SendAsync(null!, new object()));
 
         // several mails
-        Assert.Throws<ArgumentNullException>(() => mms.Send(null, new Dictionary<string, string>()));
+        Assert.Throws<ArgumentNullException>(() => mms.Send(null!, new Dictionary<string, string>()));
         Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await mms.SendAsync(null, new Dictionary<string, string>()));
+            await mms.SendAsync(null!, new Dictionary<string, string>()));
     }
 
     [Test]
@@ -101,9 +96,9 @@ public class Sender_EventsAndSend
         using var mms = new MailMergeSender();
         using var mmm = new MailMergeMessage(); // no need to fully prepare for this test
 
-        Assert.Throws<ArgumentNullException>(() => mms.Send(null, (Dictionary<string, string>) null));
+        Assert.Throws<ArgumentNullException>(() => mms.Send(new MailMergeMessage(), (Dictionary<string, string>) null!));
         Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await mms.SendAsync(mmm, (Dictionary<string, string>) null));
+            await mms.SendAsync(mmm, (Dictionary<string, string>) null!));
     }
 
     [Test]
@@ -125,7 +120,7 @@ public class Sender_EventsAndSend
             
         mms.SendCancel(500);
         Assert.ThrowsAsync<TaskCanceledException>(() => mms.SendAsync(mmm, anyData));
-        Assert.AreEqual(0, _server.ReceivedEmailCount);
+        Assert.AreEqual(0, _server?.ReceivedEmailCount);
     }
 
     [Test]
@@ -151,7 +146,7 @@ public class Sender_EventsAndSend
 
         Assert.Throws<AggregateException>(() => { Task.WaitAll(tasks); });
 
-        Assert.AreEqual(0, _server.ReceivedEmailCount);
+        Assert.AreEqual(0, _server?.ReceivedEmailCount);
     }
 
     [Test]
@@ -159,9 +154,9 @@ public class Sender_EventsAndSend
     {
         var connectedCounter = 0;
         var disconnectedCounter = 0;
-        SmtpClientConfig usedClientConfig = null;
+        SmtpClientConfig? usedClientConfig = null;
 
-        void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
+        void OnAfterSend(object? sender, MailSenderAfterSendEventArgs args)
         {
             lock (_locker)
             {
@@ -169,7 +164,7 @@ public class Sender_EventsAndSend
             }
         }
 
-        void OnSmtpConnected(object sender, MailSenderSmtpClientEventArgs args)
+        void OnSmtpConnected(object? sender, MailSenderSmtpClientEventArgs args)
         {
             lock (_locker)
             {
@@ -177,7 +172,7 @@ public class Sender_EventsAndSend
             }
         }
 
-        void OnSmtpDisconnected(object sender, MailSenderSmtpClientEventArgs args)
+        void OnSmtpDisconnected(object? sender, MailSenderSmtpClientEventArgs args)
         {
             lock (_locker)
             {
@@ -189,19 +184,19 @@ public class Sender_EventsAndSend
 
         Assert.AreEqual(1, connectedCounter);
         Assert.AreEqual(1, disconnectedCounter);
-        Assert.AreEqual(1, _server.ReceivedEmailCount);
-        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig.Name);
+        Assert.AreEqual(1, _server?.ReceivedEmailCount);
+        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[0].Name, usedClientConfig?.Name);
 
-        Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig.Name}' passed.\n\n");
-        Console.WriteLine(_server.ReceivedEmail[0].Data);
+        Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig?.Name}' passed.\n\n");
+        Console.WriteLine(_server?.ReceivedEmail[0].Data);
     }
 
     [Test]
     public void SendMailWithBackupConfig()
     {
-        SmtpClientConfig usedClientConfig = null;
+        SmtpClientConfig? usedClientConfig = null;
 
-        void OnAfterSend(object sender, MailSenderAfterSendEventArgs args)
+        void OnAfterSend(object? sender, MailSenderAfterSendEventArgs args)
         {
             usedClientConfig = args.SmtpClientConfig;
         }
@@ -209,20 +204,20 @@ public class Sender_EventsAndSend
         _settings.SenderConfig.SmtpClientConfig[0]
             .SmtpPort++; // set wrong server port, so that backup config should be taken
         SendMail(OnAfterSend);
-        Assert.AreEqual(1, _server.ReceivedEmailCount);
-        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig.Name);
+        Assert.AreEqual(1, _server?.ReceivedEmailCount);
+        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig?.Name);
 
-        Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig.Name}' passed.\n\n");
-        Console.WriteLine(_server.ReceivedEmail[0].Data);
+        Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig?.Name}' passed.\n\n");
+        Console.WriteLine(_server?.ReceivedEmail[0].Data);
     }
 
     [Test]
     public void SendMailWithSendFailure()
     {
-        SmtpClientConfig usedClientConfig = null;
-        Exception sendFailure = null;
+        SmtpClientConfig? usedClientConfig = null;
+        Exception? sendFailure = null;
 
-        void OnSendFailure(object sender, MailSenderSendFailureEventArgs args)
+        void OnSendFailure(object? sender, MailSenderSendFailureEventArgs args)
         {
             lock (_locker)
             {
@@ -235,14 +230,14 @@ public class Sender_EventsAndSend
             .SmtpPort++; // set wrong server port, so that backup config should be taken
         _settings.SenderConfig.SmtpClientConfig[1].SmtpPort++; // set wrong server port, so that send will fail
         Assert.Catch(() => SendMail(onSendFailure: OnSendFailure));
-        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig.Name);
-        Assert.AreEqual(0, _server.ReceivedEmailCount);
+        Assert.AreEqual(_settings.SenderConfig.SmtpClientConfig[1].Name, usedClientConfig?.Name);
+        Assert.AreEqual(0, _server?.ReceivedEmailCount);
     }
 
     private class Recipient
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
     }
 
@@ -333,8 +328,8 @@ public class Sender_EventsAndSend
         // sequence of sync sending is predefined
         while (actualEvents.Count > 0)
         {
-            expectedEvents.TryPop(out string expected);
-            actualEvents.TryPop(out string actual);
+            expectedEvents.TryPop(out var expected);
+            actualEvents.TryPop(out var actual);
             Assert.AreEqual(expected, actual);
         }
 
@@ -475,8 +470,8 @@ public class Sender_EventsAndSend
         // sequence of sync sending is predefined
         while (actualEvents.Count > 0)
         {
-            expectedEvents.TryPop(out string expected);
-            actualEvents.TryPop(out string actual);
+            expectedEvents.TryPop(out var expected);
+            actualEvents.TryPop(out var actual);
             Assert.AreEqual(expected, actual);
         }
 
@@ -593,21 +588,21 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.AreEqual(0, _server.ReceivedEmailCount);
+            Assert.AreEqual(0, _server?.ReceivedEmailCount);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.AreEqual(0, _server.ReceivedEmailCount);
+                Assert.AreEqual(0, _server?.ReceivedEmailCount);
             }
             else
             {
-                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                Assert.AreEqual(recipients.Count, _server?.ReceivedEmailCount);
             }
         }
 
-        _server.ClearReceivedEmail();
+        _server?.ClearReceivedEmail();
 
         // send single data item
         mmm.PlainText = plainText; // set text from constant
@@ -636,21 +631,21 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.AreEqual(0, _server.ReceivedEmailCount);
+            Assert.AreEqual(0, _server?.ReceivedEmailCount);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.AreEqual(0, _server.ReceivedEmailCount);
+                Assert.AreEqual(0, _server?.ReceivedEmailCount);
             }
             else
             {
-                Assert.AreEqual(1, _server.ReceivedEmailCount);
+                Assert.AreEqual(1, _server?.ReceivedEmailCount);
             }
         }
 
-        _server.ClearReceivedEmail();
+        _server?.ClearReceivedEmail();
 
         #endregion
 
@@ -685,21 +680,21 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.AreEqual(0, _server.ReceivedEmailCount);
+            Assert.AreEqual(0, _server?.ReceivedEmailCount);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.AreEqual(0, _server.ReceivedEmailCount);
+                Assert.AreEqual(0, _server?.ReceivedEmailCount);
             }
             else
             {
-                Assert.AreEqual(recipients.Count, _server.ReceivedEmailCount);
+                Assert.AreEqual(recipients.Count, _server?.ReceivedEmailCount);
             }
         }
 
-        _server.ClearReceivedEmail();
+        _server?.ClearReceivedEmail();
 
         // send single data item
         mmm.PlainText = plainText; // set text from constant
@@ -730,17 +725,17 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.AreEqual(0, _server.ReceivedEmailCount);
+            Assert.AreEqual(0, _server?.ReceivedEmailCount);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.AreEqual(0, _server.ReceivedEmailCount);
+                Assert.AreEqual(0, _server?.ReceivedEmailCount);
             }
             else
             {
-                Assert.AreEqual(1, _server.ReceivedEmailCount);
+                Assert.AreEqual(1, _server?.ReceivedEmailCount);
             }
         }
 
@@ -773,11 +768,11 @@ public class Sender_EventsAndSend
         sw.Stop();
         Console.WriteLine($"Time to send {recipients.Count} messages sync: {sw.ElapsedMilliseconds} milliseconds.");
         Console.WriteLine();
-        Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
+        Assert.AreEqual(recipients.Count, _server?.ReceivedEmail.Length);
         Assert.IsFalse(mms.IsBusy);
 
         sw.Reset();
-        _server.ClearReceivedEmail();
+        _server?.ClearReceivedEmail();
 
         sw.Start();
 
@@ -793,7 +788,7 @@ public class Sender_EventsAndSend
         Console.WriteLine(
             $"{numOfSmtpClientsUsed} tasks (and SmtpClients) used for sending async\n(max {mms.Config.MaxNumOfSmtpClients} were configured).");
 
-        Assert.AreEqual(recipients.Count, _server.ReceivedEmail.Length);
+        Assert.AreEqual(recipients.Count, _server?.ReceivedEmail.Length);
         Assert.IsFalse(mms.IsBusy);
     }
 
@@ -802,40 +797,21 @@ public class Sender_EventsAndSend
     [OneTimeSetUp]
     public void FixtureSetUp()
     {
-        _server = SimpleSmtpServer.Start(_rnd.Next(50000, 60000));
     }
 
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        _server.Stop();
-    }
-
-    /// <summary>
-    /// Initialize with port zero.
-    /// In this case, the system will select a random free port
-    /// from the dynamic port range.
-    /// We can get the number of this port from the LocalEndpoint property.
-    /// </summary>
-    /// <returns>The first free TCP port found.</returns>
-    private static int GetFreeTcpPort()
-    {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-        var freePort = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return freePort;
     }
 
     [SetUp]
     public void SetUp()
     {
-        _server.ClearReceivedEmail();
-        _server.Stop();
+        _server?.ClearReceivedEmail();
+        _server?.Stop();
 
-        _simpleSmtpServerPort ??= GetFreeTcpPort();
-
-        _server = SimpleSmtpServer.Start(_simpleSmtpServerPort.Value);
+        // Server frequently hangs, if not initialized before each test
+        _server = SimpleSmtpServer.Start(Helper.GetFreeTcpPort());
         _settings = GetSettings();
     }
 
@@ -862,19 +838,19 @@ public class Sender_EventsAndSend
 
                 SmtpClientConfig = new[]
                 {
-                    new SmtpClientConfig()
+                    new SmtpClientConfig
                     {
                         MessageOutput = MessageOutput.SmtpServer,
                         SmtpHost = "localhost",
-                        SmtpPort = _server.Configuration.Port,
+                        SmtpPort = (int)_server?.Configuration.Port!,
                         NetworkCredential = new Credential("user", "pwd"), // not used for netDumbster
-                        SecureSocketOptions = SecureSocketOptions.None,
+                        SecureSocketOptions = SecureSocketOptions.Auto,
                         Name = "Standard",
                         MaxFailures = 3,
                         DelayBetweenMessages = 0,
                         ClientDomain = "mail.mailmergelib.net"
                     },
-                    new SmtpClientConfig()
+                    new SmtpClientConfig
                     {
                         MessageOutput = MessageOutput.SmtpServer,
                         SmtpHost = "localhost",

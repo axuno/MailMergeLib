@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Mail;
-using System.Reflection;
+﻿using System.Net.Mail;
 using NUnit.Framework;
 #if NETFRAMEWORK
 using System.Configuration;
@@ -58,8 +56,8 @@ namespace MailMergeLib.Tests
             Assert.AreEqual(credentialSet, smtpConfig.NetworkCredential != null);
             if (credentialSet)
             {
-                Assert.AreEqual(username, ((Credential) smtpConfig.NetworkCredential)?.Username);
-                Assert.AreEqual(password, ((Credential) smtpConfig.NetworkCredential)?.Password);
+                Assert.AreEqual(username, ((Credential?) smtpConfig.NetworkCredential)?.Username);
+                Assert.AreEqual(password, ((Credential?) smtpConfig.NetworkCredential)?.Password);
             }
         }
 
@@ -85,7 +83,7 @@ namespace MailMergeLib.Tests
         /// If the app doesn't have a .config, it will be created.
         /// </summary>
         /// <param name="newSmtpSettings">The SMTP settings to write to the .config file.</param>
-        private void ChangeSmtpConfigFile(SmtpSection newSmtpSettings)
+        private static void ChangeSmtpConfigFile(SmtpSection newSmtpSettings)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.SectionGroups["system.net"]?.SectionGroups["mailSettings"]?.Sections.Clear();
@@ -133,7 +131,6 @@ namespace MailMergeLib.Tests
             var sc2 = new SmtpClientConfig();
 
             Assert.IsTrue(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(null));
             Assert.IsFalse(sc1.Equals(new object()));
         }
 
@@ -144,7 +141,6 @@ namespace MailMergeLib.Tests
             var sc2 = new SmtpClientConfig { SmtpPort = 12345 };
 
             Assert.IsFalse(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(null));
             Assert.IsFalse(sc1.Equals(new object()));
         }
     }

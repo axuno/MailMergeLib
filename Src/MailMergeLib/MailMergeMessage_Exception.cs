@@ -4,7 +4,7 @@ using MimeKit;
 
 namespace MailMergeLib;
 
-partial class MailMergeMessage
+public partial class MailMergeMessage
 {
     #region Nested type: AddressException
 
@@ -13,13 +13,19 @@ partial class MailMergeMessage
     /// </summary>
     public class AddressException : Exception
     {
-        public AddressException(string message, HashSet<string> badAddress, Exception innerException)
+        /// <summary>
+        /// CTOR
+        /// </summary>
+        public AddressException(string message, HashSet<string> badAddress, Exception? innerException)
             : base(message, innerException)
         {
             BadAddress = badAddress;
         }
 
-        public HashSet<string> BadAddress { get; } = new HashSet<string>();
+        /// <summary>
+        /// Gets the bad email address(es) leading to the exception.
+        /// </summary>
+        public HashSet<string> BadAddress { get; }
     }
 
     #endregion
@@ -31,13 +37,19 @@ partial class MailMergeMessage
     /// </summary>
     public class AttachmentException : Exception
     {
-        public AttachmentException(string message, HashSet<string> badAttachment, Exception innerException)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        public AttachmentException(string message, HashSet<string> badAttachment, Exception? innerException)
             : base(message, innerException)
         {
             BadAttachment = badAttachment;
         }
 
-        public HashSet<string> BadAttachment { get; } = new HashSet<string>();
+        /// <summary>
+        /// Gets the list of bad attachments that caused the exception.
+        /// </summary>
+        public HashSet<string> BadAttachment { get; }
     }
 
     #endregion
@@ -47,9 +59,12 @@ partial class MailMergeMessage
     /// <summary>
     /// Mail merge empty content exception.
     /// </summary>
-    public class EmtpyContentException : Exception
+    public class EmptyContentException : Exception
     {
-        public EmtpyContentException(string message, Exception innerException)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        public EmptyContentException(string message, Exception? innerException)
             : base(message, innerException)
         {
         }
@@ -64,15 +79,25 @@ partial class MailMergeMessage
     /// </summary>
     public class MailMergeMessageException : AggregateException
     {
-        public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage mimeMessage)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage? mimeMessage)
             : base(message, exceptions)
         {
             MimeMessage = mimeMessage;
         }
 
-        public AggregateException Exception { get; }
+        /// <summary>
+        /// Gets all exceptions that were thrown when the message was created.
+        /// Check <see cref="AggregateException.InnerExceptions"/> for more details.
+        /// </summary>
+        public AggregateException? Exception { get; }
 
-        public MimeMessage MimeMessage { get; }
+        /// <summary>
+        /// Gets the <see cref="MimeMessage"/> where the exception was thrown.
+        /// </summary>
+        public MimeMessage? MimeMessage { get; }
     }
 
     #endregion
@@ -84,12 +109,18 @@ partial class MailMergeMessage
     /// </summary>
     public class VariableException : Exception
     {
-        public VariableException(string message, HashSet<string> missingVariable, Exception innerException)
+        /// <summary>
+        /// CTOR.
+        /// </summary>
+        public VariableException(string message, HashSet<string> missingVariable, Exception? innerException)
             : base(message, innerException)
         {
             MissingVariable = missingVariable;
         }
 
+        /// <summary>
+        /// Gets the missing variables that caused the exception.
+        /// </summary>
         public HashSet<string> MissingVariable { get; }
     }
 
@@ -102,6 +133,9 @@ partial class MailMergeMessage
     /// </summary>
     public class ParseException : Exception
     {
+        /// <summary>
+        /// CTOR.
+        /// </summary>
         public ParseException(string message, Exception innerException)
             : base(message, innerException)
         { }

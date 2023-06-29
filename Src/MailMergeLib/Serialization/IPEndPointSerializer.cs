@@ -9,14 +9,14 @@ namespace MailMergeLib.Serialization;
 /// <summary>
 /// Serializer for <see cref="IPEndPoint"/> objects.
 /// </summary>
-internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
+internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint?>
 {
-    public void SerializeToAttribute(IPEndPoint objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
+    public void SerializeToAttribute(IPEndPoint? objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
 
-    public void SerializeToElement(IPEndPoint objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
+    public void SerializeToElement(IPEndPoint? objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
         if (objectToSerialize == null) return;
 
@@ -24,7 +24,7 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
         elemToFill.SetAttributeValue("Port", objectToSerialize.Port.ToString());
     }
 
-    public string SerializeToValue(IPEndPoint objectToSerialize, ISerializationContext serializationContext)
+    public string SerializeToValue(IPEndPoint? objectToSerialize, ISerializationContext serializationContext)
     {
         throw new NotImplementedException();
     }
@@ -34,7 +34,7 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint>
         throw new NotImplementedException();
     }
 
-    public IPEndPoint DeserializeFromElement(XElement element, ISerializationContext serializationContext)
+    public IPEndPoint? DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
         if (!element.HasAttributes) return null;
 

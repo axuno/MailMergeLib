@@ -13,22 +13,25 @@ public interface IMessageInfo
     /// <summary>
     /// The category of the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    string Category { get; set; }
+    string? Category { get; set; }
 
     /// <summary>
     /// Description for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    string Description { get; set; }
+    string? Description { get; set; }
 
     /// <summary>
     /// Comments for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    string Comments { get; set; }
+    string? Comments { get; set; }
 
     /// <summary>
     /// Data hint for the <see cref="MailMergeMessage"/>. A user-defined string without further relevance for <see cref="MailMergeLib"/>.
     /// </summary>
-    string Data { get; set; }
+    string? Data { get; set; }
 
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     bool Equals(IMessageInfo obj);
 }

@@ -63,7 +63,7 @@ public class AngleSharpHtmlConverter : IHtmlConverter
                 break;
 
             case NodeType.Text:
-                var parentName = node.ParentElement.NodeName.ToLower();
+                var parentName = node.ParentElement?.NodeName.ToLower();
 
                 // script, style and title text is ignored
                 if ((parentName == "script") || (parentName == "style") || parentName == "head" || parentName == "title" || parentName == "meta")
@@ -105,21 +105,21 @@ public class AngleSharpHtmlConverter : IHtmlConverter
                     case "img":
                         // images
                         toWrite.Clear();
-                        if (element.Attributes["src"] != null && element.Attributes["src"].Value.Trim() != string.Empty)
-                            toWrite.Add("[" + element.Attributes["src"].Value + "]");
-                        if (element.Attributes["alt"] != null && element.Attributes["alt"].Value.Trim() != string.Empty)
-                            toWrite.Add("[" + element.Attributes["alt"].Value + "]");
-                        if (element.Attributes["title"] != null && element.Attributes["title"].Value.Trim() != string.Empty)
-                            toWrite.Add("(\"" + element.Attributes["title"].Value + "\")");
+                        if (!string.IsNullOrEmpty(element.Attributes["src"]?.Value.Trim()))
+                            toWrite.Add("[" + element.Attributes["src"]?.Value + "]");
+                        if (!string.IsNullOrEmpty(element.Attributes["alt"]?.Value.Trim()))
+                            toWrite.Add("[" + element.Attributes["alt"]?.Value + "]");
+                        if (!string.IsNullOrEmpty(element.Attributes["title"]?.Value.Trim()))
+                            toWrite.Add("(\"" + element.Attributes["title"]?.Value + "\")");
                         outText.Write("[" + string.Join(" ", toWrite.ToArray()) + "] ");
                         break;
                     case "a":
                         // links
                         toWrite.Clear();
-                        if (element.Attributes["href"] != null && element.Attributes["href"].Value.Trim() != string.Empty)
-                            toWrite.Add("[" + element.Attributes["href"].Value + "]");
-                        if (element.Attributes["title"] != null && element.Attributes["title"].Value.Trim() != string.Empty)
-                            toWrite.Add("(\"" + element.Attributes["title"].Value + "\")");
+                        if (!string.IsNullOrEmpty(element.Attributes["href"]?.Value.Trim()))
+                            toWrite.Add("[" + element.Attributes["href"]?.Value + "]");
+                        if (!string.IsNullOrEmpty(element.Attributes["title"]?.Value.Trim()))
+                            toWrite.Add("(\"" + element.Attributes["title"]?.Value + "\")");
                         outText.Write(string.Join(" ", toWrite.ToArray()) + " ");
                         break;
                     case "hr":

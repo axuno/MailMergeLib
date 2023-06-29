@@ -15,7 +15,7 @@ public class Message_Serialization
     {
         var mmm = MessageFactory.GetMessageWithAllPropertiesSet();
         var result = mmm.Serialize();
-        var back = MailMergeMessage.Deserialize(result);
+        var back = MailMergeMessage.Deserialize(result)!;
 
         Assert.True(mmm.Equals(back));
         Assert.AreEqual(mmm.Serialize(), back.Serialize());
@@ -27,7 +27,7 @@ public class Message_Serialization
         var filename = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         var mmm = MessageFactory.GetMessageWithAllPropertiesSet();
         mmm.Serialize(filename, Encoding.Unicode);
-        var back = MailMergeMessage.Deserialize(filename, Encoding.Unicode);
+        var back = MailMergeMessage.Deserialize(filename, Encoding.Unicode)!;
 
         Assert.True(mmm.Equals(back));
         Assert.AreEqual(mmm.Serialize(), back.Serialize());
@@ -41,7 +41,7 @@ public class Message_Serialization
         mmm.Serialize(msOut, Encoding.UTF8);
         msOut.Position = 0;
 
-        var back = MailMergeMessage.Deserialize(msOut, Encoding.UTF8);
+        var back = MailMergeMessage.Deserialize(msOut, Encoding.UTF8)!;
         msOut.Close();
         msOut.Dispose();
 
@@ -69,7 +69,7 @@ public class Message_Serialization
     public void DeserializeMinimalisticXml()
     {
         // an empty deserialized message and new message must be equal
-        var mmm = MailMergeMessage.Deserialize("<MailMergeMessage></MailMergeMessage>");
+        var mmm = MailMergeMessage.Deserialize("<MailMergeMessage></MailMergeMessage>")!;
         Assert.True(new MailMergeMessage().Equals(mmm));
     }
 
@@ -96,7 +96,7 @@ public class Message_Serialization
         };
         var result = templates.Serialize();
         var back = new MailMergeMessage();
-        back.Templates.AddRange(Templates.Templates.Deserialize(result));
+        back.Templates.AddRange(Templates.Templates.Deserialize(result)!);
 
         Assert.True(templates.Equals(back.Templates));
         Assert.AreEqual(templates.Serialize(), back.Templates.Serialize());

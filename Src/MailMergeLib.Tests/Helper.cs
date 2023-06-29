@@ -1,5 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Reflection;
 
 namespace MailMergeLib.Tests;
@@ -16,10 +20,10 @@ internal class Helper
     /// <returns></returns>
     public static string GetCodeBaseDirectory()
     {
-        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
+        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath)!;
     }
 
-    internal static int Compare(Stream a, Stream b)
+    internal static int Compare(Stream? a, Stream? b)
     {
         if (a == null && b == null) return 0;
 
@@ -39,5 +43,47 @@ internal class Helper
             if (diff != 0) return diff;
         }
         return 0;
+    }
+
+    /// <summary>
+    /// The method will select the first free port after and
+    /// including the given <see paramref="startPort"/>.
+    /// </summary>
+    /// <returns>The first free TCP port found.</returns>
+    /// <exception cref="InvalidCastException">If no free port could be found.</exception>
+
+    internal static int GetFreeTcpPort(int startPort = 2000) 
+    {
+        for (var i = startPort; i <= 0xFFFF; i++)
+        {
+            if (IsFreePort(i) && CanBindPort(i)) return i;
+        }
+
+        throw new InvalidOperationException("No free TCP port found");
+    }
+
+    private static bool IsFreePort(int port)
+    {
+        var properties = IPGlobalProperties.GetIPGlobalProperties();
+        var listeners = properties.GetActiveTcpListeners();
+        var openPorts = listeners.Select(item => item.Port).ToArray<int>();
+        return openPorts.All(openPort => openPort != port);
+    }
+
+    private static bool CanBindPort(int port)
+    {
+        try
+        {
+            var localEndPoint = new IPEndPoint(IPAddress.Any, port);
+            using var listener = new Socket(IPAddress.Any.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            listener.Bind(localEndPoint);
+        }
+        catch
+        {
+            // e.g. because of "Permission denied" or other reason
+            return false;
+        }
+
+        return true;
     }
 }

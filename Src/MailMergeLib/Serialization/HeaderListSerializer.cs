@@ -46,11 +46,10 @@ internal class HeaderListSerializer : ICustomSerializer<HeaderList>
 
         foreach (var header in element.Elements(HeaderElementName))
         {
-            HeaderId id;
             var idAttr = header.Attributes(HeaderIdName).FirstOrDefault();
             if (idAttr != null)
             {
-                if (Enum.TryParse(idAttr.Value, out id))
+                if (Enum.TryParse(idAttr.Value, out HeaderId id))
                 {
                     var valueAttr = header.Attributes(HeaderValueName).FirstOrDefault();
                     if (valueAttr != null)

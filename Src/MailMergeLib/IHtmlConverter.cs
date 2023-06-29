@@ -1,5 +1,4 @@
 namespace MailMergeLib;
-
 /// <summary>
 /// Convert HTML to plain text.
 /// </summary>

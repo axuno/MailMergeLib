@@ -12,9 +12,9 @@ namespace MailMergeLib.Templates;
 [YAXSerializeAs("Template")]
 public class Template
 {
-    private string _key;
-    private string _defaultKey;
-    private Parts _text = new Parts();
+    private string? _key;
+    private string? _defaultKey;
+    private Parts _text = new();
 
     /// <summary>
     /// Creates an instance of a <see cref="Template"/> class.
@@ -30,14 +30,14 @@ public class Template
     /// <param name="name">The name of the template.</param>
     /// <param name="parts">The <see cref="Parts"/> of the template.</param>
     /// <param name="defaultKey">The default key for the template, may be omitted.</param>
-    public Template(string name, Parts parts, string defaultKey = null) : this()
+    public Template(string name, Parts parts, string? defaultKey = null) : this()
     {
         Name = name;
         Text.AddRange(parts);
         DefaultKey = defaultKey;
     }
 
-    private void TextOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+    private void TextOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
     {
         // call the setter to verify the current value can still be set after changing the collection
         DefaultKey = DefaultKey;
@@ -49,7 +49,7 @@ public class Template
     [YAXSerializableField]
     [YAXAttributeForClass]
     [YAXErrorIfMissed(YAXExceptionTypes.Error)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// The property is a list of type <see cref="Parts"/>.
@@ -74,9 +74,9 @@ public class Template
     /// </summary>
     /// <param name="key">The key to get the parts for. If null or omitted, the <see cref="Key"/> property of the <see cref="Template"/> will be used.</param>
     /// <returns>If the key parameter is found, it returns an array of <see cref="Part"/> for the key parameter, else from the default key.</returns>
-    public Part[] GetParts(string key = null)
+    public Part[] GetParts(string? key = null)
     {
-        if (key == null) key = Key;
+        key ??= Key;
 
         // Gracious detection:
         // If Text only has entries with 1 key and nothing else is selected, return the parts for the only key
@@ -91,7 +91,7 @@ public class Template
             return this[DefaultKey];
         }
 
-        return this[key];
+        return this[key!];
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class Template
     /// </summary>
     /// <exception cref="TemplateException"></exception>
     [YAXDontSerialize]
-    public string Key
+    public string? Key
     {
         get => _key;
         set
@@ -119,7 +119,7 @@ public class Template
     [YAXAttributeFor("Text")]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     [YAXDontSerializeIfNull]
-    public string DefaultKey
+    public string? DefaultKey
     {
         get => _defaultKey;
         set
@@ -149,11 +149,11 @@ public class Template
     /// </summary>
     /// <param name="obj"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((Template)obj);
     }
 

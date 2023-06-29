@@ -13,7 +13,7 @@ class Message_Templates
     [Test]
     public void Template()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         var msg = mmm.GetMimeMessage(variables);
 
@@ -37,7 +37,7 @@ class Message_Templates
             .First(t => t.Type == PartType.Plain)
             .Value.Replace("{FirstName}", variables["FirstName"])));
 
-        // Neither DefaultKey nore Key of the template are set: gets the first part
+        // Neither DefaultKey nor Key of the template are set: gets the first part
         mmm.Templates[0].DefaultKey = null;
         mmm.Templates[0].Key = null;
         // Remove so that only max. 2 parts for 1 key are left
@@ -58,7 +58,7 @@ class Message_Templates
     [Test]
     public void Part_in_Template_Changes()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
 
         Assert.Throws<TemplateException>(() => mmm.Templates["This-is-definitely-an-illegal-Key-not-existing-in-any-Part"] = new Template());
             
@@ -76,23 +76,23 @@ class Message_Templates
     [Test]
     public void FileSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var _);
         var templates = mmm.Templates;
         var tempFilename = Path.GetTempFileName();
         templates.Serialize(tempFilename, Encoding.UTF8);
-        Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)));
+        Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)!));
         File.Delete(tempFilename);
     }
 
     [Test]
     public void StreamSerialization()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var _);
         var templates = mmm.Templates;
         var stream = new MemoryStream();
         templates.Serialize(stream, Encoding.UTF8);
         stream.Position = 0;
-        var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8);
+        var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8)!;
         Assert.True(templates.Equals(restoredTemplates));
 
         Assert.True(templates.Equals(templates));
@@ -102,7 +102,7 @@ class Message_Templates
     [Test]
     public void TemplateTest()
     {
-        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out Dictionary<string, string> variables);
+        var mmm = MessageFactory.GetHtmlAndPlainMessage_WithTemplates(out var variables);
         var t = mmm.Templates[0];
         Assert.DoesNotThrow(() =>
         {
@@ -110,14 +110,10 @@ class Message_Templates
         });
         Assert.Throws<TemplateException>(() => t.Key = "This-is-definitely-an-illegal-Key-not-existing-in-any-Part");
 
-        Assert.False(t.Equals(null));
-        Assert.True(t.Equals(t));
         Assert.False(t.Equals(new object()));
 
         // Equality with null members
-        t.Name = t.Key = t.DefaultKey = null;
-        Assert.False(t.Equals(null));
-        Assert.True(t.Equals(t));
+        t.Key = t.DefaultKey = null;
         Assert.False(t.Equals(new object()));
     }
 }

@@ -15,7 +15,10 @@ public class MailMergeAddress
     /// <summary>
     /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
     /// </summary>
-    public MailMergeAddress() { }
+    public MailMergeAddress()
+    {
+        Address = DisplayName = string.Empty;
+    }
 
     /// <summary>
     /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
@@ -33,7 +36,7 @@ public class MailMergeAddress
     /// <param name="addrType">MailAddressType of the e-mail address.</param>
     /// <param name="address">A string that contains an e-mail address.</param>
     /// <param name="displayName">A string that contains the display name associated with address. This parameter can be null.</param>
-    public MailMergeAddress(MailAddressType addrType, string displayName, string address)
+    public MailMergeAddress(MailAddressType addrType, string? displayName, string address)
     {
         AddrType = addrType;
         Address = address;
@@ -51,8 +54,7 @@ public class MailMergeAddress
     {
         AddrType = addrType;
         DisplayNameCharacterEncoding = displayNameCharacterEncoding;
-        MailboxAddress mba;
-        if (MailboxAddress.TryParse(displayNameCharacterEncoding?.GetBytes(fullMailAddress), out mba))
+        if (MailboxAddress.TryParse(displayNameCharacterEncoding?.GetBytes(fullMailAddress), out var mba))
         {
             Address = mba.Address;
             DisplayName = mba.Name;
@@ -79,13 +81,13 @@ public class MailMergeAddress
     /// Gets or sets the display name of the recipient.
     /// </summary>
     [YAXSerializableField]
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
     /// <summary>
     /// Gets or sets the Encoding that defines the character set used for displayName.
     /// </summary>
     [YAXDontSerialize]
-    internal Encoding DisplayNameCharacterEncoding { get; set; }
+    internal Encoding? DisplayNameCharacterEncoding { get; set; }
 
     /// <summary>
     /// Character encoding for the display name.
@@ -93,10 +95,13 @@ public class MailMergeAddress
     /// </summary>
     [YAXSerializableField]
     [YAXSerializeAs("DisplayNameCharacterEncoding")]
-    internal string DisplayNameCharacterEncodingName
+    internal string? DisplayNameCharacterEncodingName
     {
-        get { return DisplayNameCharacterEncoding.WebName; }
-        set { DisplayNameCharacterEncoding = Encoding.GetEncoding(value); }
+        get { return DisplayNameCharacterEncoding?.WebName; }
+        set
+        {
+            if (value != null) DisplayNameCharacterEncoding = Encoding.GetEncoding(value);
+        }
     }
 
     /// <summary>
@@ -105,10 +110,10 @@ public class MailMergeAddress
     /// <returns>Returns a MailAddress ready to be used for a MailAddress, or Null if no address part exists.</returns>
     /// <exception cref="NullReferenceException">Throws a NullReferenceException if TextVariableManager is null.</exception>
     /// <exception cref="FormatException">Throws a FormatException if the computed MailAddress is not valid.</exception>
-    internal MailboxAddress GetMailAddress(MailMergeMessage mmm, object dataItem)
+    internal MailboxAddress? GetMailAddress(MailMergeMessage mmm, object? dataItem)
     {
         var address = mmm.SearchAndReplaceVars(Address, dataItem);
-        var displayName = mmm.SearchAndReplaceVars(DisplayName, dataItem);
+        var displayName = DisplayName != null ? mmm.SearchAndReplaceVars(DisplayName, dataItem) : null;
         if (string.IsNullOrEmpty(displayName)) displayName = null;
 
         // Exclude invalid address from further process
@@ -117,7 +122,7 @@ public class MailMergeAddress
             return null;
         }
 
-        return  displayName != null
+        return displayName != null
             ? new MailboxAddress(DisplayNameCharacterEncoding, displayName, address)
             : new MailboxAddress(DisplayNameCharacterEncoding, address, address);
     }
@@ -129,14 +134,17 @@ public class MailMergeAddress
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != GetType()) return false;
         return Equals((MailMergeAddress) obj);
     }
 
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     protected bool Equals(MailMergeAddress other)
     {
         return AddrType == other.AddrType && string.Equals(Address, other.Address) && string.Equals(DisplayName, other.DisplayName) && Equals(DisplayNameCharacterEncoding, other.DisplayNameCharacterEncoding);

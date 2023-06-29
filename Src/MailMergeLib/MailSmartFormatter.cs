@@ -1,7 +1,6 @@
 ﻿using SmartFormat;
-using SmartFormat.Core.Extensions;
+using SmartFormat.Core.Settings;
 using SmartFormat.Extensions;
-using SmartFormatMail = SmartFormat;
 
 namespace MailMergeLib;
 
@@ -15,37 +14,36 @@ namespace MailMergeLib;
 /// </example>
 public class MailSmartFormatter : SmartFormatter
 {
-    internal MailSmartFormatter() : base()
+    private MailSmartFormatter(SmartSettings? currentSmartSettings) : base(currentSmartSettings)
     {
-        // Register all default extensions here:
-        // Add all extensions:
-        // Note, the order is important; the extensions
-        // will be executed in this order:
-        var listFormatter = new ListFormatter(this);
-            
+        Templates = new TemplateFormatter();
+        
+        // Default sources from Smart.CreateDefaultSmartFormat() v3.2.1
         AddExtensions(
-            (ISource)listFormatter, // ListFormatter MUST be first
-            new DictionarySource(this),
-            new ValueTupleSource(this),
-            new ValueTupleSource(this),
-            new JsonSource(this),
-            //new XmlSource(this),
-            new ReflectionSource(this),
-            // The DefaultSource reproduces the string.Format behavior:
-            new DefaultSource(this)
-        );
-        AddExtensions(
-            (IFormatter)listFormatter,
-            new PluralLocalizationFormatter("en"),
-            new ConditionalFormatter(),
-            new TimeFormatter("en"),
-            //new XElementFormatter(),
-            new ChooseFormatter(),
-            new DefaultFormatter()
-        );
+            new StringSource(), 
+            new ListFormatter(), 
+            new DictionarySource(),
+            new ValueTupleSource(), 
+            new ReflectionSource(), 
+            new DefaultSource(),
+            new KeyValuePairSource())
 
-        Templates = new TemplateFormatter(this);
-        AddExtensions(Templates);
+            // Default formatters from Smart.CreateDefaultSmartFormat() v3.2.1
+            .AddExtensions(new PluralLocalizationFormatter(),
+                new ConditionalFormatter(), 
+                new IsMatchFormatter(), 
+                new NullFormatter(),
+                new ChooseFormatter(),
+                new SubStringFormatter(),
+                // The DefaultSource reproduces the string.Format behavior:
+                new DefaultFormatter())
+
+            // Extensions to keep API compatibility with MailMergeLib v5.x
+            .AddExtensions(
+                new NewtonsoftJsonSource())
+            .AddExtensions(
+                new TimeFormatter { CanAutoDetect = false },
+                Templates);
     }
 
     /// <summary>
@@ -54,25 +52,22 @@ public class MailSmartFormatter : SmartFormatter
     /// Error actions are SmartFormatters defaults.
     /// </summary>
     /// <param name="config"></param>
-    internal MailSmartFormatter(SmartFormatterConfig config) : this()
+    /// <param name="currentSmartSettings"></param>
+    internal MailSmartFormatter(SmartFormatterConfig config, SmartSettings? currentSmartSettings) : this(currentSmartSettings)
     {
-        if (config == null) return;
-            
         SetConfig(config);
     }
 
     /// <summary>
     /// Gets or sets the <see cref="TemplateFormatter"/> where the templates can be registered later on.
     /// </summary>
-    internal TemplateFormatter Templates { get; set; }
-
+    internal TemplateFormatter? Templates { get; set; }
+    
     internal void SetConfig(SmartFormatterConfig sfConfig)
     {
-        if (sfConfig == null) return;
-
-        Settings.FormatErrorAction = sfConfig.FormatErrorAction;
-        Settings.ParseErrorAction = sfConfig.ParseErrorAction;
-        Settings.CaseSensitivity = sfConfig.CaseSensitivity;
-        Settings.ConvertCharacterStringLiterals = sfConfig.ConvertCharacterStringLiterals;
+        Settings.Formatter.ErrorAction = (FormatErrorAction) sfConfig.FormatErrorAction;
+        Settings.Parser.ErrorAction = (ParseErrorAction) sfConfig.ParseErrorAction;
+        Settings.CaseSensitivity = (SmartFormat.Core.Settings.CaseSensitivityType) sfConfig.CaseSensitivity;
+        Settings.Parser.ConvertCharacterStringLiterals = sfConfig.ConvertCharacterStringLiterals;
     }
 }

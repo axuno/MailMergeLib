@@ -22,14 +22,14 @@ public static class Tools
     {
         if (string.IsNullOrWhiteSpace(path) || path.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Path.IsPathRooted(path))
             return false;
-#if NETSTANDARD
+#if NETSTANDARD || NET
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return true;
             }
 #endif
         var pathRoot = Path.GetPathRoot(path);
-        if (pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
+        if (pathRoot is null || pathRoot.Length <= 2) // Accepts X:\ and \\UNC\PATH, rejects empty string, \ and X:
             return false;
         return !(pathRoot == path && pathRoot.StartsWith("\\\\") && pathRoot.IndexOf('\\', 2) == -1); // A UNC server name without a share name (e.g "\\NAME") is invalid
     }
@@ -43,10 +43,10 @@ public static class Tools
     /// <returns>
     /// A rooted path.
     /// </returns>
-    public static string MakeFullPath(string basename, string filename)
+    public static string MakeFullPath(string basename, string? filename)
     {
         basename = basename.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-        filename = filename.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        filename = filename?.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
         if (! string.IsNullOrEmpty(filename))
         {
@@ -55,7 +55,7 @@ public static class Tools
                 filename = Path.GetFullPath(Path.Combine(basename, filename));
             }
         }
-        return filename;
+        return filename ?? basename;
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public static class Tools
         var length = Math.Min(fromDirectories.Length, toDirectories.Length);
         var lastCommonRoot = -1;
         // find common root
-        for (int x = 0; x < length; x++)
+        for (var x = 0; x < length; x++)
         {
             if (string.Compare(fromDirectories[x], toDirectories[x], StringComparison.OrdinalIgnoreCase) != 0)
                 break;
@@ -163,7 +163,7 @@ public static class Tools
     /// <returns></returns>
     public static string Stream2String(Stream stream, Encoding encoding)
     {
-        long streamPos = stream.Position;
+        var streamPos = stream.Position;
         stream.Seek(0, SeekOrigin.Begin);
         var bytes = new byte[stream.Length];
         stream.Read(bytes, 0, (int) stream.Length);
@@ -180,8 +180,8 @@ public static class Tools
     public static string WrapLines(string input, int length)
     {
         var result = new StringBuilder();
-        string[] lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-        foreach (string line in lines)
+        var lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+        foreach (var line in lines)
         {
             result.Append(WrapLine(line, length));
         }
@@ -200,7 +200,7 @@ public static class Tools
         while ((input.Length > length))
         {
             //  find the position of the last space before the length
-            int cutPos = input.Substring(0, length).LastIndexOf(" ");
+            var cutPos = input.Substring(0, length).LastIndexOf(" ");
             if ((cutPos == -1))
             {
                 //  need to cut right at length
@@ -250,7 +250,7 @@ public static class Tools
     /// <remarks>
     /// The ContentIds and Boundaries of a MimeMessage will change each time the message is written, so the size may differ for a few bytes.
     /// </remarks>
-    public static long CalcMessageSize(MimeMessage msg)
+    public static long CalcMessageSize(MimeMessage? msg)
     {
         return msg?.ToString().Length ?? 0;
     }
@@ -264,7 +264,7 @@ public static class Tools
     /// </remarks>
     /// <param name="encoding"></param>
     /// <returns></returns>
-    internal static string GetMimeCharset(Encoding encoding)
+    internal static string GetMimeCharset(Encoding? encoding)
     {
         // This method is part of CharsetUtils.cs of MimeKit
         // Author: Jeffrey Stedfast <jeff@xamarin.com>

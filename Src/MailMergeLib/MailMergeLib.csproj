@@ -4,7 +4,7 @@
         <Description>MailMergeLib is a mail message client library which provides comfortable mail merge capabilities for text, inline images and attachments, as well as good throughput and fault tolerance for sending mail messages.</Description>
         <AssemblyTitle>MailMergeLib</AssemblyTitle>
         <AssemblyName>MailMergeLib</AssemblyName>
-        <TargetFrameworks>netstandard2.1;net462</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net462;net6.0</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>MailMergeLib</RootNamespace>
         <AssemblyOriginatorKeyFile>MailMergeLib.snk</AssemblyOriginatorKeyFile>
@@ -14,9 +14,9 @@
         <PackageIcon>MailMergeLib_64x64.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageLicenseUrl></PackageLicenseUrl>
-        <PackageReleaseNotes>See the change log with links to the Wiki for details of this release:
-https://github.com/axuno/MailMergeLib/blob/main/ReleaseNotes.md</PackageReleaseNotes>
-        <Nullable>disable</Nullable>
+        <PackageReleaseNotes>See the release notes for all versions with links to the Wiki for details of this release:
+https://github.com/axuno/MailMergeLib/releases</PackageReleaseNotes>
+        <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <PackageTags>smtp mime mail email merge template netcore netstandard netframework c#</PackageTags>
         <RepositoryType>Git</RepositoryType>
@@ -55,11 +55,11 @@ https://github.com/axuno/MailMergeLib/blob/main/ReleaseNotes.md</PackageReleaseN
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AngleSharp" Version="1.0.3" />
+        <PackageReference Include="AngleSharp" Version="1.0.4" />
         <PackageReference Include="MailKit" Version="4.1.0" />
         <PackageReference Include="MimeKit" Version="4.1.0" />
-        <PackageReference Include="SmartFormat.NET" Version="[2.7.3,3.0)" />
-        <PackageReference Include="YAXLib" Version="4.0.0" />
+        <PackageReference Include="SmartFormat.NET" Version="3.2.1" />
+        <PackageReference Include="YAXLib" Version="4.1.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -74,7 +74,10 @@ https://github.com/axuno/MailMergeLib/blob/main/ReleaseNotes.md</PackageReleaseN
 
     <ItemGroup>
         <None Include="../../MailMergeLib_64x64.png" Pack="true" Visible="false" PackagePath="/" />
+        <!-- The README used as the PackageReadmeFile on NuGet -->
         <None Include="../../PkgReadMe.md" Pack="true" PackagePath="/" />
+        <!-- This readme.txt gets displayed by Visual Studio in a tab after package installation -->
+        <None Include="../../readme.txt" pack="true" PackagePath="/" />
     </ItemGroup>
 
     <ItemGroup>

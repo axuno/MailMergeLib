@@ -56,14 +56,11 @@ public class Templates : List<Template>
     /// <exception cref="TemplateException"></exception>
     public Template this[string name]
     {
-        get { return Find(k => k.Name == name); }
+        get { return Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this); }
 
         set
         {
-            var tp = Find(k => k.Name == name);
-            if (tp == null)
-                throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
-
+            var tp = Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
             tp.Name = value.Name;
             tp.Text = value.Text;
             tp.DefaultKey = value.DefaultKey;
@@ -148,7 +145,7 @@ public class Templates : List<Template>
     /// </summary>
     /// <param name="xml"></param>
     /// <returns>Returns an instance of <see cref="Templates"/>.</returns>
-    public static Templates Deserialize(string xml)
+    public static Templates? Deserialize(string xml)
     {
         return SerializationFactory.Deserialize<Templates>(xml);
     }
@@ -158,7 +155,7 @@ public class Templates : List<Template>
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public static Templates Deserialize(Stream stream, System.Text.Encoding encoding)
+    public static Templates? Deserialize(Stream stream, System.Text.Encoding encoding)
     {
         return SerializationFactory.Deserialize<Templates>(new StreamReader(stream, encoding), true);
     }
@@ -168,7 +165,7 @@ public class Templates : List<Template>
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static Templates Deserialize(string filename, System.Text.Encoding encoding)
+    public static Templates? Deserialize(string filename, System.Text.Encoding encoding)
     {
         return SerializationFactory.Deserialize<Templates>(filename, encoding);
     }

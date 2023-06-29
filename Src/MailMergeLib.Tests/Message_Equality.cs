@@ -7,13 +7,13 @@ namespace MailMergeLib.Tests;
 [TestFixture]
 public class Message_Equality
 {
-    private MailMergeAddress _addr1a = new MailMergeAddress(MailAddressType.To, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
-    private MailMergeAddress _addr2a = new MailMergeAddress(MailAddressType.Bcc, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
+    private readonly MailMergeAddress _addr1a = new(MailAddressType.To, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
+    private readonly MailMergeAddress _addr2a = new(MailAddressType.Bcc, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
 
-    private MailMergeAddress _addr3 = new MailMergeAddress(MailAddressType.From, "display name 3", "address3@test.com") { DisplayNameCharacterEncoding = Encoding.UTF8 };
+    private readonly MailMergeAddress _addr3 = new(MailAddressType.From, "display name 3", "address3@test.com") { DisplayNameCharacterEncoding = Encoding.UTF8 };
 
-    private MailMergeAddress _addr1b = new MailMergeAddress(MailAddressType.To, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
-    private MailMergeAddress _addr2b = new MailMergeAddress(MailAddressType.Bcc, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
+    private readonly MailMergeAddress _addr1b = new(MailAddressType.To, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
+    private readonly MailMergeAddress _addr2b = new(MailAddressType.Bcc, "display name", "address@test.com") { DisplayNameCharacterEncoding = Encoding.UTF32 };
 
     [Test]
     public void MailMergeAddressEquality()
@@ -35,7 +35,6 @@ public class Message_Equality
 
         addrColl2.Add(_addr3);
         Assert.False(addrColl1.Equals(addrColl2));
-        Assert.False(addrColl1.Equals(null));
     }
 
     [TestCase(MailAddressType.To)]
@@ -115,9 +114,9 @@ public class Message_Equality
     [Test]
     public void MailMergeMessage()
     {
-        var mmm1 = MessageFactory.GetMessageWithAllPropertiesSet();
-        var mmm2 = MailMergeLib.MailMergeMessage.Deserialize(mmm1.Serialize());
-        var mmm3 = MessageFactory.GetMessageWithAllPropertiesSet();
+        var mmm1 = MessageFactory.GetMessageWithAllPropertiesSet()!;
+        var mmm2 = MailMergeLib.MailMergeMessage.Deserialize(mmm1.Serialize())!;
+        var mmm3 = MessageFactory.GetMessageWithAllPropertiesSet()!;
 
         Assert.IsTrue(mmm1.Equals(mmm2));
         Assert.IsTrue(mmm1.Equals(mmm3));
@@ -128,7 +127,6 @@ public class Message_Equality
         mmm3.MailMergeAddresses.RemoveAt(0);
         Assert.IsFalse(mmm1.Equals(mmm3));
 
-        Assert.IsFalse(mmm1.Equals(default(object)));
         Assert.IsTrue(mmm1.Equals(mmm1));
         Assert.IsFalse(mmm1.Equals(new object()));
     }

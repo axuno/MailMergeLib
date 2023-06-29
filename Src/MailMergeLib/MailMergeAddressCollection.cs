@@ -54,9 +54,12 @@ public enum MailAddressType
 public class MailMergeAddressCollection : Collection<MailMergeAddress>
 {
     /// <summary>
-    /// Property <c>MailMergeMessage</c> must be set after creating the instance!
+    /// Property <c>MailMergeMessage</c> will be initialized as 'empty'.
     /// </summary>
-    internal MailMergeAddressCollection() {}
+    internal MailMergeAddressCollection()
+    {
+        MailMergeMessage = new();
+    }
 
     /// <summary>
     /// Constructor.
@@ -114,9 +117,9 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// <param name="addrType"></param>
     /// <param name="dataItem"></param>
     /// <returns>The string representation of the collection of mailbox addresses</returns>
-    public string ToString(MailAddressType addrType, object dataItem)
+    public string ToString(MailAddressType addrType, object? dataItem)
     {
-        return string.Join(", ", Get(addrType).Select(at => at.GetMailAddress(MailMergeMessage, dataItem).ToString()));
+        return string.Join(", ", Get(addrType).Select(at => at?.GetMailAddress(MailMergeMessage, dataItem)?.ToString()));
     }
 
     #region *** Equality ***
@@ -126,11 +129,11 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((MailMergeAddressCollection)obj);
     }
 

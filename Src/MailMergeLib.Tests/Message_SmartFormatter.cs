@@ -16,16 +16,19 @@ public class Message_SmartFormatter
     private class TestClass
     {
         public string Email { set; get; } = "test@example.com";
+#pragma warning disable CA1822 
         public string GetContinent()
         {
             return "Europe";
         }
+#pragma warning restore CA1822
         private TestClass2 NewTestClass { get; set; } = new TestClass2();
         public TestClass2 GetNewTestClass()
         {
             return NewTestClass;
         }
     }
+
     private class TestClass2
     {
         public string City { get; set; } = "New York";
@@ -41,15 +44,15 @@ public class Message_SmartFormatter
 
         var mmm = new MailMergeMessage();
         mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseSensitive;
-        mmm.Config.SmartFormatterConfig.FormatErrorAction =
-            mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
+        mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.OutputErrorInResult;
+        mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
 
-        var smf = mmm.SmartFormatter;
-        Assert.AreEqual(dataItem.Email, smf.Format("{Email}", dataItem));
-        Assert.AreNotEqual(dataItem.Email, smf.Format("{EmAiL}", dataItem));
-        // The following is the same as smf.Settings.CaseSensitivity = CaseSensitivityType.CaseInsensitive
+        Assert.AreEqual(dataItem.Email, mmm.SmartFormatter.Format("{Email}", dataItem));
+        Assert.AreNotEqual(dataItem.Email, mmm.SmartFormatter.Format("{EmAiL}", dataItem));
+        // Changing the the SmartFormatterConfig settings creates a new instance of
+        // the SmartFormatter inside MailMergeMessage
         mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-        var actual = smf.Format("{EmAiL}", dataItem);
+        var actual = mmm.SmartFormatter.Format("{EmAiL}", dataItem);
         Assert.AreEqual(dataItem.Email, actual);
     }
 
@@ -58,20 +61,15 @@ public class Message_SmartFormatter
     public void DataTypeTests()
     {
         // ******** Initialize ********
-        string result;
-        string expected;
-        object dataItem;
         var culture = CultureInfo.GetCultureInfo("en-US");
-        var smf = new MailSmartFormatter
-        {
-            Settings = { FormatErrorAction = ErrorAction.Ignore, ParseErrorAction = ErrorAction.ThrowError }
-        };
-
+        var smf = new MailSmartFormatter(new SmartFormatterConfig(), new SmartSettings());
+        smf.Settings.Formatter.ErrorAction = FormatErrorAction.Ignore;
+        smf.Settings.Parser.ErrorAction = ParseErrorAction.ThrowError;
         // ******** Class instances ********
-        dataItem = new TestClass();
+        object dataItem = new TestClass();
         var text = "Lorem ipsum dolor. Email={Email}, Continent={GetContinent}, City={GetNewTestClass.City}.";
-        result = smf.Format(culture, text, dataItem);
-        expected = string.Format($"Lorem ipsum dolor. Email={((TestClass)dataItem).Email}, Continent={((TestClass)dataItem).GetContinent()}, City={((TestClass)dataItem).GetNewTestClass().City}.");
+        var result = smf.Format(culture, text, dataItem);
+        var expected = string.Format($"Lorem ipsum dolor. Email={((TestClass)dataItem).Email}, Continent={((TestClass)dataItem).GetContinent()}, City={((TestClass)dataItem).GetNewTestClass().City}.");
         Assert.AreEqual(expected, result);
         Console.WriteLine("Class instances: passed");
 
@@ -171,7 +169,7 @@ public class Message_SmartFormatter
         catch (MailMergeMessage.MailMergeMessageException ex)
         {
             // will throw because of incomplete mail addresses, but Subject should contain placeholders replaced with content
-            result = ex.MimeMessage.Subject;
+            result = ex.MimeMessage?.Subject;
         }
             
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
@@ -204,7 +202,7 @@ public class Message_SmartFormatter
         Console.WriteLine("Format error (missing variable): passed");
 
         // ******** Culture ********
-        result = smf.Format(culture, "{Date:MMMM}", new DateTime(2018,01,01));
+        result = smf.Format(culture, "{Date:d:MMMM}", new DateTime(2018,01,01));
             
         Assert.AreEqual("January", result);
         Console.WriteLine("Culture: passed");

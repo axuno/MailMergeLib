@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using MailMergeLib.Serialization;
 
@@ -19,7 +20,7 @@ public class FileMessageInfo : MessageInfoBase
     /// <summary>
     /// The location of the xml serialized <see cref="MailMergeMessage"/> file.
     /// </summary>
-    public FileInfo MessageFile { get; internal set; }
+    public FileInfo? MessageFile { get; internal set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s from the file system.
@@ -30,8 +31,11 @@ public class FileMessageInfo : MessageInfoBase
     /// Deserializes the <see cref="MailMergeMessage"/> and returns a new message object.
     /// </summary>
     /// <returns>Returns the deserialized object from the <see cref="MessageFile"/>.</returns>
-    public override MailMergeMessage LoadMessage()
+    /// <exception cref="InvalidOperationException">In case <see cref="MessageFile"/> is <see langref="null"/></exception>
+    public override MailMergeMessage? LoadMessage()
     {
+        if (MessageFile == null) throw new InvalidOperationException($"{nameof(MessageFile)} must not be null");
+
         return SerializationFactory.Deserialize<MailMergeMessage>(MessageFile.FullName, MessageEncoding);
     }
 }

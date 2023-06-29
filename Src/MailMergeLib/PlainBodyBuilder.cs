@@ -7,11 +7,10 @@ internal class PlainBodyBuilder : BodyBuilderBase
 {
     private readonly string _plainText;
 
-    public PlainBodyBuilder(string plainText)
+    public PlainBodyBuilder(string? plainText)
     {
         _plainText = plainText ?? string.Empty;
     }
-
 
     /// <summary>
     /// Gets the ready made body part for a mail message as TextPart

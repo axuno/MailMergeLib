@@ -18,7 +18,9 @@ public class Credential : ICredentials
     /// Initializes a new instance of the Credential class.
     /// </summary>
     public Credential()
-    {}
+    {
+        Username = Password = string.Empty;
+    }
 
     /// <summary>
     /// Initializes a new instance of the Credential class.
@@ -26,7 +28,7 @@ public class Credential : ICredentials
     /// <param name="username"></param>
     /// <param name="password"></param>
     /// <param name="domain"></param>
-    public Credential(string username, string password, string domain = null)
+    public Credential(string username, string password, string? domain = null)
     {
         Username = username;
         Password = password;
@@ -89,7 +91,7 @@ public class Credential : ICredentials
     /// </summary>
     [YAXAttributeForClass]
     [YAXSerializableField]
-    public string Domain { get; set; }
+    public string? Domain { get; set; }
         
     #endregion
 }

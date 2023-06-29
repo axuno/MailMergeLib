@@ -117,8 +117,8 @@ public class MessageFactory
                 Comments = "Comments to the message",
                 Data = "Data hint"
             },
-            HtmlText = "<html><head></head><body>{:template(Salutation)}and so on</body></html>",
-            PlainText = "{:template(Salutation)}and so on...",
+            HtmlText = "<html><head></head><body>{:t(Salutation)}and so on</body></html>",
+            PlainText = "{:t(Salutation)}and so on...",
             Templates =
             {
                 new Template("Salutation",
@@ -136,7 +136,7 @@ public class MessageFactory
             Config =
             {
                 Organization = "MailMergeLib Inc.",
-                CharacterEncoding = Encoding.UTF8,
+                CharacterEncoding = Encoding.UTF8
             }
         };
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "{FromAddr}"));

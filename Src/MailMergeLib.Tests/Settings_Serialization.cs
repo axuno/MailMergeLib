@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -7,7 +8,6 @@ using System.Text;
 using MailKit.Security;
 using MimeKit;
 using NUnit.Framework;
-using SmartFormat.Core.Settings;
 
 namespace MailMergeLib.Tests;
 
@@ -15,7 +15,7 @@ namespace MailMergeLib.Tests;
 public class Settings_Serialization
 {
     private const string _settingsFilename = "TestSettings.xml";
-    private Settings _outSettings;
+    private Settings _outSettings = new();
 
     [OneTimeSetUp]
     public void Setup()
@@ -98,20 +98,20 @@ public class Settings_Serialization
     [Test]
     public void Credential_Without_Domain()
     {
-        var credential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
-        var networkCredential = credential.GetCredential(null, null);
-        Assert.AreEqual(credential.Username, networkCredential.UserName);
-        Assert.AreEqual(credential.Password, networkCredential.Password);
+        var credential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+        var networkCredential = credential?.GetCredential(new Uri("file:///"), "");
+        Assert.AreEqual(credential?.Username, networkCredential?.UserName);
+        Assert.AreEqual(credential?.Password, networkCredential?.Password);
     }
 
     [Test]
     public void Credential_With_Domain()
     {
-        var credential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.Last().NetworkCredential;
-        var networkCredential = credential.GetCredential(null, null);
-        Assert.AreEqual(credential.Username, networkCredential.UserName);
-        Assert.AreEqual(credential.Password, networkCredential.Password);
-        Assert.AreEqual(credential.Domain, networkCredential.Domain);
+        var credential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.Last().NetworkCredential;
+        var networkCredential = credential?.GetCredential(new Uri("file:///"), "");
+        Assert.AreEqual(credential?.Username, networkCredential?.UserName);
+        Assert.AreEqual(credential?.Password, networkCredential?.Password);
+        Assert.AreEqual(credential?.Domain, networkCredential?.Domain);
     }
 
     [Test]
@@ -125,11 +125,11 @@ public class Settings_Serialization
         _outSettings.Serialize(outMs, Encoding.UTF8);
         var inSettings = Settings.Deserialize(outMs, Encoding.UTF8);
 
-        Assert.IsTrue(inSettings.SenderConfig.Equals(_outSettings.SenderConfig));
+        Assert.IsTrue(inSettings?.SenderConfig.Equals(_outSettings.SenderConfig));
         outMs.Dispose();
 
-        var smtpCredential = (Credential) _outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
-        Assert.AreEqual(cryptoEnabled, smtpCredential.Password != smtpCredential.PasswordEncrypted && smtpCredential.Username != smtpCredential.UsernameEncrypted);
+        var smtpCredential = (Credential?) _outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+        Assert.AreEqual(cryptoEnabled, smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted);
     }
 
     [Test]
@@ -140,12 +140,12 @@ public class Settings_Serialization
         Settings.CryptoEnabled = cryptoEnabled;
 
         var serialized = _outSettings.Serialize();
-        var restored = Settings.Deserialize(serialized);
+        var restored = Settings.Deserialize(serialized)!;
 
         Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
 
-        var smtpCredential = (Credential)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
-        Assert.AreEqual(cryptoEnabled, smtpCredential.Password != smtpCredential.PasswordEncrypted && smtpCredential.Username != smtpCredential.UsernameEncrypted);
+        var smtpCredential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
+        Assert.AreEqual(cryptoEnabled, smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted);
     }
 
     [Test]
@@ -157,15 +157,15 @@ public class Settings_Serialization
         if (!cryptoEnabled)
         {
             var restored =
-                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null);
-            Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8)!;
+            Assert.That(restored.SenderConfig, Is.EqualTo(_outSettings.SenderConfig));
         }
         else
         {
             // An exception is thrown because username / password are saved as plain text,
             // while with encryption enabled, both should be encrypted.
             Assert.That(() =>
-                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), null), Throws.Exception.InstanceOf<YAXLib.Exceptions.YAXBadlyFormedInput>());
+                Settings.Deserialize(Path.Combine(TestFileFolders.FilesAbsPath, _settingsFilename), Encoding.UTF8), Throws.Exception.InstanceOf<YAXLib.Exceptions.YAXBadlyFormedInput>());
         }
     }
 }

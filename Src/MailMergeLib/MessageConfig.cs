@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Text;
 using MimeKit;
@@ -33,6 +32,7 @@ public class MessageConfig
     [YAXSerializableField]
     public ContentEncoding BinaryTransferEncoding { get; set; } = ContentEncoding.Base64;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// Character encoding.
     /// Used for serialization. It is the string representation of <see cref="CharacterEncoding"/>.
@@ -44,12 +44,14 @@ public class MessageConfig
         get => CharacterEncoding.WebName;
         set => CharacterEncoding = Encoding.GetEncoding(value);
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// Character encoding.
     /// </summary>
     public Encoding CharacterEncoding { get; set; } = Encoding.UTF8;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// Culture information.
     /// Used for serialization. It is the string representation of <see cref="CultureInfo"/>.
@@ -61,6 +63,7 @@ public class MessageConfig
         get => CultureInfo.Name;
         set => CultureInfo = new CultureInfo(value);
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// Culture information.
@@ -115,34 +118,36 @@ public class MessageConfig
     [YAXSerializableField]
     public MessagePriority Priority { get; set; } = MessagePriority.Normal;
 
+#pragma warning disable IDE0051
     /// <summary>
     /// The standard mailbox address which will be used as one of the "from" addresses.
     /// Used for serialization. It is the string representation of <see cref="StandardFromAddress"/>. 
     /// </summary>
     [YAXSerializableField]
     [YAXSerializeAs("StandardFromAddress")]
-    private string StandardFromAddressText
+    private string? StandardFromAddressText
     {
         get => StandardFromAddress?.ToString();
         set => StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value) : null;
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// The standard mailbox address which will be used as one of the "from" addresses.
     /// </summary>
-    public MailboxAddress StandardFromAddress { get; set; }
+    public MailboxAddress? StandardFromAddress { get; set; }
 
     /// <summary>
     /// The organization header of a mail message.
     /// </summary>
     [YAXSerializableField]
-    public string Organization { get; set; }
+    public string? Organization { get; set; }
 
     /// <summary>
     /// Gets or sets the "x-mailer" header value to be used.
     /// </summary>
     [YAXSerializableField]
-    public string Xmailer { get; set; }
+    public string? Xmailer { get; set; }
 
     /// <summary>
     /// SmartFormatter configuration for parsing and formatting errors.
@@ -151,6 +156,10 @@ public class MessageConfig
     public SmartFormatterConfig SmartFormatterConfig { get; internal set; } = new SmartFormatterConfig();
 
     #region *** Equality ***
+    
+    /// <summary>
+    /// Compares for equality
+    /// </summary>
     protected bool Equals(MessageConfig other)
     {
         return TextTransferEncoding == other.TextTransferEncoding &&
@@ -168,22 +177,24 @@ public class MessageConfig
                SmartFormatterConfig.Equals(other.SmartFormatterConfig);
     }
 
-    private bool Equals(MailboxAddress addr, MailboxAddress otherAddr)
+    private static bool Equals(MailboxAddress? addr, MailboxAddress? otherAddr)
     {
         if (addr is null && otherAddr is null) return true;
         if (ReferenceEquals(addr, otherAddr)) return true;
-        if (otherAddr.GetType() != addr?.GetType()) return false;
-        return addr.ToString() == otherAddr.ToString();
+        if (otherAddr?.GetType() != addr?.GetType()) return false;
+        return addr?.ToString() == otherAddr?.ToString();
     }
 
-    public override bool Equals(object obj)
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((MessageConfig)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
