@@ -1,6 +1,6 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-Heads up for MailMergeLib 5.11.0
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Heads up for MailMergeLib 5.11
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 This version is API and source compatible with prior 5.x versions.
 
