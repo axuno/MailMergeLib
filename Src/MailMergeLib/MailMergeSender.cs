@@ -214,7 +214,7 @@ public class MailMergeSender : IDisposable
     /// <exception cref="InvalidOperationException">A send operation is pending.</exception>
     /// <exception cref="AggregateException"></exception>
     /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
-    public async Task SendAsync(MailMergeMessage mailMergeMessage, object dataItem)
+    public async Task SendAsync(MailMergeMessage mailMergeMessage, object? dataItem)
     {
         if (mailMergeMessage == null)
             throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(SendAsync)}: {nameof(mailMergeMessage)} is null.");
@@ -597,7 +597,7 @@ public class MailMergeSender : IDisposable
     /// <exception cref="SmtpProtocolException"></exception>
     /// <exception cref="AuthenticationException"></exception>
     /// <exception cref="MailMergeMessage.MailMergeMessageException"></exception>
-    public void Send(MailMergeMessage mailMergeMessage, object dataItem)
+    public void Send(MailMergeMessage mailMergeMessage, object? dataItem)
     {
         if (mailMergeMessage == null)
             throw new ArgumentNullException(nameof(mailMergeMessage),$"{nameof(Send)}: {nameof(mailMergeMessage)} is null.");

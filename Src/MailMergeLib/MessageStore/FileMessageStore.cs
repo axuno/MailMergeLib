@@ -20,6 +20,7 @@ public class FileMessageStore : IMessageStore
     public FileMessageStore()
     {}
 
+#pragma warning disable IDE0051
     /// <summary>
     /// The <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s.
     /// Used for serialization. It is the string representation of <see cref="MessageEncoding"/>.
@@ -31,6 +32,7 @@ public class FileMessageStore : IMessageStore
         get => MessageEncoding.WebName;
         set => MessageEncoding = Encoding.GetEncoding(value);
     }
+#pragma warning restore IDE0051
 
     /// <summary>
     /// Gets or sets the <see cref="Encoding"/> to apply when loading <see cref="MailMergeMessage"/>s from the file system.
@@ -56,7 +58,7 @@ public class FileMessageStore : IMessageStore
     /// A list of absolute paths to file system folders where deserialized <see cref="MailMergeMessage"/> files are stored.
     /// </summary>
     [YAXCollection(YAXCollectionSerializationTypes.Recursive, EachElementName = "Folder")]
-    public string[] SearchFolders { get; set; } = {};
+    public string[] SearchFolders { get; set; } = System.Array.Empty<string>();
 
     /// <summary>
     /// The search pattern to use for getting the file names of deserialized <see cref="MailMergeMessage"/> files.
@@ -187,7 +189,7 @@ public class FileMessageStore : IMessageStore
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((FileMessageStore) obj);
     }
 

@@ -1,4 +1,4 @@
-version: 5.9.0.{build} # Only change for mayor versions (e.g. 6.0.0)
+version: 5.11.1.{build} # Only change for mayor versions (e.g. 6.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
@@ -27,13 +27,13 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
       - ps: |
-          $version = "5.9.1"
+          $version = "5.11.1"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
               $version = $version + "-PR" + $env:APPVEYOR_PULL_REQUEST_NUMBER
           }
-          dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile /nowarn:CS1591,CS0618
+          dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=$version /p:FileVersion=$versionFile
           dotnet pack MailMergeLib.sln --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=$env:APPVEYOR_BUILD_FOLDER/artifacts /p:ContinuousIntegrationBuild=true
     test_script:
       - cmd: nuget install Appveyor.TestLogger
