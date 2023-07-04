@@ -40,7 +40,8 @@ public class Template
     private void TextOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
     {
         // call the setter to verify the current value can still be set after changing the collection
-        DefaultKey = DefaultKey;
+        var temp = DefaultKey;
+        DefaultKey = temp;
     }
 
     /// <summary>
