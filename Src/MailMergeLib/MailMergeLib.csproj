@@ -55,12 +55,12 @@ https://github.com/axuno/MailMergeLib/releases</PackageReleaseNotes>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AngleSharp" Version="1.0.4" />
-        <PackageReference Include="MailKit" Version="4.1.0" />
-        <PackageReference Include="MimeKit" Version="4.1.0" />
-        <PackageReference Include="SmartFormat.NET" Version="3.2.1" />
-        <PackageReference Include="YAXLib" Version="4.1.0" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PackageReference Include="AngleSharp" Version="1.1.2" />
+        <PackageReference Include="MailKit" Version="4.6.0" />
+        <PackageReference Include="MimeKit" Version="4.6.0" />
+        <PackageReference Include="SmartFormat.NET" Version="3.4.0" />
+        <PackageReference Include="YAXLib" Version="4.2.2" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -68,7 +68,7 @@ https://github.com/axuno/MailMergeLib/releases</PackageReleaseNotes>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
         <Reference Include="System.Configuration" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
         <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
     </ItemGroup>
 
