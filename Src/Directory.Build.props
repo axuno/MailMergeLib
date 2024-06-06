@@ -8,8 +8,8 @@
         <Copyright>Copyright 2011-$(CurrentYear) axuno, MailMergeLib Project maintainers and contributers</Copyright>
         <RepositoryUrl>https://github.com/axuno/MailMergeLib.git</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>5.11.1</Version>
-        <FileVersion>5.11.1</FileVersion>
+        <Version>5.12.0</Version>
+        <FileVersion>5.12.0</FileVersion>
         <AssemblyVersion>5.0.0.0</AssemblyVersion> <!--only update AssemblyVersion with major releases -->
         <LangVersion>latest</LangVersion>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
