@@ -47,13 +47,16 @@ public class Message_SmartFormatter
         mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.OutputErrorInResult;
         mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
 
-        Assert.AreEqual(dataItem.Email, mmm.SmartFormatter.Format("{Email}", dataItem));
-        Assert.AreNotEqual(dataItem.Email, mmm.SmartFormatter.Format("{EmAiL}", dataItem));
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm.SmartFormatter.Format("{Email}", dataItem), Is.EqualTo(dataItem.Email));
+            Assert.That(mmm.SmartFormatter.Format("{EmAiL}", dataItem), Is.Not.EqualTo(dataItem.Email));
+        });
         // Changing the the SmartFormatterConfig settings creates a new instance of
         // the SmartFormatter inside MailMergeMessage
         mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
         var actual = mmm.SmartFormatter.Format("{EmAiL}", dataItem);
-        Assert.AreEqual(dataItem.Email, actual);
+        Assert.That(actual, Is.EqualTo(dataItem.Email));
     }
 
 
@@ -70,7 +73,7 @@ public class Message_SmartFormatter
         var text = "Lorem ipsum dolor. Email={Email}, Continent={GetContinent}, City={GetNewTestClass.City}.";
         var result = smf.Format(culture, text, dataItem);
         var expected = string.Format($"Lorem ipsum dolor. Email={((TestClass)dataItem).Email}, Continent={((TestClass)dataItem).GetContinent()}, City={((TestClass)dataItem).GetNewTestClass().City}.");
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("Class instances: passed");
 
         // ******** Anonymous type ********
@@ -84,21 +87,21 @@ public class Message_SmartFormatter
         text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}, City={NewTestClass.City}.";
         result = smf.Format(culture, text, dataItem);
         expected = "Lorem ipsum dolor. Email=test@example.com, Continent=Europe, City=New York.";
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("Anonymous type: passed");
 
         // ******** List ********
         dataItem = new List<string>() { "Lorem", "ipsum", "dolor" };  // this works
         result = smf.Format("{0:list:{}|, |, and }", dataItem);
         expected = "Lorem, ipsum, and dolor";
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("List: passed");
 
         // ******** Array ********
         dataItem = new[] { "Lorem", "ipsum", "dolor" };
         result = smf.Format("{0:list:{}|, |, and }", dataItem);
         expected = "Lorem, ipsum, and dolor";
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("Array: passed");
 
         // ******** Dictionary ********
@@ -107,7 +110,7 @@ public class Message_SmartFormatter
         text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
         result = smf.Format(culture, text, dataItem);
-        Assert.AreEqual(expected,result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("Dictionary: passed");
 
         // ******** JSON ********
@@ -115,7 +118,7 @@ public class Message_SmartFormatter
         dataItem = JObject.Parse("{ 'Email':'test@example.com', 'Continent':'Europe' }");
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
         result = smf.Format(culture, text, dataItem);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("JSON Object: passed");
         // JArray
         dataItem = JObject.Parse(@"
@@ -135,7 +138,7 @@ public class Message_SmartFormatter
 ");
         expected = "Acme Corp, Contoso, and Jumbo";
         result = smf.Format(culture, "{Manufacturers:list:{Name}|, |, and }", dataItem);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("JSON Array: passed");
 
         // ******** ExpandoObject ********
@@ -147,7 +150,7 @@ public class Message_SmartFormatter
         text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
         result = smf.Format(culture, text, dataItem);
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("ExpandoObject: passed");
 
         // ******** DataRow ********
@@ -174,7 +177,7 @@ public class Message_SmartFormatter
             
         expected = text.Replace("{Email}", "test@example.com").Replace("{Continent}", "Europe");
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
         Console.WriteLine("DataRow: passed");
 
 
@@ -188,8 +191,11 @@ public class Message_SmartFormatter
         }
         catch (ParsingErrors ex)
         {
-            Assert.That(parsingErrors.Count == 1);
-            Assert.That(ex.Message.Contains("In: \"{lorem\""));
+            Assert.Multiple(() =>
+            {
+                Assert.That(parsingErrors.Count == 1);
+                Assert.That(ex.Message.Contains("In: \"{lorem\""));
+            });
             Console.WriteLine("Parsing error: passed");
         }
 
@@ -203,8 +209,8 @@ public class Message_SmartFormatter
 
         // ******** Culture ********
         result = smf.Format(culture, "{Date:d:MMMM}", new DateTime(2018,01,01));
-            
-        Assert.AreEqual("January", result);
+
+        Assert.That(result, Is.EqualTo("January"));
         Console.WriteLine("Culture: passed");
     }
 }

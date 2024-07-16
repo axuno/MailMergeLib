@@ -30,12 +30,15 @@ namespace MailMergeLib.Tests
             ChangeSmtpConfigFile(smtpSettings);
             smtpConfig.ReadSmtpConfigurationFromConfigFile();
 
-            Assert.AreEqual(smtpDeliveryMethod == SmtpDeliveryMethod.Network ? MessageOutput.SmtpServer :
-                smtpDeliveryMethod == SmtpDeliveryMethod.PickupDirectoryFromIis ? MessageOutput.PickupDirectoryFromIis :
-                smtpDeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory ? MessageOutput.Directory :
-                MessageOutput.None, smtpConfig.MessageOutput);
+            Assert.Multiple(() =>
+            {
+                Assert.That(smtpConfig.MessageOutput, Is.EqualTo(smtpDeliveryMethod == SmtpDeliveryMethod.Network ? MessageOutput.SmtpServer :
+                            smtpDeliveryMethod == SmtpDeliveryMethod.PickupDirectoryFromIis ? MessageOutput.PickupDirectoryFromIis :
+                            smtpDeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory ? MessageOutput.Directory :
+                            MessageOutput.None));
 
-            Assert.AreEqual(enableSsl ? MailKit.Security.SecureSocketOptions.Auto : MailKit.Security.SecureSocketOptions.None, smtpConfig.SecureSocketOptions);
+                Assert.That(smtpConfig.SecureSocketOptions, Is.EqualTo(enableSsl ? MailKit.Security.SecureSocketOptions.Auto : MailKit.Security.SecureSocketOptions.None));
+            });
         }
 
         [Test]
@@ -43,7 +46,7 @@ namespace MailMergeLib.Tests
         [TestCase("", "password", false)]
         [TestCase("user", "", false)]
         [TestCase(null, null, false)]
-        public void Read_SmtpConfig_From_ConfigFile(string username, string password, bool credentialSet)
+        public void Read_SmtpConfig_From_ConfigFile(string? username, string? password, bool credentialSet)
         {
             var smtpConfig = new SmtpClientConfig();
             var smtpSettings = new SmtpSection()
@@ -53,28 +56,31 @@ namespace MailMergeLib.Tests
             ChangeSmtpConfigFile(smtpSettings);
             smtpConfig.ReadSmtpConfigurationFromConfigFile();
 
-            Assert.AreEqual(credentialSet, smtpConfig.NetworkCredential != null);
+            Assert.That(smtpConfig.NetworkCredential != null, Is.EqualTo(credentialSet));
             if (credentialSet)
             {
-                Assert.AreEqual(username, ((Credential?) smtpConfig.NetworkCredential)?.Username);
-                Assert.AreEqual(password, ((Credential?) smtpConfig.NetworkCredential)?.Password);
+                Assert.Multiple(() =>
+                {
+                    Assert.That(((Credential?) smtpConfig.NetworkCredential)?.Username, Is.EqualTo(username));
+                    Assert.That(((Credential?) smtpConfig.NetworkCredential)?.Password, Is.EqualTo(password));
+                });
             }
         }
 
         [Test]
         [TestCase("host", 25, "domain")]
         [TestCase(null, 123, null)]
-        public void Read_SmtpConfig_From_ConfigFile(string host, int port, string clientDomain)
+        public void Read_SmtpConfig_From_ConfigFile(string? host, int port, string? clientDomain)
         {
             var smtpConfig = new SmtpClientConfig();
-            var smtpSettings = new SmtpSection()
+            var smtpSettings = new SmtpSection
             {
                 Network = { Host = host, Port = port, ClientDomain = clientDomain}
             };
             ChangeSmtpConfigFile(smtpSettings);
             smtpConfig.ReadSmtpConfigurationFromConfigFile();
 
-            Assert.IsTrue(smtpConfig.SmtpHost == host && smtpConfig.SmtpPort == port && smtpConfig.ClientDomain == clientDomain);
+            Assert.That(smtpConfig.SmtpHost == host && smtpConfig.SmtpPort == port && smtpConfig.ClientDomain == clientDomain, Is.True);
         }
 
         /// <summary>
@@ -121,7 +127,7 @@ namespace MailMergeLib.Tests
             {
                 MessageOutput = MessageOutput.Directory
             };
-            Assert.AreEqual(System.IO.Path.GetTempPath(), smtpConfig.MailOutputDirectory);
+            Assert.That(smtpConfig.MailOutputDirectory, Is.EqualTo(System.IO.Path.GetTempPath()));
         }
 
         [Test]
@@ -130,8 +136,11 @@ namespace MailMergeLib.Tests
             var sc1 = new SmtpClientConfig();
             var sc2 = new SmtpClientConfig();
 
-            Assert.IsTrue(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(new object()));
+            Assert.Multiple(() =>
+            {
+                Assert.That(sc1.Equals(sc2), Is.True);
+                Assert.That(sc1.Equals(new object()), Is.False);
+            });
         }
 
         [Test]
@@ -140,8 +149,11 @@ namespace MailMergeLib.Tests
             var sc1 = new SmtpClientConfig();
             var sc2 = new SmtpClientConfig { SmtpPort = 12345 };
 
-            Assert.IsFalse(sc1.Equals(sc2));
-            Assert.IsFalse(sc1.Equals(new object()));
+            Assert.Multiple(() =>
+            {
+                Assert.That(sc1.Equals(sc2), Is.False);
+                Assert.That(sc1.Equals(new object()), Is.False);
+            });
         }
     }
 }

@@ -22,12 +22,12 @@ public class HtmlBodyBuilderTest
     [TestCase("/tmp", IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
     [TestCase("C:\\Temp", ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
     [TestCase("\\\\some\\unc\\path", ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
-    public void SetHtmlBuilderDocBaseUri_NoException(string baseUri)
+    public void SetHtmlBuilderDocBaseUri_NoException(string? baseUri)
     {
         var mmm = new MailMergeMessage("subject", "plain text",
             "<html><head><base href=\"\" /></head><body></body></html>");
         var hbb = new HtmlBodyBuilder(mmm, null);
-        Assert.DoesNotThrow(() => hbb.DocBaseUri = baseUri);
+        Assert.DoesNotThrow(() => hbb.DocBaseUri = baseUri!);
     }
 
     [Test]
@@ -37,8 +37,11 @@ public class HtmlBodyBuilderTest
             "<html><head><script>var x='x';</script><script>var y='y';</script></head><body>some body</body></html>");
         var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
-        Assert.IsTrue(html.ToString().Contains("some body"));
-        Assert.IsTrue(!html.ToString().Contains("script"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(html.ToString().Contains("some body"), Is.True);
+            Assert.That(!html.ToString().Contains("script"), Is.True);
+        });
     }
 
     [Test]
@@ -49,7 +52,7 @@ public class HtmlBodyBuilderTest
             "<html><head><title>abc</title></head><body></body></html>");
         var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
-        Assert.IsTrue(html.ToString().Contains(subjectToSet));
+        Assert.That(html.ToString().Contains(subjectToSet), Is.True);
     }
 
     [Test]
@@ -59,7 +62,7 @@ public class HtmlBodyBuilderTest
         var mmm = new MailMergeMessage(subjectToSet, "plain text", "<html><head></head><body></body></html>");
         var hbb = new HtmlBodyBuilder(mmm, null);
         var html = hbb.GetBodyPart();
-        Assert.IsTrue(!html.ToString().Contains(subjectToSet));
+        Assert.That(!html.ToString().Contains(subjectToSet), Is.True);
     }
 
     [Test]

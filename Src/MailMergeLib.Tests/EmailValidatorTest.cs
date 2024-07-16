@@ -148,24 +148,21 @@ public class EmailValidatorTest
     public void TestValidAddresses()
     {
         for (var i = 0; i < ValidAddresses.Length; i++)
-            Assert.IsTrue(EmailValidator.Validate(ValidAddresses[i], true), "Valid Address #{0}: {1}", i,
-                ValidAddresses[i]);
+            Assert.That(EmailValidator.Validate(ValidAddresses[i], true), Is.True, $"Valid Address #{i}: {ValidAddresses[i]}");
     }
 
     [Test]
     public void TestInvalidAddresses()
     {
         for (var i = 0; i < InvalidAddresses.Length; i++)
-            Assert.IsFalse(EmailValidator.Validate(InvalidAddresses[i], true), "Invalid Address #{0}: {1}", i,
-                InvalidAddresses[i]);
+            Assert.That(EmailValidator.Validate(InvalidAddresses[i], true), Is.False, $"Invalid Address #{i}: {InvalidAddresses[i]}");
     }
 
     [Test]
     public void TestValidInternationalAddresses()
     {
         for (var i = 0; i < ValidInternationalAddresses.Length; i++)
-            Assert.IsTrue(EmailValidator.Validate(ValidInternationalAddresses[i], true, true),
-                "Valid International Address #{0}", i);
+            Assert.That(EmailValidator.Validate(ValidInternationalAddresses[i], true, true), Is.True, $"Valid International Address #{i}");
     }
 
     [Test]

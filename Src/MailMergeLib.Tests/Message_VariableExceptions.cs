@@ -40,14 +40,14 @@ class Message_VariableExceptions
              * 4) Missing file attachment {fileAtt.filename}.xml
              * 5) Missing inline attachment {inlineAtt.filename}.jpg
              */
-            Assert.AreEqual(5, exceptions.InnerExceptions.Count);
+            Assert.That(exceptions.InnerExceptions, Has.Count.EqualTo(5));
 
             foreach (var ex in exceptions.InnerExceptions.Where(ex => !(ex is MailMergeMessage
                          .AttachmentException)))
             {
                 if (ex is MailMergeMessage.VariableException exception)
                 {
-                    Assert.AreEqual(9, exception.MissingVariable.Count);
+                    Assert.That(exception.MissingVariable, Has.Count.EqualTo(9));
                     Console.WriteLine($"{nameof(MailMergeMessage.VariableException)} thrown successfully:");
                     Console.WriteLine("Missing variables: " +
                                       string.Join(", ",
@@ -67,14 +67,14 @@ class Message_VariableExceptions
             // one exception for a missing file attachment, one for a missing inline attachment
             var attExceptions = exceptions.InnerExceptions.Where(ex => ex is MailMergeMessage.AttachmentException)
                 .ToList();
-            Assert.AreEqual(2, attExceptions.Count);
+            Assert.That(attExceptions, Has.Count.EqualTo(2));
             foreach (var ex in attExceptions)
             {
                 Console.WriteLine($"{nameof(MailMergeMessage.AttachmentException)} thrown successfully:");
                 Console.WriteLine("Missing files: " +
                                   string.Join(", ", (ex as MailMergeMessage.AttachmentException)?.BadAttachment!));
                 Console.WriteLine();
-                Assert.AreEqual(1, (ex as MailMergeMessage.AttachmentException)?.BadAttachment.Count);
+                Assert.That((ex as MailMergeMessage.AttachmentException)?.BadAttachment.Count, Is.EqualTo(1));
             }
         }
 
@@ -95,8 +95,8 @@ class Message_VariableExceptions
              * 2) No recipients
              * 3) No FROM address
              */
-            Assert.AreEqual(3, exceptions.InnerExceptions.Count);
-            Assert.IsFalse(exceptions.InnerExceptions.Any(e => e is MailMergeMessage.AttachmentException));
+            Assert.That(exceptions.InnerExceptions, Has.Count.EqualTo(3));
+            Assert.That(exceptions.InnerExceptions.Any(e => e is MailMergeMessage.AttachmentException), Is.False);
 
             Console.WriteLine("Exceptions for missing attachment files suppressed.");
         }
@@ -109,25 +109,31 @@ class Message_VariableExceptions
 
         var msg = mmm.GetMimeMessage(variables);
 
-        Assert.AreEqual(mmm.Subject.Replace("{FirstName}", variables["FirstName"]), msg.Subject);
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.Subject, Is.EqualTo(mmm.Subject.Replace("{FirstName}", variables["FirstName"])));
 
-        // DefaultKey is "Formal"
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Formal"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Formal"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+            // DefaultKey is "Formal"
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Formal"]
+                .First(t => t.Type == PartType.Html)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Formal"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
 
         // Programmacically set the part to use
         mmm.Templates[0].Key = "Dear";
         msg = mmm.GetMimeMessage(variables);
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Dear"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Dear"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Dear"]
+                    .First(t => t.Type == PartType.Html)
+                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Dear"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
 
         // Neither DefaultKey nore Key of the template are set: gets the first part
         mmm.Templates[0].DefaultKey = null;
@@ -139,11 +145,14 @@ class Message_VariableExceptions
         mmm.Templates[0].Text.Remove(mmm.Templates[0].Text[2]);
 
         msg = mmm.GetMimeMessage(variables);
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Hi"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Hi"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Hi"]
+                    .First(t => t.Type == PartType.Html)
+                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Hi"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
     }
 }

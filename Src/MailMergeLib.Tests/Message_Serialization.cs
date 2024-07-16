@@ -17,8 +17,11 @@ public class Message_Serialization
         var result = mmm.Serialize();
         var back = MailMergeMessage.Deserialize(result)!;
 
-        Assert.True(mmm.Equals(back));
-        Assert.AreEqual(mmm.Serialize(), back.Serialize());
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm.Equals(back), Is.True);
+            Assert.That(back.Serialize(), Is.EqualTo(mmm.Serialize()));
+        });
     }
 
     [Test]
@@ -29,8 +32,11 @@ public class Message_Serialization
         mmm.Serialize(filename, Encoding.Unicode);
         var back = MailMergeMessage.Deserialize(filename, Encoding.Unicode)!;
 
-        Assert.True(mmm.Equals(back));
-        Assert.AreEqual(mmm.Serialize(), back.Serialize());
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm.Equals(back), Is.True);
+            Assert.That(back.Serialize(), Is.EqualTo(mmm.Serialize()));
+        });
     }
 
     [Test]
@@ -45,8 +51,11 @@ public class Message_Serialization
         msOut.Close();
         msOut.Dispose();
 
-        Assert.True(mmm.Equals(back));
-        Assert.AreEqual(mmm.Serialize(), back.Serialize());
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm.Equals(back), Is.True);
+            Assert.That(back.Serialize(), Is.EqualTo(mmm.Serialize()));
+        });
     }
 
     [Test]
@@ -58,11 +67,11 @@ public class Message_Serialization
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "test2@abc.com"));
 
         var mime = mmm.GetMimeMessage(new {Date = DateTime.Now, Success = true, Name = "Joe"});
-        Assert.IsTrue(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") != null);
+        Assert.That(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") != null, Is.True);
 
         mmm.ClearExternalInlineAttachment();
         mime = mmm.GetMimeMessage(new { Date = DateTime.Now, Success = true, Name = "Joe" });
-        Assert.IsTrue(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") == null);
+        Assert.That(mime.BodyParts.FirstOrDefault(mbp => mbp.ContentId == "error-image.jpg") == null, Is.True);
     }
 
     [Test]
@@ -70,7 +79,7 @@ public class Message_Serialization
     {
         // an empty deserialized message and new message must be equal
         var mmm = MailMergeMessage.Deserialize("<MailMergeMessage></MailMergeMessage>")!;
-        Assert.True(new MailMergeMessage().Equals(mmm));
+        Assert.That(new MailMergeMessage().Equals(mmm), Is.True);
     }
 
     [Test]
@@ -98,7 +107,10 @@ public class Message_Serialization
         var back = new MailMergeMessage();
         back.Templates.AddRange(Templates.Templates.Deserialize(result)!);
 
-        Assert.True(templates.Equals(back.Templates));
-        Assert.AreEqual(templates.Serialize(), back.Templates.Serialize());
+        Assert.Multiple(() =>
+        {
+            Assert.That(templates.Equals(back.Templates), Is.True);
+            Assert.That(back.Templates.Serialize(), Is.EqualTo(templates.Serialize()));
+        });
     }
 }

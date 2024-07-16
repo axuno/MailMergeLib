@@ -11,8 +11,11 @@ public class Sender_Config
         var sc1 = new SenderConfig();
         var sc2 = new SenderConfig();
 
-        Assert.IsTrue(sc1.Equals(sc2));
-        Assert.IsFalse(sc1.Equals(new object()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sc1.Equals(sc2), Is.True);
+            Assert.That(sc1.Equals(new object()), Is.False);
+        });
     }
 
     [Test]
@@ -21,7 +24,10 @@ public class Sender_Config
         var sc1 = new SenderConfig();
         var sc2 = new SenderConfig {MaxNumOfSmtpClients = 99999 };
 
-        Assert.IsFalse(sc1.Equals(sc2));
-        Assert.IsFalse(sc1.Equals(new object()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sc1.Equals(sc2), Is.False);
+            Assert.That(sc1.Equals(new object()), Is.False);
+        });
     }
 }
