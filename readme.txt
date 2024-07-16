@@ -1,11 +1,11 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-Heads up for MailMergeLib 5.11
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Heads up for MailMergeLib >= 5.11
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 This version is API and source compatible with prior 5.x versions.
 
-In v5.11 the referenced package for SmartFormat.NET is updated
-from v2.7.3 to v3.2.1. This new major version of SmartFormat.NET incurs
+In v5.11 and later the referenced package for SmartFormat.NET is updated
+from v2.7.3 to v3.x. This new major version of SmartFormat.NET incurs
 breaking changes. MailMergeLib manages breaking API changes
 under the hood. Other breaking changes are related to using formatters
 in placeholders:
