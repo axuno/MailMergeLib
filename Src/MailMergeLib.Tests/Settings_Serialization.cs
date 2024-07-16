@@ -91,7 +91,7 @@ public class Settings_Serialization
         const string newKey = "some-random-key-for-testing";
         var oldValue = Settings.CryptoKey;
         Settings.CryptoKey = newKey;
-        Assert.AreEqual(newKey, Settings.CryptoKey);
+        Assert.That(Settings.CryptoKey, Is.EqualTo(newKey));
         Settings.CryptoKey = oldValue;
     }
 
@@ -100,8 +100,11 @@ public class Settings_Serialization
     {
         var credential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
         var networkCredential = credential?.GetCredential(new Uri("file:///"), "");
-        Assert.AreEqual(credential?.Username, networkCredential?.UserName);
-        Assert.AreEqual(credential?.Password, networkCredential?.Password);
+        Assert.Multiple(() =>
+        {
+            Assert.That(networkCredential?.UserName, Is.EqualTo(credential?.Username));
+            Assert.That(networkCredential?.Password, Is.EqualTo(credential?.Password));
+        });
     }
 
     [Test]
@@ -109,9 +112,12 @@ public class Settings_Serialization
     {
         var credential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.Last().NetworkCredential;
         var networkCredential = credential?.GetCredential(new Uri("file:///"), "");
-        Assert.AreEqual(credential?.Username, networkCredential?.UserName);
-        Assert.AreEqual(credential?.Password, networkCredential?.Password);
-        Assert.AreEqual(credential?.Domain, networkCredential?.Domain);
+        Assert.Multiple(() =>
+        {
+            Assert.That(networkCredential?.UserName, Is.EqualTo(credential?.Username));
+            Assert.That(networkCredential?.Password, Is.EqualTo(credential?.Password));
+            Assert.That(networkCredential?.Domain, Is.EqualTo(credential?.Domain));
+        });
     }
 
     [Test]
@@ -125,11 +131,11 @@ public class Settings_Serialization
         _outSettings.Serialize(outMs, Encoding.UTF8);
         var inSettings = Settings.Deserialize(outMs, Encoding.UTF8);
 
-        Assert.IsTrue(inSettings?.SenderConfig.Equals(_outSettings.SenderConfig));
+        Assert.That(inSettings?.SenderConfig.Equals(_outSettings.SenderConfig), Is.True);
         outMs.Dispose();
 
         var smtpCredential = (Credential?) _outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
-        Assert.AreEqual(cryptoEnabled, smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted);
+        Assert.That(smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted, Is.EqualTo(cryptoEnabled));
     }
 
     [Test]
@@ -142,10 +148,10 @@ public class Settings_Serialization
         var serialized = _outSettings.Serialize();
         var restored = Settings.Deserialize(serialized)!;
 
-        Assert.IsTrue(restored.SenderConfig.Equals(_outSettings.SenderConfig));
+        Assert.That(restored.SenderConfig.Equals(_outSettings.SenderConfig), Is.True);
 
         var smtpCredential = (Credential?)_outSettings.SenderConfig.SmtpClientConfig.First().NetworkCredential;
-        Assert.AreEqual(cryptoEnabled, smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted);
+        Assert.That(smtpCredential?.Password != smtpCredential?.PasswordEncrypted && smtpCredential?.Username != smtpCredential?.UsernameEncrypted, Is.EqualTo(cryptoEnabled));
     }
 
     [Test]

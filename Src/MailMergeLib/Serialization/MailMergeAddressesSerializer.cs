@@ -36,11 +36,13 @@ internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddress
     {
         var addrColl = new MailMergeAddressCollection();
         var serializer = SerializationFactory.GetStandardSerializer(typeof(MailMergeAddressCollection));
-        var result = serializer.Deserialize(element) as List<object>;
-        if (result == null) return addrColl;
-        foreach (MailMergeAddress addr in result)
+
+        if (serializer.Deserialize(element) is not IEnumerable<MailMergeAddress> result)
+            return addrColl;
+        
+        foreach (var address in result)
         {
-            addrColl.AddWithCurrentCharacterEncoding(addr);
+            addrColl.AddWithCurrentCharacterEncoding(address);
         }
         return addrColl;
     }

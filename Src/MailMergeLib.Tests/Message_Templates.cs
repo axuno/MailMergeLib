@@ -17,25 +17,31 @@ class Message_Templates
 
         var msg = mmm.GetMimeMessage(variables);
 
-        Assert.AreEqual(mmm.Subject.Replace("{FirstName}", variables["FirstName"]), msg.Subject);
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.Subject, Is.EqualTo(mmm.Subject.Replace("{FirstName}", variables["FirstName"])));
 
-        // DefaultKey is "Formal"
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Formal"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Formal"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+            // DefaultKey is "Formal"
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Formal"]
+                .First(t => t.Type == PartType.Html)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Formal"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
 
         // Programmacically set the part to use
         mmm.Templates[0].Key = "Dear";
         msg = mmm.GetMimeMessage(variables);
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Dear"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Dear"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Dear"]
+                    .First(t => t.Type == PartType.Html)
+                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Dear"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
 
         // Neither DefaultKey nor Key of the template are set: gets the first part
         mmm.Templates[0].DefaultKey = null;
@@ -47,12 +53,15 @@ class Message_Templates
         mmm.Templates[0].Text.Remove(mmm.Templates[0].Text[2]);
 
         msg = mmm.GetMimeMessage(variables);
-        Assert.IsTrue(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Hi"]
-            .First(t => t.Type == PartType.Html)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
-        Assert.IsTrue(msg.TextBody.Contains(mmm.Templates["Salutation"]["Hi"]
-            .First(t => t.Type == PartType.Plain)
-            .Value.Replace("{FirstName}", variables["FirstName"])));
+        Assert.Multiple(() =>
+        {
+            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Hi"]
+                    .First(t => t.Type == PartType.Html)
+                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Hi"]
+                .First(t => t.Type == PartType.Plain)
+                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+        });
     }
 
     [Test]
@@ -80,7 +89,7 @@ class Message_Templates
         var templates = mmm.Templates;
         var tempFilename = Path.GetTempFileName();
         templates.Serialize(tempFilename, Encoding.UTF8);
-        Assert.True(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)!));
+        Assert.That(templates.Equals(Templates.Templates.Deserialize(tempFilename, Encoding.UTF8)!), Is.True);
         File.Delete(tempFilename);
     }
 
@@ -93,10 +102,12 @@ class Message_Templates
         templates.Serialize(stream, Encoding.UTF8);
         stream.Position = 0;
         var restoredTemplates = Templates.Templates.Deserialize(stream, Encoding.UTF8)!;
-        Assert.True(templates.Equals(restoredTemplates));
-
-        Assert.True(templates.Equals(templates));
-        Assert.False(templates.Equals(new object()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(templates.Equals(restoredTemplates), Is.True);
+            Assert.That(templates.Equals(templates), Is.True);
+            Assert.That(templates.Equals(new object()), Is.False);
+        });
     }
 
     [Test]
@@ -106,14 +117,13 @@ class Message_Templates
         var t = mmm.Templates[0];
         Assert.DoesNotThrow(() =>
         {
-            Assert.IsTrue(t.GetParts(null).Length > 0);
+            Assert.That(t.GetParts(null).Length > 0, Is.True);
         });
         Assert.Throws<TemplateException>(() => t.Key = "This-is-definitely-an-illegal-Key-not-existing-in-any-Part");
-
-        Assert.False(t.Equals(new object()));
+        Assert.That(t.Equals(new object()), Is.False);
 
         // Equality with null members
         t.Key = t.DefaultKey = null;
-        Assert.False(t.Equals(new object()));
+        Assert.That(t.Equals(new object()), Is.False);
     }
 }

@@ -18,8 +18,8 @@ public class Message_Equality
     [Test]
     public void MailMergeAddressEquality()
     {
-        Assert.True(_addr1a.Equals(_addr1b));
-        Assert.False(_addr1a.Equals(_addr3));
+        Assert.That(_addr1a.Equals(_addr1b), Is.True);
+        Assert.That(_addr1a.Equals(_addr3), Is.False);
     }
 
     [Test]
@@ -29,12 +29,15 @@ public class Message_Equality
         var addrColl2 = new MailMergeAddressCollection {_addr2b, _addr1b};
         var addrColl1_Ref = addrColl1;
 
-        Assert.True(addrColl1.Equals(addrColl2));
-        Assert.True(addrColl1.Equals(addrColl1_Ref));
-        Assert.False(addrColl1.Equals(_addr1a));
+        Assert.Multiple(() =>
+        {
+            Assert.That(addrColl1.Equals(addrColl2), Is.True);
+            Assert.That(addrColl1.Equals(addrColl1_Ref), Is.True);
+        });
+        Assert.That(addrColl1.Equals(_addr1a), Is.False);
 
         addrColl2.Add(_addr3);
-        Assert.False(addrColl1.Equals(addrColl2));
+        Assert.That(addrColl1.Equals(addrColl2), Is.False);
     }
 
     [TestCase(MailAddressType.To)]
@@ -53,16 +56,16 @@ public class Message_Equality
         switch (addrType)
         {
             case MailAddressType.To:
-                Assert.AreEqual(_addr1a, addrColl.Get(addrType).FirstOrDefault());
+                Assert.That(addrColl.Get(addrType).FirstOrDefault(), Is.EqualTo(_addr1a));
                 break;
             case MailAddressType.Bcc:
-                Assert.AreEqual(_addr2a, addrColl.Get(addrType).FirstOrDefault());
+                Assert.That(addrColl.Get(addrType).FirstOrDefault(), Is.EqualTo(_addr2a));
                 break;
             case MailAddressType.From:
-                Assert.AreEqual(_addr3, addrColl.Get(addrType).FirstOrDefault());
+                Assert.That(addrColl.Get(addrType).FirstOrDefault(), Is.EqualTo(_addr3));
                 break;
             default:
-                Assert.AreEqual(null, addrColl.Get(addrType).FirstOrDefault());
+                Assert.That(addrColl.Get(addrType).FirstOrDefault(), Is.EqualTo(null));
                 break;
         }
     }
@@ -73,8 +76,8 @@ public class Message_Equality
         var mmm = new MailMergeMessage();
         mmm.MailMergeAddresses.Add(_addr1a);
         mmm.MailMergeAddresses.Add(_addr2a);
-            
-        Assert.AreEqual($"\"{_addr1a.DisplayName}\" <{_addr1a.Address}>", mmm.MailMergeAddresses.ToString(MailAddressType.To, null));
+
+        Assert.That(mmm.MailMergeAddresses.ToString(MailAddressType.To, null), Is.EqualTo($"\"{_addr1a.DisplayName}\" <{_addr1a.Address}>"));
     }
 
     [Test]
@@ -86,7 +89,7 @@ public class Message_Equality
         mmm.MailMergeAddresses.Add(_addr3);
         var addrColl = new MailMergeAddressCollection { _addr1a, _addr2a, _addr3 };
 
-        Assert.AreEqual(mmm.MailMergeAddresses.GetHashCode(), addrColl.GetHashCode());
+        Assert.That(addrColl.GetHashCode(), Is.EqualTo(mmm.MailMergeAddresses.GetHashCode()));
     }
 
     [Test]
@@ -96,8 +99,8 @@ public class Message_Equality
         var fa2 = new FileAttachment("filename", "display name", "txt/html");
         var fa3 = new FileAttachment("filename 3", "display name", "txt/html");
 
-        Assert.True(fa1.Equals(fa2));
-        Assert.False(fa1.Equals(fa3));
+        Assert.That(fa1.Equals(fa2), Is.True);
+        Assert.That(fa1.Equals(fa3), Is.False);
     }
 
     [Test]
@@ -107,8 +110,8 @@ public class Message_Equality
         var sa2 = new StringAttachment("Content", "display name", "txt/html");
         var sa3 = new StringAttachment("Content", "display name", "txt/plain");
 
-        Assert.True(sa1.Equals(sa2));
-        Assert.False(sa1.Equals(sa3));
+        Assert.That(sa1.Equals(sa2), Is.True);
+        Assert.That(sa1.Equals(sa3), Is.False);
     }
 
     [Test]
@@ -118,17 +121,26 @@ public class Message_Equality
         var mmm2 = MailMergeLib.MailMergeMessage.Deserialize(mmm1.Serialize())!;
         var mmm3 = MessageFactory.GetMessageWithAllPropertiesSet()!;
 
-        Assert.IsTrue(mmm1.Equals(mmm2));
-        Assert.IsTrue(mmm1.Equals(mmm3));
+        Assert.That(mmm1.Equals(mmm2), Is.True);
+        Assert.That(mmm1.Equals(mmm2), Is.True);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm1, Is.EqualTo(mmm2));
+            Assert.That(mmm1, Is.EqualTo(mmm3));
+        });
 
         mmm2.HtmlText += "?";
-        Assert.IsFalse(mmm1.Equals(mmm2));
+        Assert.That(mmm1.Equals(mmm2), Is.False);
 
         mmm3.MailMergeAddresses.RemoveAt(0);
-        Assert.IsFalse(mmm1.Equals(mmm3));
+        Assert.Multiple(() =>
+        {
+            Assert.That(mmm1.Equals(mmm3), Is.False);
 
-        Assert.IsTrue(mmm1.Equals(mmm1));
-        Assert.IsFalse(mmm1.Equals(new object()));
+            Assert.That(mmm1.Equals(mmm1), Is.True);
+            Assert.That(mmm1.Equals(new object()), Is.False);
+        });
     }
 
     [Test]

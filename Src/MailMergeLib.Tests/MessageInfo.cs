@@ -23,10 +23,16 @@ public class MessageInfo
 
         // MessageInfo
         var deserializedInfo = MailMergeLib.MessageStore.MessageInfoBase.Read(xml);
-        Assert.AreEqual(info, deserializedInfo);
-        Assert.IsTrue(info.Equals(info));
-        Assert.IsFalse(info.Equals(new object()));
-        Assert.AreEqual(info.GetHashCode(), deserializedInfo.GetHashCode());
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserializedInfo, Is.EqualTo(info));
+            Assert.That(info.Equals(info), Is.True);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(info.Equals(new object()), Is.False);
+            Assert.That(deserializedInfo.GetHashCode(), Is.EqualTo(info.GetHashCode()));
+        });
     }
 
     [Test]
@@ -42,10 +48,16 @@ public class MessageInfo
 
         // MessageInfo
         var deserializedInfo = MailMergeLib.MessageStore.MessageInfoBase.Read(xml);
-        Assert.AreEqual(info, deserializedInfo);
-        Assert.IsTrue(info.Equals(info));
-        Assert.IsFalse(info.Equals(new object()));
-        Assert.AreEqual(info.GetHashCode(), deserializedInfo.GetHashCode());
+        Assert.Multiple(() =>
+        {
+            Assert.That(deserializedInfo, Is.EqualTo(info));
+            Assert.That(info.Equals(info), Is.True);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.That(info.Equals(new object()), Is.False);
+            Assert.That(deserializedInfo.GetHashCode(), Is.EqualTo(info.GetHashCode()));
+        });
     }
 
     [Test]

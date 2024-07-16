@@ -12,7 +12,7 @@ public class Crypto
         var test = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         MailMergeLib.Crypto.IV = test;
 
-        Assert.AreEqual(test, MailMergeLib.Crypto.IV);
+        Assert.That(MailMergeLib.Crypto.IV, Is.EqualTo(test));
         MailMergeLib.Crypto.IV = oldValue;
     }
 
@@ -23,7 +23,7 @@ public class Crypto
         var key = "some-random-key-for-testing";
         MailMergeLib.Crypto.CryptoKey = key;
 
-        Assert.AreEqual(key, MailMergeLib.Crypto.CryptoKey);
+        Assert.That(MailMergeLib.Crypto.CryptoKey, Is.EqualTo(key));
         MailMergeLib.Crypto.CryptoKey = oldValue;
     }
 
@@ -34,7 +34,7 @@ public class Crypto
         var encoding = System.Text.Encoding.BigEndianUnicode;
         MailMergeLib.Crypto.Encoding = encoding;
 
-        Assert.AreEqual(encoding, MailMergeLib.Crypto.Encoding);
+        Assert.That(MailMergeLib.Crypto.Encoding, Is.EqualTo(encoding));
         MailMergeLib.Crypto.Encoding = oldValue;
     }
 
@@ -45,6 +45,6 @@ public class Crypto
         const string someValue = "some-random-value-for-testing";
         var encrypted = MailMergeLib.Crypto.Encrypt(someValue);
 
-        Assert.AreEqual(someValue, MailMergeLib.Crypto.Decrypt(encrypted));
+        Assert.That(MailMergeLib.Crypto.Decrypt(encrypted), Is.EqualTo(someValue));
     }
 }

@@ -2,7 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace YAXLibTests;
+namespace MailMergeLib.Tests;
 
 [SetUpFixture]
 public class TestSetup

@@ -34,21 +34,21 @@ public class Tools
         [TestCase(@"C:\inval|d", false, false, ExcludePlatform="Linux")]
         [TestCase(@"\\is_this_a_dir_or_a_hostname", false, false, ExcludePlatform="Linux")]
 #endif
-    public static void IsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
+    public static void IsFullPath(string? path, bool expectedIsFull, bool expectedIsValid = true)
     {
-        Assert.AreEqual(expectedIsFull, MailMergeLib.Tools.IsFullPath(path), "IsFullPath('" + path + "')");
+        Assert.That(MailMergeLib.Tools.IsFullPath(path ?? string.Empty), Is.EqualTo(expectedIsFull), "IsFullPath('" + path + "')");
 
         if (expectedIsFull)
         {
-            Assert.AreEqual(path, Path.GetFullPath(path));
+            Assert.That(Path.GetFullPath(path ?? string.Empty), Is.EqualTo(path));
         }
         else if (expectedIsValid)
         {
-            Assert.AreNotEqual(path, Path.GetFullPath(path));
+            Assert.That(Path.GetFullPath(path ?? string.Empty), Is.Not.EqualTo(path ?? string.Empty));
         }
         else
         {
-            Assert.That(() => Path.GetFullPath(path), Throws.Exception);
+            Assert.That(() => Path.GetFullPath(path ?? string.Empty), Throws.Exception);
         }
     }
 
@@ -61,12 +61,12 @@ public class Tools
     [TestCase(@"folder2/folder3", @"folder1/", @"folder1/folder2/folder3", IncludePlatform="Linux")]
     public void RelativePathTo(string expected, string from, string to)
     {
-        Assert.AreEqual(expected, MailMergeLib.Tools.RelativePathTo(from, to));
+        Assert.That(MailMergeLib.Tools.RelativePathTo(from, to), Is.EqualTo(expected));
     }
 
     [Test]
     [TestCase(null, @"C:\Temp", @"D:\", ExcludePlatform="Linux")]
-    public void RelativePathTo_Different_Path_Roots(string expected, string from, string to)
+    public void RelativePathTo_Different_Path_Roots(string? expected, string from, string to)
     {
         Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
     }
@@ -74,7 +74,7 @@ public class Tools
     [Test]
     [TestCase(null, @"folder1\", @"folder2", ExcludePlatform="Linux")]
     [TestCase(null, @"folder1/", @"folder2", IncludePlatform="Linux")]
-    public void RelativePathTo_No_Common_Prefix_Path(string expected, string from, string to)
+    public void RelativePathTo_No_Common_Prefix_Path(string? expected, string from, string to)
     {
         Assert.Throws<ArgumentException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
     }
@@ -82,9 +82,9 @@ public class Tools
     [Test]
     [TestCase(null, null, "")]
     [TestCase(null, "", null)]
-    public void RelativePathTo_NullTests(string expected, string from, string to)
+    public void RelativePathTo_NullTests(string? expected, string? from, string? to)
     {
-        Assert.Throws<ArgumentNullException>(() => { MailMergeLib.Tools.RelativePathTo(from, to); });
+        Assert.Throws<ArgumentNullException>(() => { MailMergeLib.Tools.RelativePathTo(from!, to!); });
     }
 
 
@@ -93,7 +93,7 @@ public class Tools
     [TestCase(false, "abcdeföäü")]
     public void IsSevenBit(bool expected, string toTest)
     {
-        Assert.AreEqual(expected, MailMergeLib.Tools.IsSevenBit(toTest));
+        Assert.That(MailMergeLib.Tools.IsSevenBit(toTest), Is.EqualTo(expected));
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class Tools
     public void IsSevenBitStream(bool expected, string toTest)
     {
         using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty));
-        Assert.AreEqual(expected, MailMergeLib.Tools.IsSevenBit(stream));
+        Assert.That(MailMergeLib.Tools.IsSevenBit(stream), Is.EqualTo(expected));
     }
 
     [Test]
@@ -110,14 +110,14 @@ public class Tools
     public void StreamToString(string toTest)
     {
         using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(toTest ?? string.Empty));
-        Assert.AreEqual(toTest, MailMergeLib.Tools.Stream2String(stream));
+        Assert.That(MailMergeLib.Tools.Stream2String(stream), Is.EqualTo(toTest));
     }
 
     [Test]
     public void WrapLines()
     {
         var text = "this is a number of words in one line which will be wrapped 1234567890 1234";
-        Assert.AreEqual(9, MailMergeLib.Tools.WrapLines(text, 10).Split(new []{ '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length);
+        Assert.That(MailMergeLib.Tools.WrapLines(text, 10).Split(new []{ '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length, Is.EqualTo(9));
     }
 
     [Test]
@@ -126,8 +126,11 @@ public class Tools
     public void ParseMailAddress(string toTest, string expectedEmail, string expectedDisplayName)
     {
         MailMergeLib.Tools.ParseMailAddress(toTest, out var displayName, out var email);
-        Assert.AreEqual(expectedEmail, email);
-        Assert.AreEqual(expectedDisplayName, displayName);
+        Assert.Multiple(() =>
+        {
+            Assert.That(email, Is.EqualTo(expectedEmail));
+            Assert.That(displayName, Is.EqualTo(expectedDisplayName));
+        });
     }
 
     [Test]
@@ -144,7 +147,7 @@ public class Tools
 #endif
     public void GetMimeCharset(string expected, string encoding)
     {
-        Assert.AreEqual(expected, MailMergeLib.Tools.GetMimeCharset(Encoding.GetEncoding(encoding)));
+        Assert.That(MailMergeLib.Tools.GetMimeCharset(Encoding.GetEncoding(encoding)), Is.EqualTo(expected));
         Assert.Throws<ArgumentNullException>(() => MailMergeLib.Tools.GetMimeCharset(null));
     }
 }

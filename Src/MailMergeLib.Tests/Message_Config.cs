@@ -19,10 +19,10 @@ public class Message_Config
     [TestCase("C:\\some\\path\\to\\folder", "C:\\some\\path\\to\\folder", ExcludePlatform =
         nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
     [TestCase("/some/path/to/folder", "/some/path/to/folder", IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
-    public void SetFileBaseDirectory(string path, string expected)
+    public void SetFileBaseDirectory(string? path, string expected)
     {
-        _msgConfig.FileBaseDirectory = path;
-        Assert.AreEqual(expected, _msgConfig.FileBaseDirectory);
+        _msgConfig.FileBaseDirectory = path ?? string.Empty;
+        Assert.That(_msgConfig.FileBaseDirectory, Is.EqualTo(expected));
     }
 
     [TestCase(" \t", false)]
@@ -35,12 +35,12 @@ public class Message_Config
     [TestCase("noFullPath", true)]
     [TestCase("..\\..\\relativePath", true, ExcludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
     [TestCase("../../relativePath", true, IncludePlatform = nameof(OpSys.Linux) + "," + nameof(OpSys.MacOsX))]
-    public void FileBaseDirectory_must_be_full_path_when_processing_the_message(string path, bool shouldThrow)
+    public void FileBaseDirectory_must_be_full_path_when_processing_the_message(string? path, bool shouldThrow)
     {
         var mmm = new MailMergeMessage("subject", "plain text", "<html><body></body></html>");
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "to@example.org"));
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "from@example.org"));
-        mmm.Config.FileBaseDirectory = path;
+        mmm.Config.FileBaseDirectory = path ?? string.Empty;
 
         if (shouldThrow)
         {
@@ -50,8 +50,11 @@ public class Message_Config
             }
             catch (Exception e)
             {
-                Assert.IsTrue(e is MailMergeMessage.MailMergeMessageException);
-                Assert.IsTrue(e.InnerException != null);
+                Assert.Multiple(() =>
+                {
+                    Assert.That(e is MailMergeMessage.MailMergeMessageException, Is.True);
+                    Assert.That(e.InnerException != null, Is.True);
+                });
             }
         }
         else
@@ -83,7 +86,7 @@ public class Message_Config
         else
         {
             hbb = new HtmlBodyBuilder(mmm, null);
-            Assert.AreEqual(expected, hbb.DocBaseUri);
+            Assert.That(hbb.DocBaseUri, Is.EqualTo(expected));
         }
     }
 
@@ -95,7 +98,7 @@ public class Message_Config
         mmm.Config.FileBaseDirectory = Path.GetTempPath();
 
         var hbb = new HtmlBodyBuilder(mmm, null);
-        Assert.AreEqual( new Uri(mmm.Config.FileBaseDirectory), hbb.DocBaseUri);
+        Assert.That(hbb.DocBaseUri, Is.EqualTo(new Uri(mmm.Config.FileBaseDirectory).ToString()));
     }
 
     [Test]
@@ -108,7 +111,7 @@ public class Message_Config
 
         var hbb = new HtmlBodyBuilder(mmm, null);
         hbb.GetBodyPart();
-        Assert.AreEqual(baseTagHref, hbb.DocBaseUri);
+        Assert.That(hbb.DocBaseUri, Is.EqualTo(baseTagHref));
     }
 
     [Test]
@@ -117,9 +120,7 @@ public class Message_Config
         var mc1 = new MessageConfig();
         var mc2 = new MessageConfig();
 
-        Assert.AreEqual(mc1.GetHashCode(), mc2.GetHashCode());
-        Assert.AreEqual(mc1.GetHashCode(), mc1.GetHashCode());
-        Assert.AreEqual(mc2.GetHashCode(), mc2.GetHashCode());
+        Assert.That(mc2.GetHashCode(), Is.EqualTo(mc1.GetHashCode()));
     }
 
     [Test]
