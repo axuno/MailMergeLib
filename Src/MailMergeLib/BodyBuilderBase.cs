@@ -25,7 +25,7 @@ internal abstract class BodyBuilderBase
     public ContentEncoding TextTransferEncoding { get; set; }
 
     /// <summary>
-    /// Gets the ready made body part for a mail message.
+    /// Gets the ready-made body part for a mail message.
     /// </summary>
     public abstract MimeEntity GetBodyPart();
 }

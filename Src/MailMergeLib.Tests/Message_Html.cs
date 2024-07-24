@@ -5,7 +5,6 @@ using System.Linq;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using MimeKit;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace MailMergeLib.Tests;
@@ -351,7 +350,19 @@ public class Message_Html
         mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "no-reply@specimen.com"));
         var dataItem = new { Name = "John", Value = 2 };
         var msg = mmm.GetMimeMessage(dataItem);
-        Assert.That(msg.HtmlBody.Contains(dataItem.Name), Is.True);
+        Assert.That(msg.HtmlBody, Does.Contain(dataItem.Name));
+    }
+
+    [Test]
+    public void HtmlBodyBuilder()
+    {
+        using var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>{Name}{Value:0.00}</body></html>");
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "john@specimen.com"));
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "no-reply@specimen.com"));
+        var dataItem = new { Name = "John", Value = 2 };
+        var bb = new HtmlBodyBuilder(mmm, dataItem);
+
+        Assert.That(bb.DocHtml, Does.Contain(dataItem.Name));
     }
 
     [TestCase("John", 0, "John: Nothing")]
