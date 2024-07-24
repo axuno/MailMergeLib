@@ -5,6 +5,7 @@ using System.Linq;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using MimeKit;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace MailMergeLib.Tests;
@@ -340,5 +341,31 @@ public class Message_Html
         mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.ThrowError;
         var result = mmm.SearchAndReplaceVarsInFilename(text, dataItem);
         Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void SimpleHtmlContent()
+    {
+        using var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>{Name}{Value:0.00}</body></html>");
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "john@specimen.com"));
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "no-reply@specimen.com"));
+        var dataItem = new { Name = "John", Value = 2 };
+        var msg = mmm.GetMimeMessage(dataItem);
+        Assert.That(msg.HtmlBody.Contains(dataItem.Name), Is.True);
+    }
+
+    [TestCase("John", 0, "John: Nothing")]
+    [TestCase("John", 2, "John: Double")]
+    [TestCase("John", 3, "John: More")]
+    public void ConditionalHtmlContent(string name, int value, string expected)
+    {
+        // Note: The ConditionalFormatter makes use of characters <, >, =, &, ? and :
+        //       which must not be encoded to &lt;, &gt;, &amp; etc.
+        using var mmm = new MailMergeMessage("subject", "plain text", "<html><head></head><body>{Name}: {Value:cond:<1?Nothing|=2?Double|More}</body></html>");
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.To, "john@specimen.com"));
+        mmm.MailMergeAddresses.Add(new MailMergeAddress(MailAddressType.From, "no-reply@specimen.com"));
+        var dataItem = new { Name = name, Value = value };
+        var msg = mmm.GetMimeMessage(dataItem);
+        Assert.That(msg.HtmlBody, Does.Contain(expected));
     }
 }

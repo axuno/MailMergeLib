@@ -38,10 +38,15 @@ internal class HtmlBodyBuilder : BodyBuilderBase
         _dataItem = dataItem;
         BinaryTransferEncoding = mailMergeMessage.Config.BinaryTransferEncoding;
 
+        // We need to replace placeholders in the HTML text before parsing as HTML
+        // because SmartFormat extensions may use characters like '<', '&' or '>' in placeholders.
+        // These characters would be encoded to HTML entities by AngleSharp
+        // and thus not be interpreted correctly in SmartFormat.
+        var htmlFormatted = mailMergeMessage.SearchAndReplaceVars(mailMergeMessage.HtmlText, dataItem);
         // Create a new parser front-end (can be re-used)
         var parser = new HtmlParser();
-        //Just get the DOM representation
-        _htmlDocument = parser.ParseDocument(mailMergeMessage.HtmlText);
+        // Just get the DOM representation
+        _htmlDocument = parser.ParseDocument(htmlFormatted);
     }
 
     /// <summary>
@@ -55,7 +60,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     public string DocHtml => _htmlDocument.ToHtml();
 
     /// <summary>
-    /// Gets the ready made body part for a mail message either 
+    /// Gets the ready-made body part for a mail message either 
     /// - as TextPart, if there are no inline attachments
     /// - as MultipartRelated with a TextPart and one or more MimeParts of type inline attachments
     /// </summary>
@@ -89,17 +94,12 @@ internal class HtmlBodyBuilder : BodyBuilderBase
             
         ReplaceImgSrcByCid();
 
-        // replace placeholders only in the HTML Body, because e.g. 
-        // in the header there may be CSS definitions with curly brace which collide with SmartFormat {placeholders}
-        if (_htmlDocument.Body != null)
-            _htmlDocument.Body.InnerHtml =
-                _mailMergeMessage.SearchAndReplaceVars(_htmlDocument.Body.InnerHtml, _dataItem) ?? string.Empty;
-
         var htmlTextPart = new TextPart("html")
         {
             ContentTransferEncoding = TextTransferEncoding
         };
-        htmlTextPart.SetText(CharacterEncoding, DocHtml);  // MimeKit.ContentType.Charset is set using CharacterEncoding
+        // MimeKit.ContentType.Charset is set using CharacterEncoding
+        htmlTextPart.SetText(CharacterEncoding, _htmlDocument.ToHtml());
         htmlTextPart.ContentId = MimeUtils.GenerateMessageId();
 
         if (!InlineAtt.Any())
@@ -214,30 +214,25 @@ internal class HtmlBodyBuilder : BodyBuilderBase
             var filename = _mailMergeMessage.SearchAndReplaceVarsInFilename(srcUri.LocalPath, _dataItem);
             try
             {
-                if (filename != null)
+                if (!fileList.TryGetValue(filename, out var cidForExistingFile))
                 {
-                    if (!fileList.ContainsKey(filename))
-                    {
-                        var fileInfo = new FileInfo(filename);
-                        var contentType = MimeTypes.GetMimeType(filename);
-                        var cid = MimeUtils.GenerateMessageId();
-                        InlineAtt.Add(new FileAttachment(fileInfo.FullName,
-                            MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
-                        srcAttr.Value = MakeCid("cid:", cid, fileInfo.Extension);
-                        fileList.Add(fileInfo.FullName, cid);
-                    }
-                    else
-                    {
-                        var cidForExistingFile = fileList[filename];
-                        var fileInfo = new FileInfo(filename);
-                        srcAttr.Value = MakeCid("cid:", cidForExistingFile, fileInfo.Extension);
-                    }
+                    var fileInfo = new FileInfo(filename);
+                    var contentType = MimeTypes.GetMimeType(filename);
+                    var cid = MimeUtils.GenerateMessageId();
+                    InlineAtt.Add(new FileAttachment(fileInfo.FullName,
+                        MakeCid(string.Empty, cid, fileInfo.Extension), contentType));
+                    srcAttr.Value = MakeCid("cid:", cid, fileInfo.Extension);
+                    fileList.Add(fileInfo.FullName, cid);
+                }
+                else
+                {
+                    var fileInfo = new FileInfo(filename);
+                    srcAttr.Value = MakeCid("cid:", cidForExistingFile, fileInfo.Extension);
                 }
             }
             catch
             {
-                BadInlineFiles.Add(filename ?? "(null)");
-                continue;
+                BadInlineFiles.Add(filename);
             }
         }
     }
@@ -246,7 +241,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     /// Makes the content identifier (CID)
     /// </summary>
     /// <param name="prefix">i.e. normally "cid:"</param>
-    /// <param name="contentId">unique indentifier</param>
+    /// <param name="contentId">unique identifier</param>
     /// <param name="fileExt">file extension, so that content type can be easily identified. May be string.empty</param>
     /// <returns></returns>
     private static string MakeCid(string prefix, string contentId, string fileExt)
