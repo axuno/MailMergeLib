@@ -1,4 +1,4 @@
-version: 5.12.1.{build} # Only change for mayor versions (e.g. 6.0.0)
+version: 5.12.2.{build} # Only change for mayor versions (e.g. 6.0.0)
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
@@ -27,7 +27,7 @@ for:
       - ps: dotnet restore --verbosity quiet
       - ps: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
       - ps: |
-          $version = "5.12.1"
+          $version = "5.12.2"
           $versionFile = $version + "." + ${env:APPVEYOR_BUILD_NUMBER}
 
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {

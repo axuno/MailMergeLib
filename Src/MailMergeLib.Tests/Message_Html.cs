@@ -31,10 +31,10 @@ public class Message_Html
             var mimeMessage = mmm.GetMimeMessage(null);
 
             var size = MailMergeLib.Tools.CalcMessageSize(mimeMessage);
-            Assert.That(size > 0, Is.True);
+            Assert.That(size, Is.GreaterThan(0));
         }
 
-        Assert.That(MailMergeLib.Tools.CalcMessageSize(null) == 0, Is.True);
+        Assert.That(MailMergeLib.Tools.CalcMessageSize(null), Is.EqualTo(0));
     }
 
     [Test]
@@ -105,16 +105,24 @@ public class Message_Html
 
         Assert.Multiple(() =>
         {
-            Assert.That(((MailboxAddress) msg.From.First()).Address == dataItem.SenderAddr, Is.True);
-            Assert.That(((MailboxAddress) msg.To.First()).Address == dataItem.MailboxAddr, Is.True);
-            Assert.That(((MailboxAddress) msg.To.First()).Name == dataItem.Name, Is.True);
-            Assert.That(msg.Headers[HeaderId.Organization] == mmm.Config.Organization, Is.True);
-            Assert.That(msg.Priority == mmm.Config.Priority, Is.True);
-            Assert.That(msg.Attachments.FirstOrDefault(a => ((MimePart) a).FileName == "Log file from {Date:yyyy-MM-dd}.log".Replace("{Date:yyyy-MM-dd}", dataItem.Date.ToString("yyyy-MM-dd"))) != null, Is.True);
-            Assert.That(msg.Subject == mmm.Subject.Replace("{Date:yyyy-MM-dd}", dataItem.Date.ToString("yyyy-MM-dd")), Is.True);
-            Assert.That(msg.HtmlBody.Contains(dataItem.Success ? "succeeded" : "failed"), Is.True);
-            Assert.That(msg.TextBody.Contains(dataItem.Success ? "succeeded" : "failed"), Is.True);
-            Assert.That(msg.BodyParts.Any(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")), Is.True);
+            Assert.That(((MailboxAddress) msg.From.First()).Address, Is.EqualTo(dataItem.SenderAddr));
+            Assert.That(((MailboxAddress) msg.To.First()).Address, Is.EqualTo(dataItem.MailboxAddr));
+            Assert.That(((MailboxAddress) msg.To.First()).Name, Is.EqualTo(dataItem.Name));
+            Assert.That(msg.Headers[HeaderId.Organization], Is.EqualTo(mmm.Config.Organization));
+            Assert.That(msg.Priority, Is.EqualTo(mmm.Config.Priority));
+            Assert.That(
+                msg.Attachments.FirstOrDefault(a =>
+                    ((MimePart) a).FileName ==
+                    "Log file from {Date:yyyy-MM-dd}.log".Replace("{Date:yyyy-MM-dd}",
+                        dataItem.Date.ToString("yyyy-MM-dd"))), Is.Not.EqualTo(null));
+            Assert.That(msg.Subject,
+                Is.EqualTo(mmm.Subject.Replace("{Date:yyyy-MM-dd}", dataItem.Date.ToString("yyyy-MM-dd"))));
+            Assert.That(msg.HtmlBody, Does.Contain(dataItem.Success ? "succeeded" : "failed"));
+            Assert.That(msg.TextBody, Does.Contain(dataItem.Success ? "succeeded" : "failed"));
+            Assert.That(
+                msg.BodyParts.Any(bp =>
+                    bp.ContentDisposition?.Disposition == ContentDisposition.Inline &&
+                    bp.ContentType.IsMimeType("image", "jpeg")), Is.True);
         });
 
         MailMergeMessage.DisposeFileStreams(msg);
@@ -134,12 +142,12 @@ public class Message_Html
             mmm.StreamAttachments.Add(new StreamAttachment(stream, streamAttFilename, "text/plain"));
         }
 
-        Assert.That(mmm.StreamAttachments.Count == 1, Is.True);
+        Assert.That(mmm.StreamAttachments.Count, Is.EqualTo(1));
         mmm.StreamAttachments.Clear();
-        Assert.That(mmm.StreamAttachments.Count == 0, Is.True);
+        Assert.That(mmm.StreamAttachments.Count, Is.EqualTo(0));
 
         mmm.StreamAttachments = streamAttachments;
-        Assert.That(mmm.StreamAttachments.Count == 2, Is.True);
+        Assert.That(mmm.StreamAttachments.Count, Is.EqualTo(2));
     }
 
 
@@ -199,8 +207,8 @@ public class Message_Html
 
         Assert.Multiple(() =>
         {
-            Assert.That(new HtmlParser().ParseDocument((string) msg.HtmlBody).All.Count(m => m is IHtmlImageElement) == 3, Is.True);
-            Assert.That(msg.BodyParts.Count(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")) == 1, Is.True);
+            Assert.That(new HtmlParser().ParseDocument((string) msg.HtmlBody).All.Count(m => m is IHtmlImageElement), Is.EqualTo(3));
+            Assert.That(msg.BodyParts.Count(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")), Is.EqualTo(1));
         });
 
         MailMergeMessage.DisposeFileStreams(msg);
