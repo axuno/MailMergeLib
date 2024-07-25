@@ -340,6 +340,10 @@ public partial class MailMergeMessage : IDisposable
         var currentSmartSettings = invokedFromConstructor
             ? new SmartSettings()
             : SmartFormatter.Settings;
+        // Parse content of <script> and <style> tags as literal text, 
+        // i.e. placeholder parsing is disabled for these tags
+        currentSmartSettings.Parser.ParseInputAsHtml = true;
+
         var smartFormatter = new MailSmartFormatter(Config.SmartFormatterConfig, currentSmartSettings);
         smartFormatter.OnFormattingFailure += (sender, args) => { _badVariableNames.Add(args.Placeholder); };
         smartFormatter.Parser.OnParsingFailure += (sender, args) => { _parseExceptions.Add(new ParseException(args.Errors.MessageShort, args.Errors)); };
@@ -356,7 +360,7 @@ public partial class MailMergeMessage : IDisposable
     /// <remarks>
     /// In case <see cref="SmartFormat.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
     /// or <see cref="SmartFormat.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
-    /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
+    /// we simply catch the exception and simulate setting ErrorAction.MaintainTokens.
     /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
     /// </remarks>
     internal string SearchAndReplaceVars(string text, object? dataItem)
@@ -390,7 +394,7 @@ public partial class MailMergeMessage : IDisposable
     /// <remarks>
     /// In case <see cref="SmartFormat.Core.Settings.SmartSettings.FormatErrorAction"/> == ErrorAction.ThrowError
     /// or <see cref="SmartFormat.Core.Settings.SmartSettings.ParseErrorAction"/> == ErrorAction.ThrowError
-    /// we simple catch the exception and simulate setting ErrorAction.MaintainTokens.
+    /// we simply catch the exception and simulate setting ErrorAction.MaintainTokens.
     /// Note: We track such errors by subscribing to Parser.OnParsingFailure and Formatter.OnFormattingFailure.
     /// </remarks>
     internal string SearchAndReplaceVarsInFilename(string text, object? dataItem)

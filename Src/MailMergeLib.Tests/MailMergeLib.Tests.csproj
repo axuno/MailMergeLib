@@ -8,7 +8,6 @@
         <AssemblyName>MailMergeLib.Tests</AssemblyName>
         <AssemblyOriginatorKeyFile>../MailMergeLib/MailMergeLib.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
-        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
         <IsTestProject>true</IsTestProject>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
