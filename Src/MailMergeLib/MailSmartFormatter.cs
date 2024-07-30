@@ -35,7 +35,6 @@ public class MailSmartFormatter : SmartFormatter
                 new NullFormatter(),
                 new ChooseFormatter(),
                 new SubStringFormatter(),
-                // The DefaultSource reproduces the string.Format behavior:
                 new DefaultFormatter())
 
             // Extensions to keep API compatibility with MailMergeLib v5.x
