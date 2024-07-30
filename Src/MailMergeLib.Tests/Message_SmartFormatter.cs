@@ -35,14 +35,14 @@ public class Message_SmartFormatter
     }
 
     [Test]
-    public void PlaceholderCaseSensitivityTest()
+    public void PlaceholderCaseSensitiveTest()
     {
         var dataItem = new
         {
             Email = "test@example.com",
         };
 
-        var mmm = new MailMergeMessage();
+        using var mmm = new MailMergeMessage();
         mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseSensitive;
         mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.OutputErrorInResult;
         mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
@@ -52,13 +52,23 @@ public class Message_SmartFormatter
             Assert.That(mmm.SmartFormatter.Format("{Email}", dataItem), Is.EqualTo(dataItem.Email));
             Assert.That(mmm.SmartFormatter.Format("{EmAiL}", dataItem), Is.Not.EqualTo(dataItem.Email));
         });
-        // Changing the the SmartFormatterConfig settings creates a new instance of
-        // the SmartFormatter inside MailMergeMessage
-        mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
-        var actual = mmm.SmartFormatter.Format("{EmAiL}", dataItem);
-        Assert.That(actual, Is.EqualTo(dataItem.Email));
     }
 
+    [Test]
+    public void PlaceholderCaseInsensitiveTest()
+    {
+        var dataItem = new {
+            Email = "test@example.com",
+        };
+
+        using var mmm = new MailMergeMessage();
+        mmm.Config.SmartFormatterConfig.CaseSensitivity = CaseSensitivityType.CaseInsensitive;
+        mmm.Config.SmartFormatterConfig.FormatErrorAction = ErrorAction.OutputErrorInResult;
+        mmm.Config.SmartFormatterConfig.ParseErrorAction = ErrorAction.OutputErrorInResult;
+        
+        var actual = mmm.SmartFormatter.Format("{EMAIl}", dataItem);
+        Assert.That(actual, Is.EqualTo(dataItem.Email));
+    }
 
     [Test]
     public void DataTypeTests()
