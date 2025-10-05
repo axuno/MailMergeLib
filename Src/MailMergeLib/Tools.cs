@@ -166,7 +166,9 @@ public static class Tools
         var streamPos = stream.Position;
         stream.Seek(0, SeekOrigin.Begin);
         var bytes = new byte[stream.Length];
-        stream.Read(bytes, 0, (int) stream.Length);
+        var read = stream.Read(bytes, 0, (int) stream.Length);
+        if (read != stream.Length)
+            throw new IOException("Could not read the whole stream.");
         stream.Seek(streamPos, SeekOrigin.Begin);
         return encoding.GetString(bytes);
     }
