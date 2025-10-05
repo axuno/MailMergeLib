@@ -65,4 +65,4 @@ for:
       - dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618 
     test_script:
       - dotnet test --framework net8.0 MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
-      - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.net6.0.xml -n net6.0linux
+      - bash <(curl -s https://codecov.io/bash) -f ./MailMergeLib.Tests/coverage.net8.0.xml -n net8.0linux
