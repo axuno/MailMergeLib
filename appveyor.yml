@@ -57,6 +57,8 @@ for:
         - job_name: linux
     build_script:
       - cd $APPVEYOR_BUILD_FOLDER/Src
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+      - export PATH="$HOME/.dotnet:$PATH"
       - dotnet --version
       - dotnet restore --verbosity quiet
       - dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
