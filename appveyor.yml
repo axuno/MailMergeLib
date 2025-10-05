@@ -39,7 +39,7 @@ for:
       - cmd: nuget install Appveyor.TestLogger
       - cmd: dotnet test --framework net8.0 --test-adapter-path:. --logger:Appveyor MailMergeLib.sln /p:configuration=release /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCover=true /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       - cmd: nuget install codecov -excludeversion
-      - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.net6.0.xml" -n net6.0win
+      - cmd: .\Codecov\Tools\win7-x86\codecov.exe -f ".\MailMergeLib.Tests\coverage.net8.0.xml" -n net8.0win
     artifacts:
       - path: 'artifacts\*.nupkg'
         type: NuGetPackage
