@@ -17,7 +17,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_NOLOGO: true
-  VERSION: '5.13.0'
+  VERSION: '5.14.0'
 
 jobs:
 
@@ -109,8 +109,11 @@ jobs:
         
     - name: Build solution
       run: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=${{ steps.version.outputs.VERSION }} /p:FileVersion=${{ steps.version.outputs.FILE_VERSION }}
-      
-    - name: Run tests
+     
+    - name: Run tests (net462)
+      run: dotnet test --framework net462 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+
+    - name: Run tests (net10.0)
       run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
       
     - name: Upload coverage to Codecov
