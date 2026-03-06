@@ -23,7 +23,7 @@ jobs:
 
   build-linux:
     name: Build and Test (Linux)
-    runs-on: ubuntu-22.04  # ubuntu-24.04 does not include mono needed for net4x tests
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: Src
