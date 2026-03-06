@@ -128,7 +128,7 @@ public class MessageConfig
     private string? StandardFromAddressText
     {
         get => StandardFromAddress?.ToString();
-        set => StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value) : null;
+        set => StandardFromAddress = !string.IsNullOrEmpty(value) ? MailboxAddress.Parse(ParserOptions.Default, value!) : null;
     }
 #pragma warning restore IDE0051
 

@@ -134,7 +134,7 @@ class Message_Variables
             Assert.Multiple(() =>
             {
                 Assert.That(mimeMessage.To.ToString().Contains(row["Email"].ToString()!), Is.True);
-                Assert.That(mimeMessage.TextBody.Contains(text
+                Assert.That(mimeMessage.TextBody!.Contains(text
                     .Replace("{Email}", row["Email"].ToString())
                     .Replace("{Continent}", row["Continent"].ToString())), Is.True);
             });
@@ -166,7 +166,7 @@ class Message_Variables
             Assert.Multiple(() =>
             {
                 Assert.That(mimeMessage.To.ToString().Contains(((Dictionary<string, string>) emailPart)["Email"]), Is.True);
-                Assert.That(mimeMessage.TextBody.Contains(text.Replace("{Email}", emailPart["Email"]).Replace("{Continent}", continentPart["Continent"])), Is.True);
+                Assert.That(mimeMessage.TextBody!.Contains(text.Replace("{Email}", emailPart["Email"]).Replace("{Continent}", continentPart["Continent"])), Is.True);
             });
             MailMergeMessage.DisposeFileStreams(mimeMessage);
             i++;
@@ -190,7 +190,7 @@ class Message_Variables
         Assert.Multiple(() =>
         {
             Assert.That(mimeMessage.To.ToString().Contains(anonymous.Email), Is.True);
-            Assert.That(mimeMessage.TextBody.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", continentPart["Continent"])), Is.True);
+            Assert.That(mimeMessage.TextBody!.Contains(text.Replace("{Email}", anonymous.Email).Replace("{Continent}", continentPart["Continent"])), Is.True);
         });
         MailMergeMessage.DisposeFileStreams(mimeMessage);
     }
@@ -225,7 +225,7 @@ class Message_Variables
                 Assert.That(mimeMessage.TextBody ==
                                       string.Format(
                                           $"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})"), Is.True);
-                Assert.That(mimeMessage.HtmlBody.Contains(string.Format(
+                Assert.That(mimeMessage.HtmlBody!.Contains(string.Format(
                     $"This is the plain text part for {recipients[cnt].Name} ({recipients[cnt].Email})")), Is.True);
                 Assert.That(mimeMessage.To.ToString().Contains(recipients[cnt].Name) &&
                               mimeMessage.To.ToString().Contains(recipients[cnt].Email), Is.True);
@@ -268,7 +268,7 @@ class Message_Variables
             Assert.Multiple(() =>
             {
                 Assert.That(mimeMessage.TextBody == string.Format($"This is the plain text part for {recipients[cnt]["Name"]} ({recipients[cnt]["Email"]})"), Is.True);
-                Assert.That(mimeMessage.HtmlBody.Contains(string.Format($"This is the plain text part for {recipients[cnt]["Name"]} ({recipients[cnt]["Email"]})")), Is.True);
+                Assert.That(mimeMessage.HtmlBody!.Contains(string.Format($"This is the plain text part for {recipients[cnt]["Name"]} ({recipients[cnt]["Email"]})")), Is.True);
                 Assert.That(mimeMessage.To.ToString().Contains(recipients[cnt]["Name"]!.ToString()) && mimeMessage.To.ToString().Contains(recipients[cnt]["Email"]!.ToString()), Is.True);
             });
             MailMergeMessage.DisposeFileStreams(mimeMessage);
@@ -295,9 +295,9 @@ class Message_Variables
 
         Assert.Multiple(() =>
         {
-            Assert.That(mimeMessage.Subject.Contains("Subject for {Continent}"), Is.True);
+            Assert.That(mimeMessage.Subject!.Contains("Subject for {Continent}"), Is.True);
             Assert.That(mimeMessage.To.ToString().Contains("{Name}"), Is.True);
-            Assert.That(mimeMessage.TextBody.Contains(text), Is.True);
+            Assert.That(mimeMessage.TextBody!.Contains(text), Is.True);
         });
         MailMergeMessage.DisposeFileStreams(mimeMessage);
     }

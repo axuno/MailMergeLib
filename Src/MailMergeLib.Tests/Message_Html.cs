@@ -207,7 +207,7 @@ public class Message_Html
 
         Assert.Multiple(() =>
         {
-            Assert.That(new HtmlParser().ParseDocument((string) msg.HtmlBody).All.Count(m => m is IHtmlImageElement), Is.EqualTo(3));
+            Assert.That(new HtmlParser().ParseDocument(msg.HtmlBody!).All.Count(m => m is IHtmlImageElement), Is.EqualTo(3));
             Assert.That(msg.BodyParts.Count(bp => bp.ContentDisposition?.Disposition == ContentDisposition.Inline && bp.ContentType.IsMimeType("image", "jpeg")), Is.EqualTo(1));
         });
 

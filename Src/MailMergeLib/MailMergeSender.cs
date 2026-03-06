@@ -362,7 +362,7 @@ public class MailMergeSender : IDisposable
         foreach (var mimeEntity in mimeMsg.Attachments)
         {
             var att = mimeEntity as MimePart;
-            att?.Content.Stream.Dispose();
+            att?.Content?.Stream?.Dispose();
         }
 
         if (sendException != null)

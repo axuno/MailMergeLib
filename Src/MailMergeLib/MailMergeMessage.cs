@@ -809,7 +809,7 @@ public partial class MailMergeMessage : IDisposable
         if (Config.StandardFromAddress != null)
         {
             Config.StandardFromAddress.Address = SearchAndReplaceVars(Config.StandardFromAddress.Address, dataItem);
-            Config.StandardFromAddress.Name = SearchAndReplaceVars(Config.StandardFromAddress.Name, dataItem);
+            Config.StandardFromAddress.Name = SearchAndReplaceVars(Config.StandardFromAddress.Name ?? string.Empty, dataItem);
             mimeMessage.From.Add(Config.StandardFromAddress);
         }
 
@@ -832,6 +832,9 @@ public partial class MailMergeMessage : IDisposable
                 if (Config.IgnoreIllegalRecipientAddresses && mailboxAddr == null)
                     continue;
 
+                if (mailboxAddr == null)
+                    continue;
+
                 switch (mmAddr.AddrType)
                 {
                     case MailAddressType.To:
@@ -848,11 +851,13 @@ public partial class MailMergeMessage : IDisposable
                         break;
                     case MailAddressType.ConfirmReadingTo:
                         mimeMessage.Headers.RemoveAll(HeaderId.DispositionNotificationTo);
-                        mimeMessage.Headers.Add(HeaderId.DispositionNotificationTo, mailboxAddr?.Address);
+                        if (mailboxAddr.Address != null)
+                            mimeMessage.Headers.Add(HeaderId.DispositionNotificationTo, mailboxAddr.Address);
                         break;
                     case MailAddressType.ReturnReceiptTo:
                         mimeMessage.Headers.RemoveAll(HeaderId.ReturnReceiptTo);
-                        mimeMessage.Headers.Add(HeaderId.ReturnReceiptTo, mailboxAddr?.Address);
+                        if (mailboxAddr.Address != null)
+                            mimeMessage.Headers.Add(HeaderId.ReturnReceiptTo, mailboxAddr.Address);
                         break;
                     case MailAddressType.Sender:
                         mimeMessage.Sender = mailboxAddr;
@@ -878,12 +883,12 @@ public partial class MailMergeMessage : IDisposable
 
         if (!string.IsNullOrEmpty(Config.Xmailer))
         {
-            mimeMessage.Headers.Replace(HeaderId.XMailer, Config.CharacterEncoding, Config.Xmailer);
+            mimeMessage.Headers.Replace(HeaderId.XMailer, Config.CharacterEncoding, Config.Xmailer!);
         }
 
         if (!string.IsNullOrEmpty(Config.Organization))
         {
-            mimeMessage.Headers.Replace(HeaderId.Organization, Config.CharacterEncoding, Config.Organization);
+            mimeMessage.Headers.Replace(HeaderId.Organization, Config.CharacterEncoding, Config.Organization!);
         }
 
         // collect any headers already present, e.g. headers for mailbox addresses like return-receipt
@@ -1001,7 +1006,7 @@ public partial class MailMergeMessage : IDisposable
     }
 
     /// <summary>
-    /// Compares the MailMergeMessage with an other instance of MailMergeMessage for equality.
+    /// Compares the MailMergeMessage with another instance of MailMergeMessage for equality.
     /// </summary>
     /// <param name="mmm"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
