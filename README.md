@@ -1,11 +1,10 @@
 <img src="https://raw.githubusercontent.com/axuno/MailMergeLib/main/MailMergeLlib.png" width="300" alt="Logo">
 
 [![GitHub release](https://img.shields.io/github/release/axuno/mailmergelib.svg)](https://github.com/axuno/MailMergeLib/releases/latest)
+[![NuGet](https://img.shields.io/nuget/v/MailMergeLib.svg)](https://www.nuget.org/packages/MailMergeLib/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/axuno/MailMergeLib/blob/main/License.txt)
 
-[![AppVeyor build status windows](https://img.shields.io/appveyor/job/build/axuno/MailMergeLib/windows/main?label=windows%20build)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/main)
-[![AppVeyor build status linux](https://img.shields.io/appveyor/job/build/axuno/MailMergeLib/linux/main?label=linux%20build)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/main)
-[![AppVeyor tests (compact)](https://img.shields.io/appveyor/tests/axuno/mailmergelib?compact_message)](https://ci.appveyor.com/project/axuno/mailmergelib/branch/main)
+[![Build + Test](https://github.com/axuno/mailmergelib/actions/workflows/build.yml/badge.svg)](https://github.com/axuno/MailMergeLib/actions)
 [![CodeCoverage](https://codecov.io/gh/axuno/MailMergeLib/branch/main/graph/badge.svg)](https://codecov.io/gh/axuno/MailMergeLib/tree/a9ecf7e4bdf708cf0bc1f393136faa7c0de7875c/MailMergeLib)
 
 ### What is *MailMergeLib*?
