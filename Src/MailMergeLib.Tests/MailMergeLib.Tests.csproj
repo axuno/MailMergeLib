@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Description>Test project for MailMergeLib</Description>
         <AssemblyTitle>MailMergeLib.UnitTest</AssemblyTitle>
-        <TargetFrameworks>net462;net8.0</TargetFrameworks>
+        <TargetFrameworks>net462;net10.0</TargetFrameworks>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <AssemblyName>MailMergeLib.Tests</AssemblyName>
         <AssemblyOriginatorKeyFile>../MailMergeLib/MailMergeLib.snk</AssemblyOriginatorKeyFile>

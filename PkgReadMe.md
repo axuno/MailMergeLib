@@ -34,6 +34,6 @@
 ### Supported Frameworks
 * .Net Framework 4.6.2 and later
 * .Net Standard 2.1
-* NET 6.0 and later
+* NET 6.0 and NET 10.0
 
 [![Paypal-Donations](https://img.shields.io/badge/Donate-PayPal-important.svg?style=flat-square)](https://www.paypal.com/donate?hosted_button_id=KSC3LRAR26AHN)

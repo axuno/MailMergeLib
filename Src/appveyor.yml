@@ -3,7 +3,7 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2026
+    appveyor_build_worker_image: Visual Studio 2022 # 2026 is not available yet
   - job_name: linux
     appveyor_build_worker_image: Ubuntu
 matrix:
@@ -21,6 +21,9 @@ for:
     init:
       # default is: core.autocrlf input
       - git config --global core.autocrlf true
+    install:
+      - ps: Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile "dotnet-install.ps1"
+      - ps: .\dotnet-install.ps1 -Channel 10.0 -InstallDir "$env:ProgramFiles\dotnet"
     build_script:
       - ps: cd $env:APPVEYOR_BUILD_FOLDER\Src
       - ps: dotnet --version
@@ -56,7 +59,7 @@ for:
         - job_name: linux
     build_script:
       - cd $APPVEYOR_BUILD_FOLDER/Src
-      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
       - export PATH="$HOME/.dotnet:$PATH"
       - dotnet --version
       - dotnet restore --verbosity quiet
