@@ -22,12 +22,12 @@ class Message_Templates
             Assert.That(msg.Subject, Is.EqualTo(mmm.Subject.Replace("{FirstName}", variables["FirstName"])));
 
             // DefaultKey is "Formal"
-            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Formal"]
+            Assert.That(msg.HtmlBody!.Contains(mmm.Templates["Salutation"]["Formal"]
                 .First(t => t.Type == PartType.Html)
-                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
-            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Formal"]
+                .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody!.Contains(mmm.Templates["Salutation"]["Formal"]
                 .First(t => t.Type == PartType.Plain)
-                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+                .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
         });
 
         // Programmacically set the part to use
@@ -35,12 +35,12 @@ class Message_Templates
         msg = mmm.GetMimeMessage(variables);
         Assert.Multiple(() =>
         {
-            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Dear"]
+            Assert.That(msg.HtmlBody!.Contains(mmm.Templates["Salutation"]["Dear"]
                     .First(t => t.Type == PartType.Html)
-                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
-            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Dear"]
+                    .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody!.Contains(mmm.Templates["Salutation"]["Dear"]
                 .First(t => t.Type == PartType.Plain)
-                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+                .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
         });
 
         // Neither DefaultKey nor Key of the template are set: gets the first part
@@ -55,12 +55,12 @@ class Message_Templates
         msg = mmm.GetMimeMessage(variables);
         Assert.Multiple(() =>
         {
-            Assert.That(msg.HtmlBody.Contains(mmm.Templates["Salutation"]["Hi"]
+            Assert.That(msg.HtmlBody!.Contains(mmm.Templates["Salutation"]["Hi"]
                     .First(t => t.Type == PartType.Html)
-                    .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
-            Assert.That(msg.TextBody.Contains(mmm.Templates["Salutation"]["Hi"]
+                    .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
+            Assert.That(msg.TextBody!.Contains(mmm.Templates["Salutation"]["Hi"]
                 .First(t => t.Type == PartType.Plain)
-                .Value.Replace("{FirstName}", variables["FirstName"])), Is.True);
+                .Value!.Replace("{FirstName}", variables["FirstName"])), Is.True);
         });
     }
 

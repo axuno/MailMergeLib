@@ -123,8 +123,8 @@ public class MailMergeAddress
         }
 
         return displayName != null
-            ? new MailboxAddress(DisplayNameCharacterEncoding, displayName, address)
-            : new MailboxAddress(DisplayNameCharacterEncoding, address, address);
+            ? new MailboxAddress(DisplayNameCharacterEncoding ?? Encoding.UTF8, displayName, address)
+            : new MailboxAddress(DisplayNameCharacterEncoding ?? Encoding.UTF8, address, address);
     }
 
     #region *** Equality ***

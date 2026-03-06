@@ -240,7 +240,7 @@ public static class Tools
     public static void ParseMailAddress(string inputAddr, out string displayName, out string address)
     {
         var mbAddr = MailboxAddress.Parse(ParserOptions.Default, inputAddr);
-        displayName = mbAddr.Name;
+        displayName = mbAddr.Name ?? string.Empty;
         address = mbAddr.Address;
     }
 
