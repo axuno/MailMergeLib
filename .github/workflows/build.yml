@@ -23,7 +23,7 @@ jobs:
 
   build-linux:
     name: Build and Test (Linux)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # ubuntu-24.04 does not include mono needed for net4x tests
     defaults:
       run:
         working-directory: Src
@@ -60,3 +60,79 @@ jobs:
         flags: net10.0-linux
         name: net10.0-linux
         token: ${{ secrets.CODECOV_TOKEN }}
+
+
+  build-windows:
+    name: Build and Test (Windows)
+    runs-on: windows-2022
+    defaults:
+      run:
+        working-directory: Src
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      
+    - name: Configure Git line endings
+      run: git config --global core.autocrlf true
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          10.0.x
+
+    - name: Display .NET version
+      run: dotnet --version
+
+    - name: Restore dependencies
+      run: dotnet restore --verbosity quiet
+
+    - name: Add AltCover package
+      run: dotnet add .\MailMergeLib.Tests\MailMergeLib.Tests.csproj package AltCover
+      
+    - name: Determine version
+      id: version
+      shell: pwsh
+      run: |
+        $version = "${{ env.VERSION }}"
+        $versionFile = "$version.${{ github.run_number }}"
+        
+        if ("${{ github.event_name }}" -eq "pull_request") {
+          $version = "$version-PR${{ github.event.pull_request.number }}"
+        }
+        
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "FILE_VERSION=$versionFile" >> $env:GITHUB_OUTPUT
+        echo "Package version: $version"
+        echo "File version: $versionFile"
+        
+    - name: Build solution
+      run: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=${{ steps.version.outputs.VERSION }} /p:FileVersion=${{ steps.version.outputs.FILE_VERSION }}
+      
+    - name: Run tests
+      run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        files: ./Src/MailMergeLib.Tests/coverage.net10.0.xml
+        flags: net10.0-windows
+        name: net10.0-windows
+        token: ${{ secrets.CODECOV_TOKEN }}
+        
+    - name: Pack NuGet packages
+      run: dotnet pack MailMergeLib.sln --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:ContinuousIntegrationBuild=true
+      
+    - name: Upload NuGet packages as artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: nuget-packages
+        path: |
+          artifacts/*.nupkg
+          artifacts/*.snupkg
+        retention-days: 30
+        
+    - name: Publish to NuGet
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
