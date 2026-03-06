@@ -138,5 +138,8 @@ jobs:
         
     - name: Publish to NuGet
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      working-directory: ${{ github.workspace }}
-      run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      shell: pwsh
+      run: |
+        Get-ChildItem "${{ github.workspace }}\artifacts\*.nupkg" | ForEach-Object {
+          dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        }
