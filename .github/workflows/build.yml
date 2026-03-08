@@ -68,6 +68,8 @@ jobs:
     defaults:
       run:
         working-directory: Src
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
 
     steps:
     - name: Checkout
@@ -135,11 +137,18 @@ jobs:
           artifacts/*.nupkg
           artifacts/*.snupkg
         retention-days: 30
+
+      # Get a short-lived NuGet API key
+    - name: NuGet login (OIDC -> temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+         user: ${{ secrets.NUGET_USER }}
         
     - name: Publish to NuGet
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       shell: pwsh
       run: |
         Get-ChildItem "${{ github.workspace }}\artifacts\*.nupkg" | ForEach-Object {
-          dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push $_.FullName --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
         }
