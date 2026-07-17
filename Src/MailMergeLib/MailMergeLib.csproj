@@ -55,7 +55,7 @@ https://github.com/axuno/MailMergeLib/releases</PackageReleaseNotes>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AngleSharp" Version="1.4.0" />
+        <PackageReference Include="AngleSharp" Version="1.5.0" />
         <PackageReference Include="MailKit" Version="4.16.0" />
         <PackageReference Include="MimeKit" Version="4.16.0" />
         <PackageReference Include="SmartFormat.NET" Version="3.6.1" />
