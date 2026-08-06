@@ -48,10 +48,10 @@ jobs:
       run: dotnet add ./MailMergeLib.Tests/MailMergeLib.Tests.csproj package AltCover
 
     - name: Build solution
-      run: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
+      run: dotnet build MailMergeLib.slnx /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
 
     - name: Run tests
-      run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.slnx /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyFilter="MailMergeLib" /p:AltCoverLineCover="true"
       
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7
@@ -110,13 +110,14 @@ jobs:
         echo "File version: $versionFile"
         
     - name: Build solution
-      run: dotnet build MailMergeLib.sln /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=${{ steps.version.outputs.VERSION }} /p:FileVersion=${{ steps.version.outputs.FILE_VERSION }}
-     
+      run: dotnet build MailMergeLib.slnx /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=${{ steps.version.outputs.VERSION }} /p:FileVersion=${{ steps.version.outputs.FILE_VERSION }}
+
     - name: Run tests (net462)
-      run: dotnet test --framework net462 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      # AltCover fails on .NET Framework with stack overflow issue, so exclude coverage for now
+      run: dotnet test --framework net462 --no-build --configuration release MailMergeLib.slnx
 
     - name: Run tests (net10.0)
-      run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.sln /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true"
+      run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.slnx /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyFilter="MailMergeLib" /p:AltCoverLineCover="true"
       
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7
@@ -127,7 +128,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         
     - name: Pack NuGet packages
-      run: dotnet pack MailMergeLib.sln --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:ContinuousIntegrationBuild=true
+      run: dotnet pack MailMergeLib.slnx --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:ContinuousIntegrationBuild=true
       
     - name: Upload NuGet packages as artifacts
       uses: actions/upload-artifact@v7
