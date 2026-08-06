@@ -50,9 +50,9 @@ jobs:
     - name: Build solution
       run: dotnet build MailMergeLib.slnx /verbosity:minimal /t:rebuild /p:configuration=release /nowarn:CS1591,CS0618
 
-    - name: Run tests
+    - name: Run tests (net10.0)
       run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.slnx /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyFilter="MailMergeLib" /p:AltCoverLineCover="true"
-      
+    
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7
       with:
@@ -60,7 +60,6 @@ jobs:
         flags: net10.0-linux
         name: net10.0-linux
         token: ${{ secrets.CODECOV_TOKEN }}
-
 
   build-windows:
     name: Build and Test (Windows)
@@ -112,21 +111,30 @@ jobs:
     - name: Build solution
       run: dotnet build MailMergeLib.slnx /verbosity:minimal /t:rebuild /p:configuration=release /p:IncludeSymbols=true /p:ContinuousIntegrationBuild=true /p:Version=${{ steps.version.outputs.VERSION }} /p:FileVersion=${{ steps.version.outputs.FILE_VERSION }}
 
-    - name: Run tests (net462)
-      # AltCover fails on .NET Framework with stack overflow issue, so exclude coverage for now
-      run: dotnet test --framework net462 --no-build --configuration release MailMergeLib.slnx
-
     - name: Run tests (net10.0)
       run: dotnet test --framework net10.0 --no-build --configuration release MailMergeLib.slnx /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="..\MailMergeLib\MailMergeLib.snk" /p:AltCoverAssemblyFilter="MailMergeLib" /p:AltCoverLineCover="true"
+
+    - name: Run tests (net481)
+      # Note: --test-adapter-path is required for .NET Framework tests,
+      # AltCoverAssemblyExcludeFilter instead of AltCoverAssemblyFilter
+      run: dotnet test --framework net481 --no-build --configuration release MailMergeLib.slnx /p:AltCover=true /p:AltCoverXmlReport="coverage.xml" /p:AltCoverStrongNameKey="../MailMergeLib/MailMergeLib.snk" /p:AltCoverAssemblyExcludeFilter="MailMergeLib.Tests|NUnit3.TestAdapter" /p:AltCoverLineCover="true" --test-adapter-path ".\MailMergeLib.Tests\bin\release\net481"
       
-    - name: Upload coverage to Codecov
+    - name: Upload coverage to Codecov (net10.0)
       uses: codecov/codecov-action@v7
       with:
         files: ./Src/MailMergeLib.Tests/coverage.net10.0.xml
         flags: net10.0-windows
         name: net10.0-windows
         token: ${{ secrets.CODECOV_TOKEN }}
-        
+
+    - name: Upload coverage to Codecov (net481)
+      uses: codecov/codecov-action@v7
+      with:
+        files: ./Src/MailMergeLib.Tests/coverage.net481.xml
+        flags: net481-windows
+        name: net481-windows
+        token: ${{ secrets.CODECOV_TOKEN }}
+       
     - name: Pack NuGet packages
       run: dotnet pack MailMergeLib.slnx --verbosity minimal --no-build --configuration release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=${{ github.workspace }}/artifacts /p:ContinuousIntegrationBuild=true
       
@@ -140,7 +148,7 @@ jobs:
         retention-days: 30
 
       # Get a short-lived NuGet API key
-    - name: NuGet login (OIDC -> temp API key)
+    - name: NuGet login (with OIDC temp API key)
       uses: NuGet/login@v1
       id: login
       with:

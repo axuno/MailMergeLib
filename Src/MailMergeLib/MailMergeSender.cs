@@ -255,7 +255,7 @@ public class MailMergeSender : IDisposable
 
                 await SendMimeMessageAsync(smtpClient, mimeMessage, smtpClientConfig).ConfigureAwait(false);
                 smtpClient.ProtocolLogger?.Dispose();
-                smtpClient.Disconnect(true, _cancellationTokenSource.Token);
+                await smtpClient.DisconnectAsync(true, _cancellationTokenSource.Token);
 
             }, _cancellationTokenSource.Token).ConfigureAwait(false);
         }

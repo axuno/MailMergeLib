@@ -16,7 +16,11 @@ namespace MailMergeLib.Tests;
 [TestFixture]
 public class Sender_EventsAndSend
 {
+#if NET10_0_OR_GREATER
+    private static readonly System.Threading.Lock _locker = new();
+#else
     private static readonly object _locker = new();
+#endif
     private static SimpleSmtpServer? _server;
     private Settings _settings = new();
 
@@ -123,7 +127,7 @@ public class Sender_EventsAndSend
             
         mms.SendCancel(500);
         Assert.ThrowsAsync<TaskCanceledException>(() => mms.SendAsync(mmm, anyData));
-        Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+        Assert.That(_server?.ReceivedEmailCount, Is.Zero);
     }
 
     [Test]
@@ -149,7 +153,7 @@ public class Sender_EventsAndSend
 
         Assert.Throws<AggregateException>(() => { Task.WaitAll(tasks); });
 
-        Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+        Assert.That(_server?.ReceivedEmailCount, Is.Zero);
     }
 
     [Test]
@@ -185,13 +189,13 @@ public class Sender_EventsAndSend
 
         SendMail(OnAfterSend, OnSmtpConnected, OnSmtpDisconnected);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(connectedCounter, Is.EqualTo(1));
             Assert.That(disconnectedCounter, Is.EqualTo(1));
             Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(1));
             Assert.That(usedClientConfig?.Name, Is.EqualTo(_settings.SenderConfig.SmtpClientConfig[0].Name));
-        });
+        }
 
         Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig?.Name}' passed.\n\n");
         Console.WriteLine(_server?.ReceivedEmail[0].Data);
@@ -210,11 +214,11 @@ public class Sender_EventsAndSend
         _settings.SenderConfig.SmtpClientConfig[0]
             .SmtpPort++; // set wrong server port, so that backup config should be taken
         SendMail(OnAfterSend);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(1));
             Assert.That(usedClientConfig?.Name, Is.EqualTo(_settings.SenderConfig.SmtpClientConfig[1].Name));
-        });
+        }
 
         Console.WriteLine($"Sending mail with smtp config name '{usedClientConfig?.Name}' passed.\n\n");
         Console.WriteLine(_server?.ReceivedEmail[0].Data);
@@ -239,11 +243,11 @@ public class Sender_EventsAndSend
             .SmtpPort++; // set wrong server port, so that backup config should be taken
         _settings.SenderConfig.SmtpClientConfig[1].SmtpPort++; // set wrong server port, so that send will fail
         Assert.Catch(() => SendMail(onSendFailure: OnSendFailure));
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(usedClientConfig?.Name, Is.EqualTo(_settings.SenderConfig.SmtpClientConfig[1].Name));
-            Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
-        });
+            Assert.That(_server?.ReceivedEmailCount, Is.Zero);
+        }
     }
 
     private class Recipient
@@ -336,7 +340,7 @@ public class Sender_EventsAndSend
 
         Assert.That(actualEvents, Has.Count.EqualTo(expectedEvents.Count));
         // sequence of sync sending is predefined
-        while (actualEvents.Count > 0)
+        while (actualEvents.IsEmpty)
         {
             expectedEvents.TryPop(out var expected);
             actualEvents.TryPop(out var actual);
@@ -476,7 +480,7 @@ public class Sender_EventsAndSend
 
         Assert.That(actualEvents, Has.Count.EqualTo(expectedEvents.Count));
         // sequence of sync sending is predefined
-        while (actualEvents.Count > 0)
+        while (actualEvents.IsEmpty)
         {
             expectedEvents.TryPop(out var expected);
             actualEvents.TryPop(out var actual);
@@ -596,13 +600,13 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+            Assert.That(_server?.ReceivedEmailCount, Is.Zero);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+                Assert.That(_server?.ReceivedEmailCount, Is.Zero);
             }
             else
             {
@@ -639,13 +643,13 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+            Assert.That(_server?.ReceivedEmailCount, Is.Zero);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+                Assert.That(_server?.ReceivedEmailCount, Is.Zero);
             }
             else
             {
@@ -688,13 +692,13 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+            Assert.That(_server?.ReceivedEmailCount, Is.Zero);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+                Assert.That(_server?.ReceivedEmailCount, Is.Zero);
             }
             else
             {
@@ -733,13 +737,13 @@ public class Sender_EventsAndSend
 
         if (throwException)
         {
-            Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+            Assert.That(_server?.ReceivedEmailCount, Is.Zero);
         }
         else
         {
             if (setMimeMessageToNull)
             {
-                Assert.That(_server?.ReceivedEmailCount, Is.EqualTo(0));
+                Assert.That(_server?.ReceivedEmailCount, Is.Zero);
             }
             else
             {
@@ -776,11 +780,11 @@ public class Sender_EventsAndSend
         sw.Stop();
         Console.WriteLine($"Time to send {recipients.Count} messages sync: {sw.ElapsedMilliseconds} milliseconds.");
         Console.WriteLine();
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(_server?.ReceivedEmail.Length, Is.EqualTo(recipients.Count));
             Assert.That(mms.IsBusy, Is.False);
-        });
+        }
 
         sw.Reset();
         _server?.ClearReceivedEmail();
@@ -799,11 +803,11 @@ public class Sender_EventsAndSend
         Console.WriteLine(
             $"{numOfSmtpClientsUsed} tasks (and SmtpClients) used for sending async\n(max {mms.Config.MaxNumOfSmtpClients} were configured).");
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(_server?.ReceivedEmail.Length, Is.EqualTo(recipients.Count));
             Assert.That(mms.IsBusy, Is.False);
-        });
+        }
     }
 
     #region *** Test setup ***
