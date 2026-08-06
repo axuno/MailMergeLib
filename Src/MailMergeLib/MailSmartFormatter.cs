@@ -53,9 +53,7 @@ public class MailSmartFormatter : SmartFormatter
     /// <param name="config"></param>
     /// <param name="currentSmartSettings"></param>
     internal MailSmartFormatter(SmartFormatterConfig config, SmartSettings? currentSmartSettings) : this(currentSmartSettings)
-    {
-        SetConfig(config);
-    }
+        => SetConfig(config);
 
     /// <summary>
     /// Gets or sets the <see cref="TemplateFormatter"/> where the templates can be registered later on.

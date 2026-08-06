@@ -71,9 +71,7 @@ public class StringAttachment
     }
 
     private bool Equals(StringAttachment sa)
-    {
-        return string.Equals(Content, sa.Content) && string.Equals(DisplayName, sa.DisplayName) && string.Equals(MimeType, sa.MimeType);
-    }
+        => string.Equals(Content, sa.Content) && string.Equals(DisplayName, sa.DisplayName) && string.Equals(MimeType, sa.MimeType);
 
     /// <summary>
     /// The HashCode for the StringAttachment.

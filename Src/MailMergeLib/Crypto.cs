@@ -12,7 +12,7 @@ public static class Crypto
     /// <summary>
     /// The Initialization Vector for the DES encryption routine. You should change the default value, but keep the 8 bytes.
     /// </summary>
-    public static byte[] IV { get; set; } = new byte[8] {255, 33, 128, 49, 0, 76, 177, 155};
+    public static byte[] IV { get; set; } = [255, 33, 128, 49, 0, 76, 177, 155];
 
     /// <summary>
     /// The crypto key used to calculate an MD5 hash. You should change the default value before using the Crypto class.

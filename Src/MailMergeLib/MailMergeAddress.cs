@@ -16,9 +16,7 @@ public class MailMergeAddress
     /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
     /// </summary>
     public MailMergeAddress()
-    {
-        Address = DisplayName = string.Empty;
-    }
+        => Address = DisplayName = string.Empty;
 
     /// <summary>
     /// Represents the address of a mail sender or recipient for use with a MailMergeMessage.
@@ -97,10 +95,10 @@ public class MailMergeAddress
     [YAXSerializeAs("DisplayNameCharacterEncoding")]
     internal string? DisplayNameCharacterEncodingName
     {
-        get { return DisplayNameCharacterEncoding?.WebName; }
+        get => DisplayNameCharacterEncoding?.WebName;
         set
         {
-            if (value != null) DisplayNameCharacterEncoding = Encoding.GetEncoding(value);
+            if (value is not null) DisplayNameCharacterEncoding = Encoding.GetEncoding(value);
         }
     }
 
@@ -113,7 +111,7 @@ public class MailMergeAddress
     internal MailboxAddress? GetMailAddress(MailMergeMessage mmm, object? dataItem)
     {
         var address = mmm.SearchAndReplaceVars(Address, dataItem);
-        var displayName = DisplayName != null ? mmm.SearchAndReplaceVars(DisplayName, dataItem) : null;
+        var displayName = DisplayName is not null ? mmm.SearchAndReplaceVars(DisplayName, dataItem) : null;
         if (string.IsNullOrEmpty(displayName)) displayName = null;
 
         // Exclude invalid address from further process
@@ -122,7 +120,7 @@ public class MailMergeAddress
             return null;
         }
 
-        return displayName != null
+        return displayName is not null
             ? new MailboxAddress(DisplayNameCharacterEncoding ?? Encoding.UTF8, displayName, address)
             : new MailboxAddress(DisplayNameCharacterEncoding ?? Encoding.UTF8, address, address);
     }
@@ -145,10 +143,8 @@ public class MailMergeAddress
     /// <summary>
     /// Compares for equality
     /// </summary>
-    protected bool Equals(MailMergeAddress other)
-    {
-        return AddrType == other.AddrType && string.Equals(Address, other.Address) && string.Equals(DisplayName, other.DisplayName) && Equals(DisplayNameCharacterEncoding, other.DisplayNameCharacterEncoding);
-    }
+    protected bool Equals(MailMergeAddress other) =>
+        AddrType == other.AddrType && string.Equals(Address, other.Address) && string.Equals(DisplayName, other.DisplayName) && Equals(DisplayNameCharacterEncoding, other.DisplayNameCharacterEncoding);
 
     /// <summary>
     /// Returns the hash code for the MailMergeAddress
@@ -159,9 +155,9 @@ public class MailMergeAddress
         unchecked
         {
             var hashCode = (int) AddrType;
-            hashCode = (hashCode * 397) ^ (Address != null ? Address.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (DisplayName != null ? DisplayName.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (DisplayNameCharacterEncoding != null ? DisplayNameCharacterEncoding.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (Address?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (DisplayName?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (DisplayNameCharacterEncoding?.GetHashCode() ?? 0);
             return hashCode;
         }
     }

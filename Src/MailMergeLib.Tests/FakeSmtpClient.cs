@@ -66,32 +66,19 @@ public class FakeSmtpClient : SmtpClient
         return Task.CompletedTask;
     }
 
-    public override Task DisconnectAsync(bool quit, CancellationToken cancellationToken = new CancellationToken())
-    {
-        return Task.CompletedTask;
-    }
+    public override Task DisconnectAsync(bool quit, CancellationToken cancellationToken = new CancellationToken()) => Task.CompletedTask;
 
-    public override Task NoOpAsync(CancellationToken cancellationToken = new CancellationToken())
-    {
-        return Task.CompletedTask;
-    }
+    public override Task NoOpAsync(CancellationToken cancellationToken = new CancellationToken()) => Task.CompletedTask;
 
     public override Task<string> SendAsync(FormatOptions options, MimeMessage message,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
-    {
-        throw new NotImplementedException(); 
-    }
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null) =>
+        throw new NotImplementedException();
 
     public override Task<string> SendAsync(FormatOptions options, MimeMessage message, MailboxAddress sender, IEnumerable<MailboxAddress> recipients,
-        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null)
-    {
+        CancellationToken cancellationToken = new CancellationToken(), ITransferProgress? progress = null) =>
         throw new NotImplementedException();
-    }
 
-    protected override void OnNoRecipientsAccepted(MimeMessage message)
-    {
-        base.OnNoRecipientsAccepted(message);
-    }
+    protected override void OnNoRecipientsAccepted(MimeMessage message) => base.OnNoRecipientsAccepted(message);
 
     public override void Authenticate(SaslMechanism mechanism, CancellationToken cancellationToken = new CancellationToken())
     {
@@ -132,35 +119,17 @@ public class FakeSmtpClient : SmtpClient
         return;
     }
 
-    protected override void OnSenderAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-    {
-        base.OnSenderAccepted(message, mailbox, response);
-    }
+    protected override void OnSenderAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response) => base.OnSenderAccepted(message, mailbox, response);
 
-    protected override void OnSenderNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-    {
-        base.OnSenderNotAccepted(message, mailbox, response);
-    }
+    protected override void OnSenderNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response) => base.OnSenderNotAccepted(message, mailbox, response);
 
-    protected override string GetEnvelopeId(MimeMessage message)
-    {
-        return base.GetEnvelopeId(message);
-    }
+    protected override string? GetEnvelopeId(MimeMessage message) => base.GetEnvelopeId(message);
 
-    protected override void OnRecipientAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-    {
-        base.OnRecipientAccepted(message, mailbox, response);
-    }
+    protected override void OnRecipientAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response) => base.OnRecipientAccepted(message, mailbox, response);
 
-    protected override void OnRecipientNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response)
-    {
-        base.OnRecipientNotAccepted(message, mailbox, response);
-    }
+    protected override void OnRecipientNotAccepted(MimeMessage message, MailboxAddress mailbox, SmtpResponse response) => base.OnRecipientNotAccepted(message, mailbox, response);
 
-    protected override DeliveryStatusNotification? GetDeliveryStatusNotifications(MimeMessage message, MailboxAddress mailbox)
-    {
-        return base.GetDeliveryStatusNotifications(message, mailbox);
-    }
+    protected override DeliveryStatusNotification? GetDeliveryStatusNotifications(MimeMessage message, MailboxAddress mailbox) => base.GetDeliveryStatusNotifications(message, mailbox);
 
     public override string Send(FormatOptions options, MimeMessage message, CancellationToken cancellationToken = new CancellationToken(),
         ITransferProgress? progress = null)
@@ -216,23 +185,11 @@ public class FakeSmtpClient : SmtpClient
         return Task.FromResult(string.Empty);
     }
 
-    protected override void OnMessageSent(MessageSentEventArgs e)
-    {
-        base.OnMessageSent(e);
-    }
+    protected override void OnMessageSent(MessageSentEventArgs e) => base.OnMessageSent(e);
 
-    protected override void OnConnected(string host, int port, SecureSocketOptions options)
-    {
-        base.OnConnected(host, port, options);
-    }
+    protected override void OnConnected(string host, int port, SecureSocketOptions options) => base.OnConnected(host, port, options);
 
-    protected override void OnDisconnected(string host, int port, SecureSocketOptions options, bool requested)
-    {
-        base.OnDisconnected(host, port, options, requested);
-    }
+    protected override void OnDisconnected(string host, int port, SecureSocketOptions options, bool requested) => base.OnDisconnected(host, port, options, requested);
 
-    protected override void OnAuthenticated(string message)
-    {
-        base.OnAuthenticated(message);
-    }
+    protected override void OnAuthenticated(string message) => base.OnAuthenticated(message);
 }

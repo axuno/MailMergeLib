@@ -83,10 +83,7 @@ public class Message_Serialization
     }
 
     [Test]
-    public void SerializeNewMailMergeMessage()
-    {
-        Assert.DoesNotThrow(() => new MailMergeMessage().Serialize()); 
-    }
+    public void SerializeNewMailMergeMessage() => Assert.DoesNotThrow(() => new MailMergeMessage().Serialize());
 
     [Test]
     public void SerializeTemplates()
@@ -96,11 +93,11 @@ public class Message_Serialization
             new Template()
             {
                 Name = "TestTemplate",
-                Text = new Parts
-                {
+                Text =
+                [
                     new Part(PartType.Plain, "key1", "some text"),
                     new Part(PartType.Plain, "key2", "other text")
-                }
+                ]
             }
         };
         var result = templates.Serialize();

@@ -118,9 +118,7 @@ public static class Tools
     /// <param name="text">string text</param>
     /// <returns>true, if text only contains seven bit characters - else false.</returns>
     public static bool IsSevenBit(string text)
-    {
-        return text.All(t => t <= 127);
-    }
+        => text.All(t => t <= 127);
 
     /// <summary>
     /// Checks a Stream, whether it consists of pure seven bit bytes.
@@ -129,9 +127,7 @@ public static class Tools
     /// <param name="stream">System.IO.Stream stream</param>
     /// <returns>true, if Stream only contains seven bit bytes - else false.</returns>
     public static bool IsSevenBit(Stream stream)
-    {
-        return IsSevenBit(stream, Encoding.UTF8);
-    }
+        => IsSevenBit(stream, Encoding.UTF8);
 
     /// <summary>
     /// Checks a Stream, whether it consists of pure seven bit bytes.
@@ -140,9 +136,7 @@ public static class Tools
     /// <param name="characterEncoding">System.Text.Encoding encoding</param>
     /// <returns>true, if Stream only contains seven bit characters - else false.</returns>
     public static bool IsSevenBit(Stream stream, Encoding characterEncoding)
-    {
-        return IsSevenBit(Stream2String(stream, characterEncoding));
-    }
+        => IsSevenBit(Stream2String(stream, characterEncoding));
 
 
     /// <summary>
@@ -151,9 +145,7 @@ public static class Tools
     /// <param name="stream">System.IO.Stream stream</param>
     /// <returns>string representation of the stream.</returns>
     public static string Stream2String(Stream stream)
-    {
-        return Stream2String(stream, Encoding.UTF8);
-    }
+        => Stream2String(stream, Encoding.UTF8);
 
     /// <summary>
     /// Converts a stream to a string.
@@ -182,7 +174,7 @@ public static class Tools
     public static string WrapLines(string input, int length)
     {
         var result = new StringBuilder();
-        var lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+        var lines = input.Split([Environment.NewLine], StringSplitOptions.None);
         foreach (var line in lines)
         {
             result.Append(WrapLine(line, length));
@@ -253,9 +245,7 @@ public static class Tools
     /// The ContentIds and Boundaries of a MimeMessage will change each time the message is written, so the size may differ for a few bytes.
     /// </remarks>
     public static long CalcMessageSize(MimeMessage? msg)
-    {
-        return msg?.ToString().Length ?? 0;
-    }
+        => msg?.ToString().Length ?? 0;
 
 
     /// <summary>

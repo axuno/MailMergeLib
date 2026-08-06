@@ -18,9 +18,9 @@ public class TemplateException : Exception
     public TemplateException(string message, Part? part, Parts? parts, Template? template, Templates? templates) : base (message)
     {
         Part = part;
-        Parts = parts ?? new ();
+        Parts = parts ?? [];
         Template = template;
-        Templates = templates ?? new();
+        Templates = templates ?? [];
     }
 
     /// <summary>

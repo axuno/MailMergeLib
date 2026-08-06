@@ -9,9 +9,7 @@ namespace MailMergeLib.Serialization;
 internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddressCollection>
 {
     public void SerializeToAttribute(MailMergeAddressCollection objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public void SerializeToElement(MailMergeAddressCollection objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
@@ -23,14 +21,10 @@ internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddress
     }
 
     public string SerializeToValue(MailMergeAddressCollection objectToSerialize, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public MailMergeAddressCollection DeserializeFromAttribute(XAttribute attrib, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public MailMergeAddressCollection DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
@@ -48,7 +42,5 @@ internal class MailMergeAddressesSerializer : ICustomSerializer<MailMergeAddress
     }
 
     public MailMergeAddressCollection DeserializeFromValue(string value, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 }

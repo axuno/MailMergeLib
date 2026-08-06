@@ -18,8 +18,8 @@ public class Settings
     /// </summary>
     public Settings()
     {
-        SenderConfig = new SenderConfig();
-        MessageConfig = new MessageConfig();
+        SenderConfig = new();
+        MessageConfig = new();
     }
 
     /// <summary>
@@ -58,9 +58,7 @@ public class Settings
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
     public void Serialize(Stream stream, Encoding encoding)
-    {
-        Serialize(new StreamWriter(stream, encoding), true);
-    }
+        => Serialize(new StreamWriter(stream, encoding), true);
 
     /// <summary>
     /// Write MailMergeLib settings to a file.
@@ -78,20 +76,14 @@ public class Settings
     /// Get MailMergeLib settings as an xml string.
     /// </summary>
     /// <returns>Returns the MailMergeLib settings as an xml string.</returns>
-    public string Serialize()
-    {
-        return SerializationFactory.Serialize(this);
-    }
+    public string Serialize() => SerializationFactory.Serialize(this);
 
     /// <summary>
     /// Write MailMergeLib settings with a StreamWriter.
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-    private void Serialize(TextWriter writer, bool isStream)
-    {
-        SerializationFactory.Serialize(this, writer, isStream);
-    }
+    private void Serialize(TextWriter writer, bool isStream) => SerializationFactory.Serialize(this, writer, isStream);
 
     /// <summary>
     /// Reads MailMergeLib settings from a stream.
@@ -109,17 +101,12 @@ public class Settings
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static Settings? Deserialize(string filename, Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<Settings>(filename, encoding ?? Encoding.UTF8);
-    }
+    public static Settings? Deserialize(string filename, Encoding encoding) =>
+        SerializationFactory.Deserialize<Settings>(filename, encoding ?? Encoding.UTF8);
 
     /// <summary>
     /// Read the MailMergeLib settings from an xml string.
     /// </summary>
     /// <returns>Returns the MailMergeLib settings as an xml string.</returns>
-    public static Settings? Deserialize(string xml)
-    {
-        return SerializationFactory.Deserialize<Settings>(xml);
-    }
+    public static Settings? Deserialize(string xml) => SerializationFactory.Deserialize<Settings>(xml);
 }

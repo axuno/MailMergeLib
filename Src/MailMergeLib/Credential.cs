@@ -18,9 +18,7 @@ public class Credential : ICredentials
     /// Initializes a new instance of the Credential class.
     /// </summary>
     public Credential()
-    {
-        Username = Password = string.Empty;
-    }
+        => Username = Password = string.Empty;
 
     /// <summary>
     /// Initializes a new instance of the Credential class.
@@ -45,12 +43,10 @@ public class Credential : ICredentials
     /// <param name="uri"></param>
     /// <param name="authType"></param>
     /// <returns>Returns an instance of NetworkCredential.</returns>
-    public NetworkCredential GetCredential(Uri uri, string authType)
-    {
-        return string.IsNullOrEmpty(Domain)
+    public NetworkCredential GetCredential(Uri uri, string authType) =>
+        string.IsNullOrEmpty(Domain)
             ? new NetworkCredential(Username, Password).GetCredential(uri, authType)
             : new NetworkCredential(Username, Password, Domain).GetCredential(uri, authType);
-    }
 
     #endregion
 

@@ -16,8 +16,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_ConnectException(Type connectException)
     {
-        var sender = Sender_SendMimeMessage.GetMailMergeSender();
-        var msg = Sender_SendMimeMessage.GetMimeMessage();
+        var sender = GetMailMergeSender();
+        var msg = GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty)};
         sender.Config.SmtpClientConfig[0] = config;
 
@@ -53,8 +53,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_AuthenticateException(Type authenticateException)
     {
-        var sender = Sender_SendMimeMessage.GetMailMergeSender();
-        var msg = Sender_SendMimeMessage.GetMimeMessage();
+        var sender = GetMailMergeSender();
+        var msg = GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 
@@ -99,8 +99,8 @@ public class Sender_SendMimeMessage
     [TestCase(typeof(Exception))]
     public void With_SendException(Type sendException, SmtpErrorCode smtpErrorCode = SmtpErrorCode.UnexpectedStatusCode)
     {
-        var sender = Sender_SendMimeMessage.GetMailMergeSender();
-        var msg = Sender_SendMimeMessage.GetMimeMessage();
+        var sender = GetMailMergeSender();
+        var msg = GetMimeMessage();
         var config = new SmtpClientConfig { MessageOutput = MessageOutput.SmtpServer, NetworkCredential = new Credential(string.Empty, string.Empty) };
         sender.Config.SmtpClientConfig[0] = config;
 

@@ -17,16 +17,10 @@ public class Message_SmartFormatter
     {
         public string Email { set; get; } = "test@example.com";
 #pragma warning disable CA1822 
-        public string GetContinent()
-        {
-            return "Europe";
-        }
+        public string GetContinent() => "Europe";
 #pragma warning restore CA1822
         private TestClass2 NewTestClass { get; set; } = new TestClass2();
-        public TestClass2 GetNewTestClass()
-        {
-            return NewTestClass;
-        }
+        public TestClass2 GetNewTestClass() => NewTestClass;
     }
 
     private class TestClass2

@@ -15,10 +15,7 @@ public class Message_Html
     private class DummyHtmlConverter : IHtmlConverter
     {
         public const string ConstantText = "Plain text for test";
-        public string ToPlainText(string html)
-        {
-            return ConstantText;
-        }
+        public string ToPlainText(string html) => ConstantText;
     }
 
     [Test]

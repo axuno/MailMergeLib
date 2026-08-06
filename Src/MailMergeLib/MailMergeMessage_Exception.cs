@@ -17,10 +17,8 @@ public partial class MailMergeMessage
         /// CTOR
         /// </summary>
         public AddressException(string message, HashSet<string> badAddress, Exception? innerException)
-            : base(message, innerException)
-        {
+            : base(message, innerException) =>
             BadAddress = badAddress;
-        }
 
         /// <summary>
         /// Gets the bad email address(es) leading to the exception.
@@ -41,10 +39,8 @@ public partial class MailMergeMessage
         /// CTOR.
         /// </summary>
         public AttachmentException(string message, HashSet<string> badAttachment, Exception? innerException)
-            : base(message, innerException)
-        {
+            : base(message, innerException) =>
             BadAttachment = badAttachment;
-        }
 
         /// <summary>
         /// Gets the list of bad attachments that caused the exception.
@@ -83,10 +79,8 @@ public partial class MailMergeMessage
         /// CTOR.
         /// </summary>
         public MailMergeMessageException(string message, IEnumerable<Exception> exceptions, MimeMessage? mimeMessage)
-            : base(message, exceptions)
-        {
+            : base(message, exceptions) =>
             MimeMessage = mimeMessage;
-        }
 
         /// <summary>
         /// Gets all exceptions that were thrown when the message was created.
@@ -113,10 +107,8 @@ public partial class MailMergeMessage
         /// CTOR.
         /// </summary>
         public VariableException(string message, HashSet<string> missingVariable, Exception? innerException)
-            : base(message, innerException)
-        {
+            : base(message, innerException) =>
             MissingVariable = missingVariable;
-        }
 
         /// <summary>
         /// Gets the missing variables that caused the exception.

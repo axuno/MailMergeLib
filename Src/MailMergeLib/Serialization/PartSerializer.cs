@@ -10,9 +10,7 @@ namespace MailMergeLib.Serialization;
 internal class PartSerializer : ICustomSerializer<Part>
 {
     public void SerializeToAttribute(Part objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public void SerializeToElement(Part objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
@@ -22,14 +20,10 @@ internal class PartSerializer : ICustomSerializer<Part>
     }
 
     public string SerializeToValue(Part objectToSerialize, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public Part DeserializeFromAttribute(XAttribute attrib, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public Part DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
@@ -52,7 +46,5 @@ internal class PartSerializer : ICustomSerializer<Part>
     }
 
     public Part DeserializeFromValue(string value, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 }

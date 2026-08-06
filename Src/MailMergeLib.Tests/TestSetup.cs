@@ -8,11 +8,9 @@ namespace MailMergeLib.Tests;
 public class TestSetup
 {
     [OneTimeSetUp]
-    public void RunBeforeAnyTests()
-    {
+    public void RunBeforeAnyTests() =>
         // Disable console output from test methods
         Console.SetOut(TextWriter.Null);
-    }
 
     [OneTimeTearDown]
     public void RunAfterAnyTests()

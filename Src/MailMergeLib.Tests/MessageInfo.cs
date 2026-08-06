@@ -22,7 +22,7 @@ public class MessageInfo
                   "</MailMergeMessage>";
 
         // MessageInfo
-        var deserializedInfo = MailMergeLib.MessageStore.MessageInfoBase.Read(xml);
+        var deserializedInfo = MessageStore.MessageInfoBase.Read(xml);
         Assert.Multiple(() =>
         {
             Assert.That(deserializedInfo, Is.EqualTo(info));
@@ -47,7 +47,7 @@ public class MessageInfo
                   "</MailMergeMessage>";
 
         // MessageInfo
-        var deserializedInfo = MailMergeLib.MessageStore.MessageInfoBase.Read(xml);
+        var deserializedInfo = MessageStore.MessageInfoBase.Read(xml);
         Assert.Multiple(() =>
         {
             Assert.That(deserializedInfo, Is.EqualTo(info));
@@ -71,7 +71,7 @@ public class MessageInfo
                   "</Info>" +
                   "</MailMergeMessage>";
 
-        Assert.Throws<XmlException>(() => MailMergeLib.MessageStore.MessageInfoBase.Read(xml));
+        Assert.Throws<XmlException>(() => MessageStore.MessageInfoBase.Read(xml));
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class MessageInfo
                   "</InfoMissing>" +
                   "</MailMergeMessage>";
 
-        Assert.Throws<XmlException>(() => MailMergeLib.MessageStore.MessageInfoBase.Read(xml));
+        Assert.Throws<XmlException>(() => MessageStore.MessageInfoBase.Read(xml));
     }
 
     [Test]
@@ -102,6 +102,6 @@ public class MessageInfo
                   "</Info>" + 
                   "</MailMergeMessage>";
 
-        Assert.Throws<XmlException>(() => MailMergeLib.MessageStore.MessageInfoBase.Read(xml));
+        Assert.Throws<XmlException>(() => MessageStore.MessageInfoBase.Read(xml));
     }
 }

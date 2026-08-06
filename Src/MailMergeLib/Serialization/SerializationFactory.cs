@@ -27,9 +27,8 @@ internal class SerializationFactory
     /// </summary>
     /// <param name="classType"></param>
     /// <returns>Returns a pre-configured YAXSerializer.</returns>
-    internal static YAXSerializer GetStandardSerializer (Type classType)
-    {
-        return new YAXSerializer(classType,
+    internal static YAXSerializer GetStandardSerializer (Type classType) =>
+        new(classType,
             new SerializerOptions
             {
                 ExceptionHandlingPolicies = YAXExceptionHandlingPolicies.ThrowErrorsOnly,
@@ -37,8 +36,7 @@ internal class SerializationFactory
                 MaxRecursion = 50,
                 SerializationOptions = YAXSerializationOptions.SerializeNullObjects
             });
-    }
-        
+
     /// <summary>
     /// Serialize type T to XML.
     /// </summary>
@@ -55,10 +53,8 @@ internal class SerializationFactory
     /// <param name="obj"></param>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    internal static void Serialize<T>(T obj, Stream stream, System.Text.Encoding encoding)
-    {
-        Serialize(obj, new StreamWriter(stream, encoding), true);
-    }
+    internal static void Serialize<T>(T obj, Stream stream, Encoding encoding)
+        => Serialize(obj, new StreamWriter(stream, encoding), true);
 
     /// <summary>
     /// Write type T to a file.
@@ -110,16 +106,14 @@ internal class SerializationFactory
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
     internal static T? Deserialize<T>(Stream stream, Encoding encoding)
-    {
-        return Deserialize<T>(new StreamReader(stream, encoding), true);
-    }
+        => Deserialize<T>(new StreamReader(stream, encoding), true);
 
     /// <summary>
     /// Reads T from an XML file.
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    internal static T? Deserialize<T>(string filename, System.Text.Encoding encoding)
+    internal static T? Deserialize<T>(string filename, Encoding encoding)
     {
         using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var sr = new StreamReader(fs, encoding);

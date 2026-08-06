@@ -35,11 +35,8 @@ public class MailMergeSender : IDisposable
     /// Otherwise the <see cref="CancellationToken"/> will be left in the canceled state, and a
     /// <see cref="TaskCanceledException"/> will throw when sending is invoked again after the first cancellation.
     /// </remarks>
-    private void RenewCancellationTokenSource()
-    {
-        _cancellationTokenSource = new CancellationTokenSource();
-    }
-        
+    private void RenewCancellationTokenSource() => _cancellationTokenSource = new CancellationTokenSource();
+
     /// <summary>
     /// Returns true, while a Send method is pending.
     /// Entering a Send method while IsBusy will raise an InvalidOperationException.
@@ -365,7 +362,7 @@ public class MailMergeSender : IDisposable
             att?.Content?.Stream?.Dispose();
         }
 
-        if (sendException != null)
+        if (sendException is not null)
         {
             throw sendException;
         }
@@ -395,7 +392,7 @@ public class MailMergeSender : IDisposable
         }
         catch (SmtpCommandException ex)
         {
-            throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+            throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                 $"{errorConnect} {hostPortConfig}'. " + ex.Message);
         }
         catch (SmtpProtocolException ex)
@@ -416,7 +413,7 @@ public class MailMergeSender : IDisposable
             }
             catch (SmtpCommandException ex)
             {
-                throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox, $"{errorAuth} {hostPortConfig}. " + ex.Message);
+                throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!, $"{errorAuth} {hostPortConfig}. " + ex.Message);
             }
             catch (SmtpProtocolException ex)
             {
@@ -432,13 +429,13 @@ public class MailMergeSender : IDisposable
         {
             throw ex.ErrorCode switch
             {
-                SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Recipient not accepted by {hostPortConfig}. " + ex.Message),
-                SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Sender not accepted by {hostPortConfig}. " + ex.Message),
-                SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Message not accepted by {hostPortConfig}. " + ex.Message),
-                _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Error sending message to {hostPortConfig}. " + ex.Message),
             };
         }
@@ -743,7 +740,7 @@ public class MailMergeSender : IDisposable
         // Dispose the streams of file attachments and inline file attachments
         MailMergeMessage.DisposeFileStreams(mimeMsg);
 
-        if (sendException != null)
+        if (sendException is not null)
         {
             throw sendException;
         }
@@ -772,7 +769,7 @@ public class MailMergeSender : IDisposable
         }
         catch (SmtpCommandException ex)
         {
-            throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+            throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                 $"{errorConnect} {hostPortConfig}'. " + ex.Message);
         }
         catch (SmtpProtocolException ex)
@@ -797,7 +794,7 @@ public class MailMergeSender : IDisposable
             }
             catch (SmtpCommandException ex)
             {
-                throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                throw new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"{errorAuth} {hostPortConfig}. " + ex.Message);
             }
             catch (SmtpProtocolException ex)
@@ -814,13 +811,13 @@ public class MailMergeSender : IDisposable
         {
             throw ex.ErrorCode switch
             {
-                SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.RecipientNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Recipient not accepted by {hostPortConfig}. " + ex.Message),
-                SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.SenderNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Sender not accepted by {hostPortConfig}. " + ex.Message),
-                SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                SmtpErrorCode.MessageNotAccepted => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Message not accepted by {hostPortConfig}. " + ex.Message),
-                _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox,
+                _ => new SmtpCommandException(ex.ErrorCode, ex.StatusCode, ex.Mailbox!,
                     $"Error sending message to {hostPortConfig}. " + ex.Message),
             };
         }
@@ -901,7 +898,7 @@ public class MailMergeSender : IDisposable
     /// </summary>
     private SmtpClient GetInitializedSmtpClient(SmtpClientConfig config)
     {
-        var smtpClient = config.ProtocolLoggerDelegate != null ? new SmtpClient(config.ProtocolLoggerDelegate?.Invoke()) : new SmtpClient();
+        var smtpClient = config.ProtocolLoggerDelegate != null ? new SmtpClient(config.ProtocolLoggerDelegate.Invoke()!) : new SmtpClient();
 
         smtpClient.Timeout = config.Timeout;
         smtpClient.LocalDomain = config.ClientDomain;
@@ -920,10 +917,7 @@ public class MailMergeSender : IDisposable
     /// <summary>
     /// Destructor.
     /// </summary>
-    ~MailMergeSender()
-    {
-        Dispose(false);
-    }
+    ~MailMergeSender() => Dispose(false);
 
     #region *** IDisposable Members ***
 

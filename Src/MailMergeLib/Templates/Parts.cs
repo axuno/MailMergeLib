@@ -46,11 +46,9 @@ public class Parts : ObservableCollection<Part>
     /// </summary>
     /// <param name="other"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
-    private bool Equals(Parts other)
-    {
+    private bool Equals(Parts other) =>
         // not any entry missing in this, nor in the other list
-        return !this.Except(other).Union(other.Except(this)).Any();
-    }
+        !this.Except(other).Union(other.Except(this)).Any();
 
     /// <summary>
     /// Compares this instance with an other instance of Parts for equality.
@@ -73,7 +71,7 @@ public class Parts : ObservableCollection<Part>
     {
         unchecked
         {
-            return this.Aggregate(0, (current, item) => (current * 397) ^ (item != null ? item.GetHashCode() : 0));
+            return this.Aggregate(0, (current, item) => (current * 397) ^ (item?.GetHashCode() ?? 0));
         }
     }
 }
