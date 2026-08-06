@@ -12,9 +12,7 @@ namespace MailMergeLib.Serialization;
 internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint?>
 {
     public void SerializeToAttribute(IPEndPoint? objectToSerialize, XAttribute attrToFill, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public void SerializeToElement(IPEndPoint? objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
@@ -25,14 +23,10 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint?>
     }
 
     public string SerializeToValue(IPEndPoint? objectToSerialize, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public IPEndPoint DeserializeFromAttribute(XAttribute attrib, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 
     public IPEndPoint? DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
@@ -48,7 +42,5 @@ internal class IPEndPointSerializer : ICustomSerializer<IPEndPoint?>
     }
 
     public IPEndPoint DeserializeFromValue(string value, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 }

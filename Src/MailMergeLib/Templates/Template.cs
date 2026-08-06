@@ -12,17 +12,13 @@ namespace MailMergeLib.Templates;
 [YAXSerializeAs("Template")]
 public class Template
 {
-    private string? _key;
-    private string? _defaultKey;
-    private Parts _text = new();
+    private Parts _text = [];
 
     /// <summary>
     /// Creates an instance of a <see cref="Template"/> class.
     /// </summary>
     public Template()
-    {
-        _text.CollectionChanged += TextOnCollectionChanged;
-    }
+        => _text.CollectionChanged += TextOnCollectionChanged;
 
     /// <summary>
     /// Creates an instance of a <see cref="Template"/> class.
@@ -82,12 +78,12 @@ public class Template
         // Gracious detection:
         // If Text only has entries with 1 key and nothing else is selected, return the parts for the only key
         var onlyOneKeyInParts = Text.GroupBy(p => p.Key, (k, g) => new {Key = k}).ToList();
-        if (key == null && DefaultKey == null && onlyOneKeyInParts.Count == 1)
+        if (key is null && DefaultKey is null && onlyOneKeyInParts.Count == 1)
         {
             return this[onlyOneKeyInParts.First().Key];
         }
 
-        if (key == null && DefaultKey != null)
+        if (key is null && DefaultKey is not null)
         {
             return this[DefaultKey];
         }
@@ -102,13 +98,15 @@ public class Template
     [YAXDontSerialize]
     public string? Key
     {
-        get => _key;
+        get;
         set
         {
-            if (value != null && this[value].Length == 0)
-                throw new TemplateException($"Illegal value for {nameof(DefaultKey)}: No entry in the parts list has a key value of '{value}'.", null, null, this, null);
+            if (value is not null && this[value].Length == 0)
+                throw new TemplateException(
+                    $"Illegal value for {nameof(DefaultKey)}: No entry in the parts list has a key value of '{value}'.",
+                    null, null, this, null);
 
-            _key = value;
+            field = value;
         }
     }
 
@@ -122,13 +120,15 @@ public class Template
     [YAXDontSerializeIfNull]
     public string? DefaultKey
     {
-        get => _defaultKey;
+        get;
         set
         {
-            if (value != null && this[value].Length == 0)
-                throw new TemplateException($"Illegal value for {nameof(DefaultKey)}: No entry in the parts list has a key value of '{value}'.", null, null, this, null);
+            if (value is not null && this[value].Length == 0)
+                throw new TemplateException(
+                    $"Illegal value for {nameof(DefaultKey)}: No entry in the parts list has a key value of '{value}'.",
+                    null, null, this, null);
 
-            _defaultKey = value;
+            field = value;
         }
     }
 
@@ -139,10 +139,7 @@ public class Template
     /// <returns>Returns an array with one or two parts, or an empty array if the key does not exist.</returns>
     public Part[] this[string key]
     {
-        get
-        {
-            return Text.Where(c => c.Key == key).ToArray();
-        }
+        get => Text.Where(c => c.Key == key).ToArray();
     }
 
     /// <summary>
@@ -163,10 +160,7 @@ public class Template
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    protected bool Equals(Template other)
-    {
-        return string.Equals(Name, other.Name) && string.Equals(Key, other.Key) && string.Equals(DefaultKey, other.DefaultKey) && Equals(Text, other.Text);
-    }
+    protected bool Equals(Template other) => string.Equals(Name, other.Name) && string.Equals(Key, other.Key) && string.Equals(DefaultKey, other.DefaultKey) && Equals(Text, other.Text);
 
     /// <summary>
     /// The hash function.
@@ -176,10 +170,10 @@ public class Template
     {
         unchecked
         {
-            var hashCode = (Name != null ? Name.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Key != null ? Key.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (DefaultKey != null ? DefaultKey.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Text != null ? Text.GetHashCode() : 0);
+            var hashCode = Name?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ (Key?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (DefaultKey?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (Text?.GetHashCode() ?? 0);
             return hashCode;
         }
     }

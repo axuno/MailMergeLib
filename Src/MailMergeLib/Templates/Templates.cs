@@ -56,7 +56,7 @@ public class Templates : List<Template>
     /// <exception cref="TemplateException"></exception>
     public Template this[string name]
     {
-        get { return Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this); }
+        get => Find(k => k.Name == name) ?? throw new TemplateException($"Template key '{name}' not found.", null, null, null, this);
 
         set
         {
@@ -106,19 +106,15 @@ public class Templates : List<Template>
     /// </summary>
     /// <returns>Returns a string with XML markup.</returns>
     public string Serialize()
-    {
-        return SerializationFactory.Serialize<Templates>(this);
-    }
+        => SerializationFactory.Serialize<Templates>(this);
 
     /// <summary>
     /// Write <see cref="Templates"/> to an XML stream.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public void Serialize(Stream stream, System.Text.Encoding encoding)
-    {
-        Serialize(new StreamWriter(stream, encoding), true);
-    }
+    public void Serialize(Stream stream, Encoding encoding)
+        => Serialize(new StreamWriter(stream, encoding), true);
 
     /// <summary>
     /// Write <see cref="Templates"/> to a file.
@@ -126,9 +122,7 @@ public class Templates : List<Template>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
     public void Serialize(string filename, Encoding encoding)
-    {
-        SerializationFactory.Serialize(this, filename, encoding);
-    }
+        => SerializationFactory.Serialize(this, filename, encoding);
 
     /// <summary>
     /// Write <see cref="Templates"/> with a StreamWriter.
@@ -136,9 +130,7 @@ public class Templates : List<Template>
     /// <param name="writer"></param>
     /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
     private void Serialize(TextWriter writer, bool isStream)
-    {
-        SerializationFactory.Serialize(this, writer, isStream);
-    }
+        => SerializationFactory.Serialize(this, writer, isStream);
 
     /// <summary>
     /// Deserialize the parameter with XML markup to an instance of <see cref="Templates"/>.
@@ -146,30 +138,24 @@ public class Templates : List<Template>
     /// <param name="xml"></param>
     /// <returns>Returns an instance of <see cref="Templates"/>.</returns>
     public static Templates? Deserialize(string xml)
-    {
-        return SerializationFactory.Deserialize<Templates>(xml);
-    }
+        => SerializationFactory.Deserialize<Templates>(xml);
 
     /// <summary>
     /// Reads <see cref="Templates"/> from an XML stream.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public static Templates? Deserialize(Stream stream, System.Text.Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<Templates>(new StreamReader(stream, encoding), true);
-    }
+    public static Templates? Deserialize(Stream stream, Encoding encoding)
+        => SerializationFactory.Deserialize<Templates>(new StreamReader(stream, encoding), true);
 
     /// <summary>
     /// Reads <see cref="Templates"/> from an XML file.
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static Templates? Deserialize(string filename, System.Text.Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<Templates>(filename, encoding);
-    }
-        
+    public static Templates? Deserialize(string filename, Encoding encoding)
+        => SerializationFactory.Deserialize<Templates>(filename, encoding);
+
     #endregion
 
     /// <summary>
@@ -177,9 +163,7 @@ public class Templates : List<Template>
     /// </summary>
     /// <param name="other"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
-    public bool Equals(Templates other)
-    {
+    public bool Equals(Templates other) =>
         // not any entry missing in this, nor in the other list
-        return !this.Except(other).Union(other.Except(this)).Any();
-    }
+        !this.Except(other).Union(other.Except(this)).Any();
 }

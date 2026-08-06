@@ -13,8 +13,6 @@ namespace MailMergeLib;
 [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly, Options = YAXSerializationOptions.DontSerializeNullObjects)]
 public class MessageConfig
 {
-    private string _fileBaseDirectory = Path.GetTempPath();
-
     /// <summary>
     /// CTOR for MailMergeMessage configuration.
     /// </summary>
@@ -79,17 +77,18 @@ public class MessageConfig
     [YAXSerializableField]
     public string FileBaseDirectory
     {
-        get => _fileBaseDirectory;
+        get;
         set
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                _fileBaseDirectory = string.Empty;
+                field = string.Empty;
                 return;
             }
-            _fileBaseDirectory = value;
+
+            field = value;
         }
-    }
+    } = Path.GetTempPath();
 
     /// <summary>
     /// If true, empty or illegal recipient addresses will be discarded.
@@ -160,22 +159,20 @@ public class MessageConfig
     /// <summary>
     /// Compares for equality
     /// </summary>
-    protected bool Equals(MessageConfig other)
-    {
-        return TextTransferEncoding == other.TextTransferEncoding &&
-               BinaryTransferEncoding == other.BinaryTransferEncoding &&
-               Equals(CharacterEncoding, other.CharacterEncoding) &&
-               Equals(CultureInfo, other.CultureInfo) &&
-               string.Equals(FileBaseDirectory, other.FileBaseDirectory) &&
-               IgnoreIllegalRecipientAddresses == other.IgnoreIllegalRecipientAddresses &&
-               IgnoreMissingInlineAttachments == other.IgnoreMissingInlineAttachments &&
-               IgnoreMissingFileAttachments == other.IgnoreMissingFileAttachments &&
-               Priority == other.Priority &&
-               Equals(StandardFromAddress, other.StandardFromAddress) &&
-               string.Equals(Organization, other.Organization) &&
-               string.Equals(Xmailer, other.Xmailer) &&
-               SmartFormatterConfig.Equals(other.SmartFormatterConfig);
-    }
+    protected bool Equals(MessageConfig other) =>
+        TextTransferEncoding == other.TextTransferEncoding &&
+        BinaryTransferEncoding == other.BinaryTransferEncoding &&
+        Equals(CharacterEncoding, other.CharacterEncoding) &&
+        Equals(CultureInfo, other.CultureInfo) &&
+        string.Equals(FileBaseDirectory, other.FileBaseDirectory) &&
+        IgnoreIllegalRecipientAddresses == other.IgnoreIllegalRecipientAddresses &&
+        IgnoreMissingInlineAttachments == other.IgnoreMissingInlineAttachments &&
+        IgnoreMissingFileAttachments == other.IgnoreMissingFileAttachments &&
+        Priority == other.Priority &&
+        Equals(StandardFromAddress, other.StandardFromAddress) &&
+        string.Equals(Organization, other.Organization) &&
+        string.Equals(Xmailer, other.Xmailer) &&
+        SmartFormatterConfig.Equals(other.SmartFormatterConfig);
 
     private static bool Equals(MailboxAddress? addr, MailboxAddress? otherAddr)
     {

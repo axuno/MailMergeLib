@@ -27,7 +27,7 @@ namespace MailMergeLib.Tests;
 public class EmailValidatorTest
 {
     static readonly string[] ValidAddresses =
-    {
+    [
         "\"Abc\\@def\"@example.com",
         "\"Fred Bloggs\"@example.com",
         "\"Joe\\\\Blow\"@example.com",
@@ -85,11 +85,11 @@ public class EmailValidatorTest
         "the-total-length@of-an-entire-address.cannot-be-longer-than-two-hundred-and-fifty-four-characters.and-this-address-is-254-characters-exactly.so-it-should-be-valid.and-im-going-to-add-some-more-words-here.to-increase-the-length-blah-blah-blah-blah-bla.org",
         "uncommon-tld@sld.mobi",
         "uncommon-tld@sld.museum",
-        "uncommon-tld@sld.travel",
-    };
+        "uncommon-tld@sld.travel"
+    ];
 
     static readonly string[] InvalidAddresses =
-    {
+    [
         "",
         "invalid",
         "invalid@",
@@ -134,15 +134,15 @@ public class EmailValidatorTest
         // examples of real (invalid) input from real users.
         "No longer available.",
         "Moved."
-    };
+    ];
 
     static readonly string[] ValidInternationalAddresses =
-    {
+    [
         "伊昭傑@郵件.商務", // Chinese
         "राम@मोहन.ईन्फो", // Hindi
         "юзер@екзампл.ком", // Ukranian
-        "θσερ@εχαμπλε.ψομ", // Greek
-    };
+        "θσερ@εχαμπλε.ψομ" // Greek
+    ];
 
     [Test]
     public void TestValidAddresses()
@@ -166,8 +166,5 @@ public class EmailValidatorTest
     }
 
     [Test]
-    public void TestThrowsExceptionIfNull()
-    {
-        Assert.Throws<ArgumentNullException>(() => EmailValidator.Validate(null!, true, true), "Null Address");
-    }
+    public void TestThrowsExceptionIfNull() => Assert.Throws<ArgumentNullException>(() => EmailValidator.Validate(null!, true, true), "Null Address");
 }

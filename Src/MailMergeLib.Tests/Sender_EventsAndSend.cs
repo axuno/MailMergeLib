@@ -27,10 +27,7 @@ public class Sender_EventsAndSend
     }
 
     [TearDown]
-    public void TearDown()
-    {
-        _server?.Dispose();
-    }
+    public void TearDown() => _server?.Dispose();
 
     private void SendMail(EventHandler<MailSenderAfterSendEventArgs>? onAfterSend = null,
         EventHandler<MailSenderSmtpClientEventArgs>? onSmtpConnected = null,
@@ -307,20 +304,18 @@ public class Sender_EventsAndSend
         if (withParseFailure)
         {
             sequenceOfExpectedEvents.Clear();
-            sequenceOfExpectedEvents.AddRange(new[]
-            {
+            sequenceOfExpectedEvents.AddRange([
                 nameof(mms.OnMessageFailure) /*,
                     nameof(mms.OnSmtpDisconnected)*/
-            });
+            ]);
         }
         else
         {
             sequenceOfExpectedEvents.Clear();
-            sequenceOfExpectedEvents.AddRange(new[]
-            {
+            sequenceOfExpectedEvents.AddRange([
                 nameof(mms.OnBeforeSend), nameof(mms.OnSmtpConnected), nameof(mms.OnSmtpAuthenticated),
                 nameof(mms.OnAfterSend), nameof(mms.OnSmtpDisconnected)
-            });
+            ]);
         }
 
         #endregion
@@ -447,22 +442,20 @@ public class Sender_EventsAndSend
         if (withParseFailure)
         {
             sequenceOfExpectedEvents.Clear();
-            sequenceOfExpectedEvents.AddRange(new[]
-            {
+            sequenceOfExpectedEvents.AddRange([
                 nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnMessageFailure),
                 nameof(mms.OnMergeProgress), nameof(mms.OnMergeComplete)
-            });
+            ]);
         }
         else
         {
             sequenceOfExpectedEvents.Clear();
-            sequenceOfExpectedEvents.AddRange(new[]
-            {
+            sequenceOfExpectedEvents.AddRange([
                 nameof(mms.OnMergeBegin), nameof(mms.OnMergeProgress), nameof(mms.OnBeforeSend),
                 nameof(mms.OnSmtpConnected), nameof(mms.OnSmtpAuthenticated),
                 nameof(mms.OnAfterSend), nameof(mms.OnMergeProgress), nameof(mms.OnSmtpDisconnected),
                 nameof(mms.OnMergeComplete)
-            });
+            ]);
         }
 
         #endregion
@@ -836,9 +829,8 @@ public class Sender_EventsAndSend
         _settings = GetSettings();
     }
 
-    private static Settings GetSettings()
-    {
-        return new Settings
+    private static Settings GetSettings() =>
+        new()
         {
             MessageConfig =
             {
@@ -857,8 +849,8 @@ public class Sender_EventsAndSend
             {
                 MaxNumOfSmtpClients = 5,
 
-                SmtpClientConfig = new[]
-                {
+                SmtpClientConfig =
+                [
                     new SmtpClientConfig
                     {
                         MessageOutput = MessageOutput.SmtpServer,
@@ -883,10 +875,9 @@ public class Sender_EventsAndSend
                         DelayBetweenMessages = 0,
                         ClientDomain = "mail.mailmergelib.net"
                     }
-                }
+                ]
             }
         };
-    }
 
     #endregion
 }

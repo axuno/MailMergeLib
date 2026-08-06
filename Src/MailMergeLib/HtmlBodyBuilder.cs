@@ -52,7 +52,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     /// <summary>
     /// Gets the list of inline attachments (linked resources) referenced in the HTML text.
     /// </summary>
-    public HashSet<FileAttachment> InlineAtt { get; } = new HashSet<FileAttachment>();
+    public HashSet<FileAttachment> InlineAtt { get; } = [];
 
     /// <summary>
     /// Get the HTML representation of the source document
@@ -162,7 +162,7 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     /// <summary>
     /// Gets inline files referenced in the HTML text, that were missing or not readable.
     /// </summary>
-    public HashSet<string> BadInlineFiles { get; } = new HashSet<string>();
+    public HashSet<string> BadInlineFiles { get; } = [];
 
     /// <summary>
     /// Gets or sets the transfer encoding for any binary content (e.g. Base64)
@@ -245,7 +245,5 @@ internal class HtmlBodyBuilder : BodyBuilderBase
     /// <param name="fileExt">file extension, so that content type can be easily identified. May be string.empty</param>
     /// <returns></returns>
     private static string MakeCid(string prefix, string contentId, string fileExt)
-    {
-        return prefix + contentId + fileExt.Replace('.', '-');
-    }
+        => prefix + contentId + fileExt.Replace('.', '-');
 }

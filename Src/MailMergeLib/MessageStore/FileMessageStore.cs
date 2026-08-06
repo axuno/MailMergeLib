@@ -58,14 +58,14 @@ public class FileMessageStore : IMessageStore
     /// A list of absolute paths to file system folders where deserialized <see cref="MailMergeMessage"/> files are stored.
     /// </summary>
     [YAXCollection(YAXCollectionSerializationTypes.Recursive, EachElementName = "Folder")]
-    public string[] SearchFolders { get; set; } = System.Array.Empty<string>();
+    public string[] SearchFolders { get; set; } = [];
 
     /// <summary>
     /// The search pattern to use for getting the file names of deserialized <see cref="MailMergeMessage"/> files.
     /// Default search pattern is "*.*".
     /// </summary>
     [YAXCollection(YAXCollectionSerializationTypes.Recursive, EachElementName = "Pattern")]
-    public string[] SearchPatterns { get; set; } = {"*.*"};
+    public string[] SearchPatterns { get; set; } = ["*.*"];
 
     /// <summary>
     /// Scans all <see cref="SearchFolders"/> for deserialized <see cref="MailMergeMessage"/> files.
@@ -90,13 +90,11 @@ public class FileMessageStore : IMessageStore
         }
     }
 
-    private static IEnumerable<FileInfo> GetFiles(IEnumerable<string> searchFolders, IEnumerable<string> searchPatterns, SearchOption searchOption = SearchOption.TopDirectoryOnly)
-    {
-        return from folder in searchFolders
-            from pattern in searchPatterns
-            from fileInfo in new DirectoryInfo(folder).GetFiles(pattern, searchOption)
-            select fileInfo;
-    }
+    private static IEnumerable<FileInfo> GetFiles(IEnumerable<string> searchFolders, IEnumerable<string> searchPatterns, SearchOption searchOption = SearchOption.TopDirectoryOnly) =>
+        from folder in searchFolders
+        from pattern in searchPatterns
+        from fileInfo in new DirectoryInfo(folder).GetFiles(pattern, searchOption)
+        select fileInfo;
 
     #region *** Serialization ***
 
@@ -104,70 +102,49 @@ public class FileMessageStore : IMessageStore
     /// Get the message store as a serialized xml string.
     /// </summary>
     /// <returns></returns>
-    public string Serialize()
-    {
-        return SerializationFactory.Serialize(this);
-    }
+    public string Serialize() => SerializationFactory.Serialize(this);
 
     /// <summary>
     /// Write a message store to an xml stream.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public void Serialize(Stream stream, System.Text.Encoding encoding)
-    {
-        Serialize(new StreamWriter(stream, encoding), true);
-    }
+    public void Serialize(Stream stream, Encoding encoding) => Serialize(new StreamWriter(stream, encoding), true);
 
     /// <summary>
     /// Write message store to a file.
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public void Serialize(string filename, Encoding encoding)
-    {
-        SerializationFactory.Serialize(this, filename, encoding);
-    }
+    public void Serialize(string filename, Encoding encoding) => SerializationFactory.Serialize(this, filename, encoding);
 
     /// <summary>
     /// Write a message store with a StreamWriter.
     /// </summary>
     /// <param name="writer"></param>
     /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
-    private void Serialize(TextWriter writer, bool isStream)
-    {
-        SerializationFactory.Serialize(this, writer, isStream);
-    }
+    private void Serialize(TextWriter writer, bool isStream) => SerializationFactory.Serialize(this, writer, isStream);
 
     /// <summary>
     /// Reads a message store from an xml string.
     /// </summary>
     /// <param name="xml"></param>
     /// <returns></returns>
-    public static FileMessageStore? Deserialize(string xml)
-    {
-        return SerializationFactory.Deserialize<FileMessageStore>(xml);
-    }
+    public static FileMessageStore? Deserialize(string xml) => SerializationFactory.Deserialize<FileMessageStore>(xml);
 
     /// <summary>
     /// Reads a message store from an xml stream.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public static FileMessageStore? Deserialize(Stream stream, System.Text.Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<FileMessageStore>(stream, encoding);
-    }
+    public static FileMessageStore? Deserialize(Stream stream, Encoding encoding) => SerializationFactory.Deserialize<FileMessageStore>(stream, encoding);
 
     /// <summary>
     /// Reads message store from an xml file.
     /// </summary>
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
-    public static FileMessageStore? Deserialize(string filename, System.Text.Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<FileMessageStore>(filename, encoding);
-    }
+    public static FileMessageStore? Deserialize(string filename, Encoding encoding) => SerializationFactory.Deserialize<FileMessageStore>(filename, encoding);
 
     #endregion
 

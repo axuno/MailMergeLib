@@ -151,7 +151,7 @@ class Message_Variables
         var t2 = (new Dictionary<string, string> { { "Email", "2ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "Asia" } });
         var t3 = (new Dictionary<string, string> { { "Email", "3ndRow@example.com" } }, new Dictionary<string, string> { { "Continent", "America" } });
 
-        dataList.AddRange(new[] { t1, t2, t3 });
+        dataList.AddRange([t1, t2, t3]);
 
         const string text = "Lorem ipsum dolor. Email={Email}, Continent={Continent}.";
 

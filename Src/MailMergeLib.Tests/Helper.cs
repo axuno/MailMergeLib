@@ -18,10 +18,7 @@ internal class Helper
     /// That's why we need reliable way to find the assembly location, which is the base for relativ data folders.
     /// </remarks>
     /// <returns></returns>
-    public static string GetCodeBaseDirectory()
-    {
-        return Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath)!;
-    }
+    public static string GetCodeBaseDirectory() => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath)!;
 
     internal static int Compare(Stream? a, Stream? b)
     {

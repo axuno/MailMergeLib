@@ -24,22 +24,10 @@ public partial class MailMergeMessage : IDisposable
     #region *** Private fields ***
 
     private MimeEntity? _textMessagePart;  // plain text and/or html text, maybe with inline attachments
-    private List<MimePart> _attachmentParts = new();
+    private List<MimePart> _attachmentParts = [];
 
     // backing fields for properties are necessary for private setters used in deserialization!
-    private string _subject = string.Empty;
-    private string _plainText = string.Empty;
-    private string _htmlText = string.Empty;
     private MailMergeAddressCollection _mailMergeAddresses;
-    private HashSet<FileAttachment> _fileAttachments = new();
-    private List<StreamAttachment> _streamAttachments = new();
-    private HashSet<FileAttachment> _inlineAttachments = new();
-    private HashSet<StringAttachment> _stringAttachments = new();
-    private HashSet<FileAttachment> _externalInlineAttachments = new();
-    private HeaderList _headers = new();
-    private MessageInfo _info = new();
-    private MessageConfig _config = new();
-    private Templates.Templates _templates = new();
 
     // disposal and sync
     private bool _disposed;
@@ -49,11 +37,11 @@ public partial class MailMergeMessage : IDisposable
 
     #region *** Private lists for tracking errors when generating a MimeMessage ***
 
-    private readonly HashSet<string> _badAttachmentFiles = new();
-    private readonly HashSet<string> _badMailAddr = new();
-    private readonly HashSet<string> _badInlineFiles = new();
-    private readonly HashSet<string> _badVariableNames = new();
-    private readonly List<ParseException> _parseExceptions = new();
+    private readonly HashSet<string> _badAttachmentFiles = [];
+    private readonly HashSet<string> _badMailAddr = [];
+    private readonly HashSet<string> _badInlineFiles = [];
+    private readonly HashSet<string> _badVariableNames = [];
+    private readonly List<ParseException> _parseExceptions = [];
 
     #endregion
 
@@ -76,10 +64,8 @@ public partial class MailMergeMessage : IDisposable
     /// </summary>
     /// <param name="subject">Mail message subject.</param>
     public MailMergeMessage(string subject)
-        : this()
-    {
+        : this() =>
         Subject = subject;
-    }
 
     /// <summary>
     /// Creates a new mail merge message.
@@ -87,10 +73,8 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="subject">Mail message subject.</param>
     /// <param name="plainText">Plain text of the mail message.</param>
     public MailMergeMessage(string subject, string plainText)
-        : this(subject)
-    {
+        : this(subject) =>
         PlainText = plainText;
-    }
 
     /// <summary>
     /// Creates a new mail merge message.
@@ -99,10 +83,8 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="plainText">Plain text part of the mail message.</param>
     /// <param name="htmlText">HTML message part of the mail message.</param>
     public MailMergeMessage(string subject, string plainText, string htmlText)
-        : this(subject, plainText)
-    {
+        : this(subject, plainText) =>
         HtmlText = htmlText;
-    }
 
     /// <summary>
     /// Creates a new mail merge message.
@@ -123,10 +105,8 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="htmlText">HTML message part of the mail message.</param>
     /// <param name="fileAtt">File attachments of the mail message.</param>
     public MailMergeMessage(string subject, string plainText, string htmlText, IEnumerable<FileAttachment> fileAtt)
-        : this(subject, plainText, htmlText)
-    {
+        : this(subject, plainText, htmlText) =>
         fileAtt.ToList().ForEach(fa => FileAttachments.Add(fa));
-    }
 
     #endregion
 
@@ -139,9 +119,9 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public MessageInfo Info
     {
-        get => _info;
-        set => _info = value ?? new MessageInfo();
-    }
+        get;
+        set => field = value ?? new MessageInfo();
+    } = new();
 
     /// <summary>
     /// Gets the collection of recipients and sender addresses of the message.
@@ -169,9 +149,9 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public HeaderList Headers
     {
-        get => _headers;
-        private set => _headers = value ?? new HeaderList();
-    }
+        get;
+        private set => field = value ?? [];
+    } = [];
 
     #endregion
 
@@ -182,13 +162,17 @@ public partial class MailMergeMessage : IDisposable
     /// This is useful, if none of the content properties contains variables, but still the <see cref="MailMergeSender"/> shall be used.
     /// </summary>
     public bool EnableFormatter { get; set; } = true;
-        
+
     /// <summary>
     /// Gets or sets the mail message subject.
     /// </summary>
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string Subject { get => _subject; set => _subject = value ?? string.Empty; }
+    public string Subject
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
 
     /// <summary>
     /// Gets or sets the mail message plain text content.
@@ -196,7 +180,11 @@ public partial class MailMergeMessage : IDisposable
     [YAXSerializableField]
     [YAXTextEmbedding(TextEmbedding.CData)]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string PlainText { get => _plainText; set => _plainText = value ?? string.Empty; }
+    public string PlainText
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
 
     /// <summary>
     /// Gets or sets the mail message HTML content.
@@ -204,7 +192,11 @@ public partial class MailMergeMessage : IDisposable
     [YAXSerializableField]
     [YAXTextEmbedding(TextEmbedding.CData)]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
-    public string HtmlText { get => _htmlText; set => _htmlText = value ?? string.Empty; }
+    public string HtmlText
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
 
     /// <summary>
     /// Gets a collection of type <see cref="MailMergeLib.Templates.Templates"/>.
@@ -214,9 +206,9 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public MailMergeLib.Templates.Templates Templates
     {
-        get => _templates;
-        private set => _templates = value ?? new Templates.Templates();
-    }
+        get;
+        private set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets the instance of the MailSmartFormatter (derived from SmartFormat.NET's SmartFormatter) which will be used with MailMergeLib.
@@ -231,16 +223,17 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public MessageConfig Config
     {
-        get => _config;
+        get;
         set
         {
             // Note: Keep null checks are for deserialization
-            _config = value ?? new MessageConfig();
-            _config.SmartFormatterConfig ??= new SmartFormatterConfig();
-            
+            field = value ?? new MessageConfig();
+            field.SmartFormatterConfig ??= new SmartFormatterConfig();
+
             RecreateMailSmartFormatter();
         }
-    }
+    } = new();
+
     #endregion
 
     #region *** Attachment properties ***
@@ -253,10 +246,10 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public HashSet<FileAttachment> FileAttachments
     {
-        get => _fileAttachments;
+        get;
         // Note: null checks are for deserialization
-        private set => _fileAttachments = value ?? new HashSet<FileAttachment>();
-    }
+        private set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets streams that will be attached to a mail message.
@@ -264,10 +257,10 @@ public partial class MailMergeMessage : IDisposable
     [YAXDontSerialize]
     public List<StreamAttachment> StreamAttachments
     {
-        get => _streamAttachments;
+        get;
         // Note: null checks are for deserialization
-        internal set => _streamAttachments = value ?? new List<StreamAttachment>();
-    }
+        internal set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets inline attachments (linked resources of the HTML body) of a mail message.
@@ -277,10 +270,10 @@ public partial class MailMergeMessage : IDisposable
     [YAXDontSerialize]
     public HashSet<FileAttachment> InlineAttachments
     {
-        get => _inlineAttachments;
+        get;
         // Note: null checks are for deserialization
-        private set => _inlineAttachments = value ?? new HashSet<FileAttachment>();
-    }
+        private set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets string attachments that will be attached to a mail message.
@@ -290,19 +283,19 @@ public partial class MailMergeMessage : IDisposable
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     public HashSet<StringAttachment> StringAttachments
     {
-        get => _stringAttachments;
+        get;
         // Note: null checks are for deserialization
-        private set => _stringAttachments = value ?? new HashSet<StringAttachment>();
-    }
+        private set => field = value ?? [];
+    } = [];
 
     [YAXSerializableField]
     [YAXErrorIfMissed(YAXExceptionTypes.Ignore)]
     private HashSet<FileAttachment> ExternalInlineAttachments
     {
-        get => _externalInlineAttachments;
+        get;
         // Note: null checks are for deserialization
-        set => _externalInlineAttachments = value ?? new HashSet<FileAttachment>();
-    }
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Adds external inline attachments (linked resources of the HTML body) of a mail message.
@@ -311,9 +304,7 @@ public partial class MailMergeMessage : IDisposable
     /// </summary>
     /// <param name="att"></param>
     public void AddExternalInlineAttachment(FileAttachment att)
-    {
-        ExternalInlineAttachments.Add(att);
-    }
+        => ExternalInlineAttachments.Add(att);
 
     /// <summary>
     /// Clears external inline attachments (linked resources of the HTML body) of a mail message.
@@ -321,18 +312,14 @@ public partial class MailMergeMessage : IDisposable
     /// This method only removes attachments formerly added with AddExternalInlineAttachment.
     /// </summary>
     public void ClearExternalInlineAttachment()
-    {
-        ExternalInlineAttachments.Clear();
-    }
+        => ExternalInlineAttachments.Clear();
 
     #endregion
 
     #region *** SmartFormat ***
 
     private void RecreateMailSmartFormatter()
-    {
-        SmartFormatter = GetConfiguredMailSmartFormatter();
-    }
+        => SmartFormatter = GetConfiguredMailSmartFormatter();
 
     private MailSmartFormatter GetConfiguredMailSmartFormatter(bool invokedFromConstructor = false)
     {
@@ -485,7 +472,7 @@ public partial class MailMergeMessage : IDisposable
 
             ExternalInlineAttachments.ToList().ForEach(ia => htmlBody.InlineAtt.Add(ia));
 
-            if (alternative != null)
+            if (alternative is not null)
             {
                 alternative.Add(htmlBody.GetBodyPart());
                 _textMessagePart = alternative;
@@ -522,7 +509,7 @@ public partial class MailMergeMessage : IDisposable
         {
             var parts = template.GetParts();
             var htmlPart = parts.FirstOrDefault(p => p.Type == PartType.Html);
-            if (htmlPart != null)
+            if (htmlPart is not null)
             {
                 SmartFormatter.Templates.Register(template.Name, htmlPart.Value ?? string.Empty);
             }
@@ -556,7 +543,7 @@ public partial class MailMergeMessage : IDisposable
     private void BuildAttachmentPartsForMessage(object? dataItem)
     {
         _badAttachmentFiles.Clear();
-        _attachmentParts = new List<MimePart>();
+        _attachmentParts = [];
 
         foreach (var fa in FileAttachments)
         {
@@ -607,9 +594,7 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="filename"></param>
     /// <returns>The full path of the file.</returns>
     private string MakeFullPath(string filename)
-    {
-        return Tools.MakeFullPath(Config.FileBaseDirectory, filename);
-    }
+        => Tools.MakeFullPath(Config.FileBaseDirectory, filename);
 
     #endregion
 
@@ -623,12 +608,10 @@ public partial class MailMergeMessage : IDisposable
     /// The IHtmlConverter to be used for converting. If the converter is null, the 
     /// <see cref="AngleSharpHtmlConverter"/> will be used.
     /// </param>
-    public void ConvertHtmlToPlainText(IHtmlConverter? converter = null)
-    {
+    public void ConvertHtmlToPlainText(IHtmlConverter? converter = null) =>
         PlainText = converter == null
             ? new AngleSharpHtmlConverter().ToPlainText(HtmlText)
             : converter.ToPlainText(HtmlText);
-    }
 
     /// <summary>
     /// Gets a list of MimeMessage representations of the MailMergeMessage for all items of the <see cref="IEnumerable{T}"/>.
@@ -732,7 +715,7 @@ public partial class MailMergeMessage : IDisposable
             {
                 var mixed = new Multipart("mixed");
 
-                if (_textMessagePart != null)
+                if (_textMessagePart is not null)
                     mixed.Add(_textMessagePart);
 
                 foreach (var att in _attachmentParts)
@@ -761,10 +744,7 @@ public partial class MailMergeMessage : IDisposable
     /// <summary>
     /// Destructor.
     /// </summary>
-    ~MailMergeMessage()
-    {
-        Dispose(false);
-    }
+    ~MailMergeMessage() => Dispose(false);
 
     /// <summary>
     /// Dispose MailMergeMessage
@@ -806,7 +786,7 @@ public partial class MailMergeMessage : IDisposable
             testAddress = new MailMergeAddress(MailAddressType.TestAddress, mmAddr.DisplayName, mmAddr.Address);
         }
 
-        if (Config.StandardFromAddress != null)
+        if (Config.StandardFromAddress is not null)
         {
             Config.StandardFromAddress.Address = SearchAndReplaceVars(Config.StandardFromAddress.Address, dataItem);
             Config.StandardFromAddress.Name = SearchAndReplaceVars(Config.StandardFromAddress.Name ?? string.Empty, dataItem);
@@ -819,7 +799,7 @@ public partial class MailMergeMessage : IDisposable
             {
                 MailboxAddress? mailboxAddr;
                 // use the address part the test mail address (if set) but use the original display name
-                if (testAddress != null)
+                if (testAddress is not null)
                 {
                     testAddress.DisplayName = mmAddr.DisplayName;
                     mailboxAddr = testAddress.GetMailAddress(this, dataItem);
@@ -851,12 +831,12 @@ public partial class MailMergeMessage : IDisposable
                         break;
                     case MailAddressType.ConfirmReadingTo:
                         mimeMessage.Headers.RemoveAll(HeaderId.DispositionNotificationTo);
-                        if (mailboxAddr.Address != null)
+                        if (mailboxAddr.Address is not null)
                             mimeMessage.Headers.Add(HeaderId.DispositionNotificationTo, mailboxAddr.Address);
                         break;
                     case MailAddressType.ReturnReceiptTo:
                         mimeMessage.Headers.RemoveAll(HeaderId.ReturnReceiptTo);
-                        if (mailboxAddr.Address != null)
+                        if (mailboxAddr.Address is not null)
                             mimeMessage.Headers.Add(HeaderId.ReturnReceiptTo, mailboxAddr.Address);
                         break;
                     case MailAddressType.Sender:
@@ -913,20 +893,14 @@ public partial class MailMergeMessage : IDisposable
     /// Get the message as a serialized XML string.
     /// </summary>
     /// <returns>Returns a string with XML markup.</returns>
-    public string Serialize()
-    {
-        return SerializationFactory.Serialize(this);
-    }
+    public string Serialize() => SerializationFactory.Serialize(this);
 
     /// <summary>
     /// Write a message to an XML stream.
     /// </summary>
     /// <param name="stream"></param>
     /// <param name="encoding"></param>
-    public void Serialize(Stream stream, Encoding encoding)
-    {
-        SerializationFactory.Serialize(this, stream, encoding);
-    }
+    public void Serialize(Stream stream, Encoding encoding) => SerializationFactory.Serialize(this, stream, encoding);
 
     /// <summary>
     /// Write message to an XML file.
@@ -934,9 +908,7 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
     public void Serialize(string filename, Encoding encoding)
-    {
-        SerializationFactory.Serialize(this, filename, encoding);
-    }
+        => SerializationFactory.Serialize(this, filename, encoding);
 
     /// <summary>
     /// Reads a message from an xml string.
@@ -944,9 +916,7 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="xml"></param>
     /// <returns></returns>
     public static MailMergeMessage? Deserialize(string xml)
-    {
-        return SerializationFactory.Deserialize<MailMergeMessage>(xml);
-    }
+        => SerializationFactory.Deserialize<MailMergeMessage>(xml);
 
     /// <summary>
     /// Reads a message from an xml stream.
@@ -965,9 +935,7 @@ public partial class MailMergeMessage : IDisposable
     /// <param name="filename"></param>
     /// <param name="encoding"></param>
     public static MailMergeMessage? Deserialize(string filename, Encoding encoding)
-    {
-        return SerializationFactory.Deserialize<MailMergeMessage>(filename, encoding);
-    }
+        => SerializationFactory.Deserialize<MailMergeMessage>(filename, encoding);
 
     /// <summary>
     /// Reads a message xml with a StreamReader.
@@ -976,9 +944,7 @@ public partial class MailMergeMessage : IDisposable
     /// <returns>Returns a <see cref="MailMergeMessage"/> instance.</returns>
     /// <param name="isStream">If true, the writer will not be closed and disposed, so that the underlying stream can be used on return.</param>
     private static MailMergeMessage? Deserialize(StreamReader reader, bool isStream)
-    {
-        return SerializationFactory.Deserialize<MailMergeMessage>(reader, isStream);
-    }
+        => SerializationFactory.Deserialize<MailMergeMessage>(reader, isStream);
 
     #endregion
 
@@ -1014,19 +980,17 @@ public partial class MailMergeMessage : IDisposable
     /// InlineAttachments are not compared because this property will be populated automatically from any HtmlText.
     /// StreamAttachments are not included in the comparison.
     /// </remarks>
-    public bool Equals(MailMergeMessage mmm)
-    {
-        return Info.Equals(mmm.Info) &&
-               MailMergeAddresses.Equals(mmm.MailMergeAddresses) &&
-               MailMergeMessage.Equals(FileAttachments, mmm.FileAttachments) &&
-               MailMergeMessage.Equals(ExternalInlineAttachments, mmm.ExternalInlineAttachments) &&
-               MailMergeMessage.Equals(StringAttachments, mmm.StringAttachments) &&
-               string.Equals(Subject, mmm.Subject) &&
-               string.Equals(PlainText, mmm.PlainText) &&
-               string.Equals(HtmlText, mmm.HtmlText) &&
-               Equals(Headers, mmm.Headers) &&
-               Config.Equals(mmm.Config);
-    }
+    public bool Equals(MailMergeMessage mmm) =>
+        Info.Equals(mmm.Info) &&
+        MailMergeAddresses.Equals(mmm.MailMergeAddresses) &&
+        Equals(FileAttachments, mmm.FileAttachments) &&
+        Equals(ExternalInlineAttachments, mmm.ExternalInlineAttachments) &&
+        Equals(StringAttachments, mmm.StringAttachments) &&
+        string.Equals(Subject, mmm.Subject) &&
+        string.Equals(PlainText, mmm.PlainText) &&
+        string.Equals(HtmlText, mmm.HtmlText) &&
+        Equals(Headers, mmm.Headers) &&
+        Config.Equals(mmm.Config);
 
     private static bool Equals(HeaderList hl1, HeaderList hl2)
     {
@@ -1037,17 +1001,13 @@ public partial class MailMergeMessage : IDisposable
         return !hl1Dict.Except(h21Dict).Union(h21Dict.Except(hl1Dict)).Any();
     }
 
-    private static bool Equals(HashSet<FileAttachment> fl1, HashSet<FileAttachment> fl2)
-    {
+    private static bool Equals(HashSet<FileAttachment> fl1, HashSet<FileAttachment> fl2) =>
         // not any entry missing in fl1, nor in the other list
-        return !fl1.Except(fl2).Union(fl2.Except(fl1)).Any();
-    }
+        !fl1.Except(fl2).Union(fl2.Except(fl1)).Any();
 
-    private static bool Equals(HashSet<StringAttachment> sa1, HashSet<StringAttachment> sa2)
-    {
+    private static bool Equals(HashSet<StringAttachment> sa1, HashSet<StringAttachment> sa2) =>
         // not any entry missing in sa11, nor in the other list
-        return !sa1.Except(sa2).Union(sa2.Except(sa1)).Any();
-    }
+        !sa1.Except(sa2).Union(sa2.Except(sa1)).Any();
 
     #endregion
 

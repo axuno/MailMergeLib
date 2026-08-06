@@ -14,10 +14,8 @@ internal class HeaderListSerializer : ICustomSerializer<HeaderList>
     private const string HeaderValueName = "Value";
  
     public void SerializeToAttribute(HeaderList objectToSerialize, XAttribute attrToFill,
-        ISerializationContext serializationContext)
-    {
+        ISerializationContext serializationContext) =>
         throw new NotImplementedException();
-    }
 
     public void SerializeToElement(HeaderList objectToSerialize, XElement elemToFill, ISerializationContext serializationContext)
     {
@@ -30,15 +28,9 @@ internal class HeaderListSerializer : ICustomSerializer<HeaderList>
         }
     }
 
-    public string SerializeToValue(HeaderList objectToSerialize, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+    public string SerializeToValue(HeaderList objectToSerialize, ISerializationContext serializationContext) => throw new NotImplementedException();
 
-    public HeaderList DeserializeFromAttribute(XAttribute attribute, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+    public HeaderList DeserializeFromAttribute(XAttribute attribute, ISerializationContext serializationContext) => throw new NotImplementedException();
 
     public HeaderList DeserializeFromElement(XElement element, ISerializationContext serializationContext)
     {
@@ -47,12 +39,12 @@ internal class HeaderListSerializer : ICustomSerializer<HeaderList>
         foreach (var header in element.Elements(HeaderElementName))
         {
             var idAttr = header.Attributes(HeaderIdName).FirstOrDefault();
-            if (idAttr != null)
+            if (idAttr is not null)
             {
                 if (Enum.TryParse(idAttr.Value, out HeaderId id))
                 {
                     var valueAttr = header.Attributes(HeaderValueName).FirstOrDefault();
-                    if (valueAttr != null)
+                    if (valueAttr is not null)
                     {
                         hl.Add(id, valueAttr.Value);
                     }
@@ -62,8 +54,5 @@ internal class HeaderListSerializer : ICustomSerializer<HeaderList>
         return hl;
     }
 
-    public HeaderList DeserializeFromValue(string value, ISerializationContext serializationContext)
-    {
-        throw new NotImplementedException();
-    }
+    public HeaderList DeserializeFromValue(string value, ISerializationContext serializationContext) => throw new NotImplementedException();
 }

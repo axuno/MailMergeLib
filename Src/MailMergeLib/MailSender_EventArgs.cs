@@ -92,10 +92,7 @@ public class MailSenderSmtpClientEventArgs : EventArgs
     /// </summary>
     public readonly SmtpClientConfig SmtpClientConfig;
 
-    internal MailSenderSmtpClientEventArgs(SmtpClientConfig smtpConfig)
-    {
-        SmtpClientConfig = smtpConfig;
-    }
+    internal MailSenderSmtpClientEventArgs(SmtpClientConfig smtpConfig) => SmtpClientConfig = smtpConfig;
 }
 /// <summary>
 /// Argument used by the event before starting a mail merge.

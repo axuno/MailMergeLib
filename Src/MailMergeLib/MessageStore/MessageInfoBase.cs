@@ -42,7 +42,7 @@ public abstract class MessageInfoBase : IMessageInfo
     /// <returns>bool</returns>
     public bool Equals(IMessageInfo? other)
     {
-        if (other == null) return false;
+        if (other is null) return false;
         return Id == other.Id && Category == other.Category && Description == other.Description && Comments == other.Comments && Data == other.Data;
     }
 
@@ -79,10 +79,10 @@ public abstract class MessageInfoBase : IMessageInfo
         unchecked
         {
             var hashCode = Id.GetHashCode();
-            hashCode = (hashCode * 397) ^ (Category != null ? Category.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Description != null ? Description.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Comments != null ? Comments.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Data != null ? Data.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (Category?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (Description?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (Comments?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ (Data?.GetHashCode() ?? 0);
             return hashCode;
         }
     }
@@ -123,7 +123,7 @@ public abstract class MessageInfoBase : IMessageInfo
         MessageInfo? Info = null;
         while (xmlReader.ReadToFollowing(nameof(Info)) && xmlReader.Depth == 1)
         {
-            if (Info != null)
+            if (Info is not null)
             {
                 throw new XmlException($"Element '{nameof(Info)}' must not exist more than once.");
             }

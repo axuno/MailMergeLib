@@ -17,7 +17,7 @@ internal class AttachmentBuilder
     {
         var displayName = ShortNameFromFile(fileAtt.DisplayName);
 
-        var mimeTypeAndSubtype = fileAtt.MimeType.Split(new[] { '/' }, 2);
+        var mimeTypeAndSubtype = fileAtt.MimeType.Split(['/'], 2);
         _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
         {
             Content = new MimeContent(File.OpenRead(fileAtt.Filename), ContentEncoding.Default),
@@ -39,7 +39,7 @@ internal class AttachmentBuilder
     {
         var displayName = ShortNameFromFile(stringAtt.DisplayName);
 
-        var mimeTypeAndSubtype = stringAtt.MimeType.Split(new[] { '/' }, 2);
+        var mimeTypeAndSubtype = stringAtt.MimeType.Split(['/'], 2);
         _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
         {
             Content = new MimeContent(
@@ -63,11 +63,11 @@ internal class AttachmentBuilder
     {
         var displayName = ShortNameFromFile(streamAtt.DisplayName);
 
-        var mimeTypeAndSubtype = streamAtt.MimeType.Split(new[] { '/' }, 2);
+        var mimeTypeAndSubtype = streamAtt.MimeType.Split(['/'], 2);
         _attachment = new MimePart(mimeTypeAndSubtype[0], mimeTypeAndSubtype[1])
         {
             Content = new MimeContent(streamAtt.Stream, ContentEncoding.Default),
-            ContentDisposition = new ContentDisposition(MimeKit.ContentDisposition.Attachment),
+            ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
             ContentType = {Name = displayName},
         };
 
@@ -83,8 +83,8 @@ internal class AttachmentBuilder
 
     internal static string ShortNameFromFile(string fileName)
     {
-        var num = fileName.LastIndexOfAny(new[] { '\\', ':' }, fileName.Length - 1, fileName.Length);
-        return num > 0 ? fileName.Substring(num + 1, (fileName.Length - num) - 1) : fileName;
+        var num = fileName.LastIndexOfAny(['\\', ':'], fileName.Length - 1, fileName.Length);
+        return num > 0 ? fileName.Substring(num + 1, fileName.Length - num - 1) : fileName;
     }
 
     private void SetTextAndBinaryAttachmentDefaults(Encoding characterEncoding, ContentEncoding textTransferEncoding, ContentEncoding binaryTransferEncoding)

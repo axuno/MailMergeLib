@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MailMergeLib.Tests/MailMergeLib.Tests.csproj" />
+  <Project Path="MailMergeLib/MailMergeLib.csproj" />
+</Solution>

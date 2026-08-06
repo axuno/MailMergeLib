@@ -50,8 +50,8 @@ public class Settings_Serialization
             },
             SenderConfig =
             {
-                SmtpClientConfig = new[]
-                {
+                SmtpClientConfig =
+                [
                     new SmtpClientConfig()
                     {
                         MessageOutput = MessageOutput.SmtpServer,
@@ -78,7 +78,7 @@ public class Settings_Serialization
                         Name = "Next best",
                         DelayBetweenMessages = 2000
                     }
-                },
+                ],
                 MaxNumOfSmtpClients = 5
             }
         };

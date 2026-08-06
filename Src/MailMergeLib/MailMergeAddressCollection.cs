@@ -57,17 +57,12 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// Property <c>MailMergeMessage</c> will be initialized as 'empty'.
     /// </summary>
     internal MailMergeAddressCollection()
-    {
-        MailMergeMessage = new();
-    }
+        => MailMergeMessage = new();
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    internal MailMergeAddressCollection(MailMergeMessage msg)
-    {
-        MailMergeMessage = msg;
-    }
+    internal MailMergeAddressCollection(MailMergeMessage msg) => MailMergeMessage = msg;
 
     /// <summary>
     /// The MailMergeMessage the MailMergeAddressCollection belongs to
@@ -97,9 +92,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// </summary>
     /// <param name="address"></param>
     internal void AddWithCurrentCharacterEncoding(MailMergeAddress address)
-    {
-        base.Add(address);
-    }
+        => base.Add(address);
 
     /// <summary>
     /// Gets all MailMergeAddresses of the specified address type.
@@ -107,9 +100,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// <param name="addrType"></param>
     /// <returns>Returns all MailMergeAddresses of the specified address type.</returns>
     public IEnumerable<MailMergeAddress> Get(MailAddressType addrType)
-    {
-        return Items.Where(mmAddr => mmAddr.AddrType == addrType);
-    }
+        => Items.Where(mmAddr => mmAddr.AddrType == addrType);
 
     /// <summary>
     /// Gets the string representation of the collection of mailbox addresses.
@@ -118,9 +109,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// <param name="dataItem"></param>
     /// <returns>The string representation of the collection of mailbox addresses</returns>
     public string ToString(MailAddressType addrType, object? dataItem)
-    {
-        return string.Join(", ", Get(addrType).Select(at => at?.GetMailAddress(MailMergeMessage, dataItem)?.ToString()));
-    }
+        => string.Join(", ", Get(addrType).Select(at => at?.GetMailAddress(MailMergeMessage, dataItem)?.ToString()));
 
     #region *** Equality ***
 
@@ -142,7 +131,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
     /// </summary>
     /// <param name="addressCollection"></param>
     /// <returns></returns>
-    protected bool Equals(MailMergeAddressCollection addressCollection)
+    protected bool Equals(MailMergeAddressCollection? addressCollection)
     {
         if (addressCollection == null) return false;
         // not any address missing in this, nor in the other collection
@@ -151,9 +140,7 @@ public class MailMergeAddressCollection : Collection<MailMergeAddress>
 
     /// <inheritdoc/>
     public override int GetHashCode()
-    {
-        return this.Aggregate(0, (current, item) => unchecked (current * 397) ^ (item != null ? item.GetHashCode() : 0));
-    }
+        => this.Aggregate(0, (current, item) => unchecked (current * 397) ^ (item != null ? item.GetHashCode() : 0));
 
     #endregion
 }

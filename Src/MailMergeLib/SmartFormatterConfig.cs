@@ -8,36 +8,31 @@ namespace MailMergeLib;
 /// </summary>
 public class SmartFormatterConfig
 {
-    private ErrorAction _parseErrorAction = ErrorAction.ThrowError;
-    private ErrorAction _formatErrorAction = ErrorAction.Ignore;
-    private CaseSensitivityType _caseSensitivity = CaseSensitivityType.CaseSensitive;
-    private bool _convertCharacterStringLiterals = true;
-
     /// <summary>
     /// Behavior of the parser in case of errors.
     /// </summary>
     public ErrorAction ParseErrorAction
     {
-        get => _parseErrorAction;
+        get;
         set
         {
-            _parseErrorAction = value;
+            field = value;
             OnConfigChanged?.Invoke();
         }
-    }
+    } = ErrorAction.ThrowError;
 
     /// <summary>
     /// Behavior of the formatter in case of errors.
     /// </summary>
     public ErrorAction FormatErrorAction
     {
-        get => _formatErrorAction;
+        get;
         set
         {
-            _formatErrorAction = value;
+            field = value;
             OnConfigChanged?.Invoke();
         }
-    }
+    } = ErrorAction.Ignore;
 
     /// <summary>
     /// Determines whether placeholders are case-sensitive or not.
@@ -45,13 +40,13 @@ public class SmartFormatterConfig
     /// </summary>
     public CaseSensitivityType CaseSensitivity
     {
-        get => _caseSensitivity;
+        get;
         set
         {
-            _caseSensitivity = value;
+            field = value;
             OnConfigChanged?.Invoke();
         }
-    }
+    } = CaseSensitivityType.CaseSensitive;
 
     /// <summary>
     /// This setting is relevant for the <see cref="LiteralText"/>.
@@ -62,13 +57,13 @@ public class SmartFormatterConfig
     /// </summary>
     public bool ConvertCharacterStringLiterals
     {
-        get => _convertCharacterStringLiterals;
+        get;
         set
         {
-            _convertCharacterStringLiterals = value;
+            field = value;
             OnConfigChanged?.Invoke();
         }
-    }
+    } = true;
 
     /// <summary>
     /// Event raising when the <see cref="SmartFormatterConfig"/> configuration has changed.
@@ -77,11 +72,9 @@ public class SmartFormatterConfig
 
     #region *** Equality ***
 
-    private bool Equals(SmartFormatterConfig other)
-    {
-        return ParseErrorAction == other.ParseErrorAction && FormatErrorAction == other.FormatErrorAction &&
-               CaseSensitivity == other.CaseSensitivity;
-    }
+    private bool Equals(SmartFormatterConfig other) =>
+        ParseErrorAction == other.ParseErrorAction && FormatErrorAction == other.FormatErrorAction &&
+        CaseSensitivity == other.CaseSensitivity;
 
     /// <summary>
     /// Determines whether this instance is equal to another instance.

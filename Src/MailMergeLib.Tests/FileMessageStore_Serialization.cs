@@ -13,14 +13,14 @@ public class FileMessageStore_Serialization
     [Test]
     public void SerializeDeserialize()
     {
-        var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { "Msg*.xml" }, Encoding.UTF8);
+        var fms = new FileMessageStore([TestFileFolders.FilesAbsPath], ["Msg*.xml"], Encoding.UTF8);
         Assert.That(FileMessageStore.Deserialize(fms.Serialize()), Is.EqualTo(fms));
     }
 
     [Test]
     public void GetMessageInfosFromFiles()
     {
-        var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { "Msg*.xml" }, Encoding.UTF8);
+        var fms = new FileMessageStore([TestFileFolders.FilesAbsPath], ["Msg*.xml"], Encoding.UTF8);
         var messageInfos = fms.ScanForMessages().ToList();
 
         Assert.That(messageInfos, Has.Count.EqualTo(2));
@@ -35,18 +35,18 @@ public class FileMessageStore_Serialization
     [Test]
     public void NoMessageFilesFound()
     {
-        var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { Guid.NewGuid().ToString("N")}, Encoding.UTF8);
+        var fms = new FileMessageStore([TestFileFolders.FilesAbsPath], [Guid.NewGuid().ToString("N")], Encoding.UTF8);
         var messageInfos = fms.ScanForMessages().ToList();
         Assert.That(messageInfos.Count, Is.EqualTo(0));
 
-        fms.SearchFolders = new[] { TestFileFolders.FilesAbsPath + Guid.NewGuid().ToString("N")};
+        fms.SearchFolders = [TestFileFolders.FilesAbsPath + Guid.NewGuid().ToString("N")];
         Assert.Throws<DirectoryNotFoundException>(() => messageInfos = fms.ScanForMessages().ToList());
     }
 
     [Test]
     public void FileSerialization()
     {
-        var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { Guid.NewGuid().ToString("N") }, Encoding.UTF8);
+        var fms = new FileMessageStore([TestFileFolders.FilesAbsPath], [Guid.NewGuid().ToString("N")], Encoding.UTF8);
         var tempFilename = Path.GetTempFileName();
         fms.Serialize(tempFilename, Encoding.UTF8);
         Assert.That(fms.Equals(FileMessageStore.Deserialize(tempFilename, Encoding.UTF8)), Is.True);
@@ -56,7 +56,7 @@ public class FileMessageStore_Serialization
     [Test]
     public void StreamSerialization()
     {
-        var fms = new FileMessageStore(new[] { TestFileFolders.FilesAbsPath }, new[] { Guid.NewGuid().ToString("N") }, Encoding.UTF8);
+        var fms = new FileMessageStore([TestFileFolders.FilesAbsPath], [Guid.NewGuid().ToString("N")], Encoding.UTF8);
         var stream = new MemoryStream();
         fms.Serialize(stream, Encoding.UTF8);
         stream.Position = 0;

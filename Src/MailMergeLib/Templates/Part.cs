@@ -12,8 +12,6 @@ namespace MailMergeLib.Templates;
 [YAXCustomSerializer(typeof(PartSerializer))]
 public class Part
 {
-    private string _value = string.Empty;
-
     /// <summary>
     /// Initialize an instance of a part.
     /// </summary>
@@ -30,7 +28,7 @@ public class Part
     {
         Type = type;
         Key = key;
-        _value = value;
+        Value = value;
     }
 
     /// <summary>
@@ -50,9 +48,9 @@ public class Part
     /// </summary>
     public string Value
     {
-        get => _value;
-        private set => _value = value;
-    }
+        get;
+        private set => field = value;
+    } = string.Empty;
 
     /// <summary>
     /// Determines whether the specified object is equal to the current object.
@@ -68,14 +66,11 @@ public class Part
     }
 
     /// <summary>
-    /// Compares the Part with an other instance of Part for equality.
+    /// Compares the Part with another instance of Part for equality.
     /// </summary>
     /// <param name="other"></param>
     /// <returns>Returns true, if both instances are equal, else false.</returns>
-    private bool Equals(Part other)
-    {
-        return Key == other.Key && Type == other.Type && Value == other.Value;
-    }
+    private bool Equals(Part other) => Key == other.Key && Type == other.Type && Value == other.Value;
 
     /// <summary>
     /// Determines the hash code of this instance.
@@ -85,9 +80,9 @@ public class Part
     {
         unchecked
         {
-            var hashCode = (Value != null ? Value.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Key != null ? Key.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (int)Type;
+            var hashCode = Value?.GetHashCode() ?? 0;
+            hashCode = (hashCode * 397) ^ (Key?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ Type.GetHashCode();
             return hashCode;
         }
     }

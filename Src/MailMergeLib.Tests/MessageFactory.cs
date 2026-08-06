@@ -28,7 +28,11 @@ public class MessageFactory
             // File.ReadAllText will include \r besides \n, while the internal C# representation is only \n
             HtmlText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, HtmlTextFile))), // contains image (<img src="..." />) which must be "inline-attached"
             PlainText = string.Join("\n", File.ReadAllLines(Path.Combine(TestFileFolders.FilesAbsPath, PlainTextFile))),
-            Templates = { new Template("Salutation", new Parts { new Part(PartType.Plain, "Hi", "Hi {FirstName}"), new Part(PartType.Plain, "Dear", "Dear {FirstName}"), new Part(PartType.Plain, "Formal", "Dear Sir or Madam") }, "Hi")},
+            Templates = { new Template("Salutation",
+            [
+                new Part(PartType.Plain, "Hi", "Hi {FirstName}"), new Part(PartType.Plain, "Dear", "Dear {FirstName}"),
+                new Part(PartType.Plain, "Formal", "Dear Sir or Madam")
+            ], "Hi")},
             Subject = Subject,
             Config = { FileBaseDirectory = TestFileFolders.FilesAbsPath, Organization = "MailMergeLib Inc.", CharacterEncoding = Encoding.UTF8, Priority = MessagePriority.Urgent }
         };
@@ -86,7 +90,7 @@ public class MessageFactory
         mmm.FileAttachments.Add(new FileAttachment(Path.GetFullPath(Path.Combine(TestFileFolders.FilesAbsPath, PdfFile)), "information.pdf"));
         mmm.StringAttachments.Add(new StringAttachment("some content", "content.txt"));
         mmm.Headers.Add(HeaderId.Comments, "some comments for header");
-        mmm.Config = new MailMergeLib.MessageConfig()
+        mmm.Config = new MessageConfig()
         {
             FileBaseDirectory = TestFileFolders.FilesAbsPath,
             CharacterEncoding = Encoding.UTF32,
@@ -122,15 +126,14 @@ public class MessageFactory
             Templates =
             {
                 new Template("Salutation",
-                    new Parts
-                    {
-                        new Part(PartType.Plain, "Hi", "Hi {FirstName}"),
-                        new Part(PartType.Html, "Hi", "Hi <b>{FirstName}</b><br>"),
-                        new Part(PartType.Plain, "Dear", "Dear {FirstName}"),
-                        new Part(PartType.Html, "Dear", "Dear <b>{FirstName}</b><br>"),
-                        new Part(PartType.Plain, "Formal", "Dear Sir or Madam"),
-                        new Part(PartType.Html, "Formal", "<b>Dear Sir or Madam</b><br>"),
-                    }, "Formal")
+                [
+                    new Part(PartType.Plain, "Hi", "Hi {FirstName}"),
+                    new Part(PartType.Html, "Hi", "Hi <b>{FirstName}</b><br>"),
+                    new Part(PartType.Plain, "Dear", "Dear {FirstName}"),
+                    new Part(PartType.Html, "Dear", "Dear <b>{FirstName}</b><br>"),
+                    new Part(PartType.Plain, "Formal", "Dear Sir or Madam"),
+                    new Part(PartType.Html, "Formal", "<b>Dear Sir or Madam</b><br>")
+                ], "Formal")
             },
             Subject = "Message to {FirstName}",
             Config =

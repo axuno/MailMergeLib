@@ -20,6 +20,8 @@ https://github.com/axuno/MailMergeLib/releases</PackageReleaseNotes>
         <LangVersion>latest</LangVersion>
         <PackageTags>smtp mime mail email merge template netcore netstandard netframework c#</PackageTags>
         <RepositoryType>Git</RepositoryType>
+        <!-- Suppress TFM support warnings for transitive dependencies that work but aren't officially tested -->
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
 
     <PropertyGroup>

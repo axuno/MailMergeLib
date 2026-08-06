@@ -47,26 +47,18 @@ public static class EmailValidator
     }
 
     static bool IsDigit(char c)
-    {
-        return (c >= '0' && c <= '9');
-    }
+        => (c >= '0' && c <= '9');
 
     static bool IsLetter(char c)
-    {
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-    }
+        => (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 
     static bool IsLetterOrDigit(char c)
-    {
-        return IsLetter(c) || IsDigit(c);
-    }
+        => IsLetter(c) || IsDigit(c);
 
     static bool IsAtom(char c, bool allowInternational)
-    {
-        return c < 128 ? IsLetterOrDigit(c) || AtomCharacters.IndexOf(c) != -1 : allowInternational;
-    }
+        => c < 128 ? IsLetterOrDigit(c) || AtomCharacters.IndexOf(c) != -1 : allowInternational;
 
-    static bool IsDomain(char c, bool allowInternational, ref SubDomainType type)
+    private static bool IsDomain(char c, bool allowInternational, ref SubDomainType type)
     {
         if (c < 128)
         {
@@ -246,10 +238,7 @@ public static class EmailValidator
         return groups == 4;
     }
 
-    static bool IsHexDigit(char c)
-    {
-        return (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || (c >= '0' && c <= '9');
-    }
+    static bool IsHexDigit(char c) => (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || (c >= '0' && c <= '9');
 
     // This needs to handle the following forms:
     //

@@ -10,8 +10,6 @@ namespace MailMergeLib;
 [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly)]
 public class SenderConfig
 {
-    private int _maxNumOfSmtpClients = 5;
-
     /// <summary>
     /// CTOR for MailMergeSender configuration.
     /// </summary>
@@ -25,14 +23,14 @@ public class SenderConfig
     [YAXSerializableField]
     public int MaxNumOfSmtpClients
     {
-        get { return _maxNumOfSmtpClients; }
+        get => field;
         set
         {
-            if (value <= 0) _maxNumOfSmtpClients = 1;
-            else if (value > 50) _maxNumOfSmtpClients = 50;
-            else _maxNumOfSmtpClients = value;
+            if (value <= 0) field = 1;
+            else if (value > 50) field = 50;
+            else field = value;
         }
-    }
+    } = 5;
 
     /// <summary>
     /// Gets or sets the array of configurations the SmtpClients will use.
@@ -41,7 +39,7 @@ public class SenderConfig
     /// </summary>
     [YAXSerializableField]
     [YAXSerializeAs("SmtpClients")]
-    public SmtpClientConfig[] SmtpClientConfig { get; set; } = {new SmtpClientConfig()};
+    public SmtpClientConfig[] SmtpClientConfig { get; set; } = [new SmtpClientConfig()];
 
     #region *** Equality ***
 
@@ -61,7 +59,7 @@ public class SenderConfig
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((SenderConfig) obj);
     }
 
@@ -70,7 +68,7 @@ public class SenderConfig
     {
         unchecked
         {
-            return (MaxNumOfSmtpClients * 397) ^ (SmtpClientConfig != null ? SmtpClientConfig.GetHashCode() : 0);
+            return (MaxNumOfSmtpClients * 397) ^ (SmtpClientConfig?.GetHashCode() ?? 0);
         }
     }
 

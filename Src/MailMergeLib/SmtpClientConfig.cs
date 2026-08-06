@@ -21,17 +21,10 @@ namespace MailMergeLib;
 [YAXSerializableType(FieldsToSerialize = YAXSerializationFields.AttributedFieldsOnly)]
 public class SmtpClientConfig
 {
-    private int _maxFailures = 2;
-    private int _retryDelayTime;
-    private string? _mailOutputDirectory;
-
     /// <summary>
     /// Creates a new instance of the configuration which is used by MailMergeSender in order to build a preconfigured SmtpClient.
     /// </summary>
-    public SmtpClientConfig()
-    {
-        MailOutputDirectory = System.IO.Path.GetTempPath();
-    }
+    public SmtpClientConfig() => MailOutputDirectory = System.IO.Path.GetTempPath();
 
 #if NETFRAMEWORK
         /// <summary>
@@ -39,10 +32,7 @@ public class SmtpClientConfig
         /// DeliveryMethod, MessageOutput, EnableSsl, Network.UserName, Network.Password, Network.Host, Network.Port, Network.ClientDomain
         /// </summary>
         [Obsolete("Use method " + nameof(ReadSmtpConfigurationFromConfigFile) + " instead", false)]
-        public void ReadSmtpConfigurationFromWebConfig()
-        {
-            ReadSmtpConfigurationFromConfigFile();
-        }
+        public void ReadSmtpConfigurationFromWebConfig() => ReadSmtpConfigurationFromConfigFile();
 
         /// <summary>
         /// MailMergeLib loads the following settings from system.net/mailSettings/smtp
@@ -78,7 +68,7 @@ public class SmtpClientConfig
                     break;
                 case System.Net.Mail.SmtpDeliveryMethod.SpecifiedPickupDirectory:
                     MessageOutput = MessageOutput.Directory;
-                    _mailOutputDirectory = smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation;
+                    MailOutputDirectory = smtpSection.SpecifiedPickupDirectory.PickupDirectoryLocation;
                     break;
             }
 
@@ -169,14 +159,14 @@ public class SmtpClientConfig
             {
                 MessageOutput.None => null,
                 MessageOutput.SmtpServer => null,
-                MessageOutput.Directory => (_mailOutputDirectory ?? System.IO.Path.GetTempPath()),
+                MessageOutput.Directory => (field ?? System.IO.Path.GetTempPath()),
 #if NETFRAMEWORK
                     MessageOutput.PickupDirectoryFromIis => GetPickDirectoryFromIis(),
 #endif
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
-        set => _mailOutputDirectory = value;
+        set;
     }
 
     /// <summary>
@@ -234,9 +224,9 @@ public class SmtpClientConfig
     [YAXSerializableField]
     public int MaxFailures
     {
-        get { return _maxFailures; }
-        set { _maxFailures = (value >= 1 && value <= 10) ? value : 1; }
-    }
+        get => field;
+        set => field = (value >= 1 && value <= 10) ? value : 1;
+    } = 2;
 
     /// <summary>
     /// Gets or sets the delay time in milliseconds (0-10000) to elaps between retries to send the message.
@@ -244,8 +234,8 @@ public class SmtpClientConfig
     [YAXSerializableField]
     public int RetryDelayTime
     {
-        get { return _retryDelayTime; }
-        set { _retryDelayTime = (value >= 0 && value <= 10000) ? value : 0; }
+        get => field;
+        set => field = (value >= 0 && value <= 10000) ? value : 0;
     }
 
 #if NETFRAMEWORK
@@ -307,17 +297,15 @@ public class SmtpClientConfig
     /// Excluding those properties which are not serialized:
     /// ClientCertificates, ServerCertificateValidationCallback, NetworkCredential, ProtocolLoggerDelegate
     /// </remarks>
-    protected bool Equals(SmtpClientConfig other)
-    {
-        return MaxFailures == other.MaxFailures && RetryDelayTime == other.RetryDelayTime &&
-               string.Equals(MailOutputDirectory, other.MailOutputDirectory) &&
-               string.Equals(Name, other.Name) &&
-               string.Equals(SmtpHost, other.SmtpHost) && SmtpPort == other.SmtpPort &&
-               string.Equals(ClientDomain, other.ClientDomain) && Equals(LocalEndPoint, other.LocalEndPoint) &&
-               MessageOutput == other.MessageOutput &&
-               SslProtocols == other.SslProtocols && SecureSocketOptions == other.SecureSocketOptions &&
-               Timeout == other.Timeout && DelayBetweenMessages == other.DelayBetweenMessages;
-    }
+    protected bool Equals(SmtpClientConfig other) =>
+        MaxFailures == other.MaxFailures && RetryDelayTime == other.RetryDelayTime &&
+        string.Equals(MailOutputDirectory, other.MailOutputDirectory) &&
+        string.Equals(Name, other.Name) &&
+        string.Equals(SmtpHost, other.SmtpHost) && SmtpPort == other.SmtpPort &&
+        string.Equals(ClientDomain, other.ClientDomain) && Equals(LocalEndPoint, other.LocalEndPoint) &&
+        MessageOutput == other.MessageOutput &&
+        SslProtocols == other.SslProtocols && SecureSocketOptions == other.SecureSocketOptions &&
+        Timeout == other.Timeout && DelayBetweenMessages == other.DelayBetweenMessages;
 
     /// <summary>
     ///  Returns the hashcode for this object.

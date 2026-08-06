@@ -74,9 +74,7 @@ public class FileAttachment
     }
 
     private bool Equals(FileAttachment fa)
-    {
-        return string.Equals(Filename, fa.Filename) && string.Equals(DisplayName, fa.DisplayName) && string.Equals(MimeType, fa.MimeType);
-    }
+        => string.Equals(Filename, fa.Filename) && string.Equals(DisplayName, fa.DisplayName) && string.Equals(MimeType, fa.MimeType);
 
     /// <summary>
     /// The HashCode for the FileAttachment.
